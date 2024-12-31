@@ -6,7 +6,7 @@ import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.evaluator.AVBLatencyMathTSNCF;
 import ktu.kaganndemirr.evaluator.AVBLatencyMathTSNRO;
 import ktu.kaganndemirr.evaluator.Evaluator;
-import ktu.kaganndemirr.outputs.shapers.phy.*;
+import ktu.kaganndemirr.output.shapers.phy.*;
 import ktu.kaganndemirr.parser.ApplicationParser;
 import ktu.kaganndemirr.parser.TopologyParser;
 import ktu.kaganndemirr.routing.phy.yen.heuristic.WPMDeadline;
