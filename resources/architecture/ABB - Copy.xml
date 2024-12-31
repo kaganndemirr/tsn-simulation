@@ -1,0 +1,180 @@
+<graph>
+	<node name ="B000"/>
+
+	<node name="B100" type="switch"/>
+	<node name="B101" type="switch"/>
+	<node name="B102" type="switch"/>
+	<node name="B103" type="switch"/>
+	<node name="B104" type="switch"/>
+
+	<node name="B200" type="switch"/>
+	<node name="B201" type="switch"/>
+	<node name="B202" type="switch"/>
+	<node name="B203" type="switch"/>
+	<node name="B204" type="switch"/>
+	<node name="B205" type="switch"/>
+	<node name="B206" type="switch"/>
+	<node name="B207" type="switch"/>
+	<node name="B208" type="switch"/>
+	<node name="B209" type="switch"/>
+
+	<node name="B300" type="switch"/>
+	<node name="B301" type="switch"/>
+	<node name="B302" type="switch"/>
+	<node name="B303" type="switch"/>
+	<node name="B304" type="switch"/>
+	<node name="B305" type="switch"/>
+	<node name="B306" type="switch"/>
+	<node name="B307" type="switch"/>
+	<node name="B308" type="switch"/>
+	<node name="B309" type="switch"/>
+	<node name="B310" type="switch"/>
+	<node name="B311" type="switch"/>
+	<node name="B312" type="switch"/>
+	<node name="B313" type="switch"/>
+	<node name="B314" type="switch"/>
+	<node name="B315" type="switch"/>
+	<node name="B316" type="switch"/>
+	<node name="B317" type="switch"/>
+	<node name="B318" type="switch"/>
+	<node name="B319" type="switch"/>
+
+	<node name="ES400" type="endsystem"/>
+	<node name="ES401" type="endsystem"/>
+	<node name="ES402" type="endsystem"/>
+	<node name="ES403" type="endsystem"/>
+	<node name="ES404" type="endsystem"/>
+	<node name="ES405" type="endsystem"/>
+	<node name="ES406" type="endsystem"/>
+	<node name="ES407" type="endsystem"/>
+	<node name="ES408" type="endsystem"/>
+	<node name="ES409" type="endsystem"/>
+	<node name="ES410" type="endsystem"/>
+	<node name="ES411" type="endsystem"/>
+	<node name="ES412" type="endsystem"/>
+	<node name="ES413" type="endsystem"/>
+	<node name="ES414" type="endsystem"/>
+	<node name="ES415" type="endsystem"/>
+	<node name="ES416" type="endsystem"/>
+	<node name="ES417" type="endsystem"/>
+	<node name="ES418" type="endsystem"/>
+	<node name="ES419" type="endsystem"/>
+
+	<edge source="B000" target="B100" rate=1000 weight=1.0/>
+	<edge source="B000" target="B101" rate=1000 weight=1.0/>
+	<edge source="B000" target="B101" rate=1000 weight=1.0/>
+	<edge source="B000" target="B102" rate=1000 weight=1.0/>
+	<edge source="B000" target="B103" rate=1000 weight=1.0/>
+	<edge source="B000" target="B104" rate=1000 weight=1.0/>
+
+	<edge source="B100" target="B101" rate=1000 weight=1.0/>
+	<edge source="B101" target="B102" rate=1000 weight=1.0/>
+	<edge source="B102" target="B103" rate=1000 weight=1.0/>
+	<edge source="B103" target="B104" rate=1000 weight=1.0/>
+	<edge source="B104" target="B100" rate=1000 weight=1.0/>
+
+	<edge source="B100" target="B200" rate=1000 weight=1.0/>
+	<edge source="B100" target="B201" rate=1000 weight=1.0/>
+	<edge source="B101" target="B202" rate=1000 weight=1.0/>
+	<edge source="B101" target="B203" rate=1000 weight=1.0/>
+	<edge source="B102" target="B204" rate=1000 weight=1.0/>
+	<edge source="B102" target="B205" rate=1000 weight=1.0/>
+	<edge source="B103" target="B206" rate=1000 weight=1.0/>
+	<edge source="B103" target="B207" rate=1000 weight=1.0/>
+	<edge source="B104" target="B208" rate=1000 weight=1.0/>
+	<edge source="B104" target="B209" rate=1000 weight=1.0/>
+
+	<edge source="B200" target="B201" rate=1000 weight=1.0/>
+	<edge source="B201" target="B202" rate=1000 weight=1.0/>
+	<edge source="B202" target="B203" rate=1000 weight=1.0/>
+	<edge source="B203" target="B204" rate=1000 weight=1.0/>
+	<edge source="B204" target="B205" rate=1000 weight=1.0/>
+	<edge source="B205" target="B206" rate=1000 weight=1.0/>
+	<edge source="B206" target="B207" rate=1000 weight=1.0/>
+	<edge source="B207" target="B208" rate=1000 weight=1.0/>
+	<edge source="B208" target="B209" rate=1000 weight=1.0/>
+	<edge source="B209" target="B200" rate=1000 weight=1.0/>
+
+	<edge source="B200" target="B300" rate=1000 weight=1.0/>
+	<edge source="B200" target="B301" rate=1000 weight=1.0/>
+	<edge source="B201" target="B302" rate=1000 weight=1.0/>
+	<edge source="B201" target="B303" rate=1000 weight=1.0/>
+	<edge source="B202" target="B304" rate=1000 weight=1.0/>
+	<edge source="B202" target="B305" rate=1000 weight=1.0/>
+	<edge source="B203" target="B306" rate=1000 weight=1.0/>
+	<edge source="B203" target="B307" rate=1000 weight=1.0/>
+	<edge source="B204" target="B308" rate=1000 weight=1.0/>
+	<edge source="B204" target="B309" rate=1000 weight=1.0/>
+	<edge source="B205" target="B310" rate=1000 weight=1.0/>
+	<edge source="B205" target="B311" rate=1000 weight=1.0/>
+	<edge source="B206" target="B312" rate=1000 weight=1.0/>
+	<edge source="B206" target="B313" rate=1000 weight=1.0/>
+	<edge source="B207" target="B314" rate=1000 weight=1.0/>
+	<edge source="B207" target="B315" rate=1000 weight=1.0/>
+	<edge source="B208" target="B316" rate=1000 weight=1.0/>
+	<edge source="B208" target="B317" rate=1000 weight=1.0/>
+	<edge source="B209" target="B318" rate=1000 weight=1.0/>
+	<edge source="B209" target="B319" rate=1000 weight=1.0/>
+
+	<edge source="B300" target="B301" rate=1000 weight=1.0/>
+	<edge source="B301" target="B302" rate=1000 weight=1.0/>
+	<edge source="B302" target="B303" rate=1000 weight=1.0/>
+	<edge source="B303" target="B304" rate=1000 weight=1.0/>
+	<edge source="B304" target="B305" rate=1000 weight=1.0/>
+	<edge source="B305" target="B306" rate=1000 weight=1.0/>
+	<edge source="B306" target="B307" rate=1000 weight=1.0/>
+	<edge source="B307" target="B308" rate=1000 weight=1.0/>
+	<edge source="B308" target="B309" rate=1000 weight=1.0/>
+	<edge source="B309" target="B310" rate=1000 weight=1.0/>
+	<edge source="B310" target="B311" rate=1000 weight=1.0/>
+	<edge source="B311" target="B312" rate=1000 weight=1.0/>
+	<edge source="B312" target="B313" rate=1000 weight=1.0/>
+	<edge source="B313" target="B314" rate=1000 weight=1.0/>
+	<edge source="B314" target="B315" rate=1000 weight=1.0/>
+	<edge source="B315" target="B316" rate=1000 weight=1.0/>
+	<edge source="B316" target="B317" rate=1000 weight=1.0/>
+	<edge source="B317" target="B318" rate=1000 weight=1.0/>
+	<edge source="B318" target="B319" rate=1000 weight=1.0/>
+	<edge source="B319" target="B300" rate=1000 weight=1.0/>
+
+	<edge source="ES400" target="B300" rate=1000 weight=1.0/>
+	<edge source="ES400" target="B301" rate=1000 weight=1.0/>
+	<edge source="ES401" target="B301" rate=1000 weight=1.0/>
+	<edge source="ES401" target="B302" rate=1000 weight=1.0/>
+	<edge source="ES402" target="B302" rate=1000 weight=1.0/>
+	<edge source="ES402" target="B303" rate=1000 weight=1.0/>
+	<edge source="ES403" target="B303" rate=1000 weight=1.0/>
+	<edge source="ES403" target="B304" rate=1000 weight=1.0/>
+	<edge source="ES404" target="B304" rate=1000 weight=1.0/>
+	<edge source="ES404" target="B305" rate=1000 weight=1.0/>
+	<edge source="ES405" target="B305" rate=1000 weight=1.0/>
+	<edge source="ES405" target="B306" rate=1000 weight=1.0/>
+	<edge source="ES406" target="B306" rate=1000 weight=1.0/>
+	<edge source="ES406" target="B307" rate=1000 weight=1.0/>
+	<edge source="ES407" target="B307" rate=1000 weight=1.0/>
+	<edge source="ES407" target="B308" rate=1000 weight=1.0/>
+	<edge source="ES408" target="B308" rate=1000 weight=1.0/>
+	<edge source="ES408" target="B309" rate=1000 weight=1.0/>
+	<edge source="ES409" target="B309" rate=1000 weight=1.0/>
+	<edge source="ES409" target="B310" rate=1000 weight=1.0/>
+	<edge source="ES410" target="B310" rate=1000 weight=1.0/>
+	<edge source="ES410" target="B311" rate=1000 weight=1.0/>
+	<edge source="ES411" target="B311" rate=1000 weight=1.0/>
+	<edge source="ES411" target="B312" rate=1000 weight=1.0/>
+	<edge source="ES412" target="B312" rate=1000 weight=1.0/>
+	<edge source="ES412" target="B313" rate=1000 weight=1.0/>
+	<edge source="ES413" target="B313" rate=1000 weight=1.0/>
+	<edge source="ES413" target="B314" rate=1000 weight=1.0/>
+	<edge source="ES414" target="B314" rate=1000 weight=1.0/>
+	<edge source="ES414" target="B315" rate=1000 weight=1.0/>
+	<edge source="ES415" target="B315" rate=1000 weight=1.0/>
+	<edge source="ES415" target="B316" rate=1000 weight=1.0/>
+	<edge source="ES416" target="B316" rate=1000 weight=1.0/>
+	<edge source="ES416" target="B317" rate=1000 weight=1.0/>
+	<edge source="ES417" target="B317" rate=1000 weight=1.0/>
+	<edge source="ES417" target="B318" rate=1000 weight=1.0/>
+	<edge source="ES418" target="B318" rate=1000 weight=1.0/>
+	<edge source="ES418" target="B319" rate=1000 weight=1.0/>
+	<edge source="ES419" target="B319" rate=1000 weight=1.0/>
+	<edge source="ES419" target="B300" rate=1000 weight=1.0/>
+</graph>

@@ -1,0 +1,168 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Applications>
+    <AVBApplication name="AVB_1">
+        <AVBClass>CLASS_A</AVBClass>
+        <PayloadSize>162</PayloadSize>
+        <NoOfFrames>1</NoOfFrames>
+        <Source name="ES_LIDAR"/>
+        <Destinations>
+            <Dest name="ES_HUD"/>
+        </Destinations>
+    </AVBApplication>
+    <AVBApplication name="AVB_2">
+        <AVBClass>CLASS_A</AVBClass>
+        <PayloadSize>325</PayloadSize>
+        <NoOfFrames>1</NoOfFrames>
+        <Source name="ES_FRONTLEFTCAMERA"/>
+        <Destinations>
+            <Dest name="ES_OBU"/>
+        </Destinations>
+    </AVBApplication>
+    <AVBApplication name="AVB_3">
+        <AVBClass>CLASS_A</AVBClass>
+        <PayloadSize>325</PayloadSize>
+        <NoOfFrames>1</NoOfFrames>
+        <Source name="ES_FRONTLEFTCAMERA"/>
+        <Destinations>
+            <Dest name="ES_HUD"/>
+        </Destinations>
+    </AVBApplication>
+    <AVBApplication name="AVB_4">
+        <AVBClass>CLASS_A</AVBClass>
+        <PayloadSize>325</PayloadSize>
+        <NoOfFrames>1</NoOfFrames>
+        <Source name="ES_FRONTRIGHTCAMERA"/>
+        <Destinations>
+            <Dest name="ES_OBU"/>
+        </Destinations>
+    </AVBApplication>
+    <AVBApplication name="AVB_5">
+        <AVBClass>CLASS_A</AVBClass>
+        <PayloadSize>325</PayloadSize>
+        <NoOfFrames>1</NoOfFrames>
+        <Source name="ES_FRONTRIGHTCAMERA"/>
+        <Destinations>
+            <Dest name="ES_HUD"/>
+        </Destinations>
+    </AVBApplication>
+    <AVBApplication name="AVB_6">
+        <AVBClass>CLASS_A</AVBClass>
+        <PayloadSize>325</PayloadSize>
+        <NoOfFrames>1</NoOfFrames>
+        <Source name="ES_REARLEFTCAMERA"/>
+        <Destinations>
+            <Dest name="ES_OBU"/>
+        </Destinations>
+    </AVBApplication>
+    <AVBApplication name="AVB_7">
+        <AVBClass>CLASS_A</AVBClass>
+        <PayloadSize>325</PayloadSize>
+        <NoOfFrames>1</NoOfFrames>
+        <Source name="ES_REARLEFTCAMERA"/>
+        <Destinations>
+            <Dest name="ES_HUD"/>
+        </Destinations>
+    </AVBApplication>
+    <AVBApplication name="AVB_7">
+        <AVBClass>CLASS_A</AVBClass>
+        <PayloadSize>325</PayloadSize>
+        <NoOfFrames>1</NoOfFrames>
+        <Source name="ES_REARRIGHTCAMERA"/>
+        <Destinations>
+            <Dest name="ES_OBU"/>
+        </Destinations>
+    </AVBApplication>
+    <AVBApplication name="AVB_8">
+        <AVBClass>CLASS_A</AVBClass>
+        <PayloadSize>325</PayloadSize>
+        <NoOfFrames>1</NoOfFrames>
+        <Source name="ES_REARRIGHTCAMERA"/>
+        <Destinations>
+            <Dest name="ES_HUD"/>
+        </Destinations>
+    </AVBApplication>
+    <AVBApplication name="AVB_9">
+        <AVBClass>CLASS_A</AVBClass>
+        <PayloadSize>325</PayloadSize>
+        <NoOfFrames>1</NoOfFrames>
+        <Source name="ES_HUD"/>
+        <Destinations>
+            <Dest name="ES_REARDISPLAY"/>
+        </Destinations>
+    </AVBApplication>
+    <AVBApplication name="AVB_10">
+        <AVBClass>CLASS_A</AVBClass>
+        <PayloadSize>162</PayloadSize>
+        <NoOfFrames>1</NoOfFrames>
+        <Source name="ES_OBU"/>
+        <Destinations>
+            <Dest name="ES_REARDISPLAY"/>
+        </Destinations>
+    </AVBApplication>
+    <TTApplication name="TT1">
+        <Source name="ES_STEERING">
+            <Destinations>
+                <GCL offset="0" duration="1.4" frequency="1"/>
+                <Dest name="ES_ENGINEACTUATOR">
+                    <Route>
+                        <Bridge name="B_FRONTSWITCH"/>
+                    </Route>
+                </Dest>
+            </Destinations>
+        </Source>
+    </TTApplication>
+    <TTApplication name="TT2">
+        <Source name="ES_FRONTLEFTWHEEL">
+            <Destinations>
+                <GCL offset="0" duration="1.4" frequency="1"/>
+                <Dest name="ES_ENGINEACTUATOR">
+                    <Route>
+                        <Bridge name="B_FRONTLEFTSWITCH"/>
+                        <Bridge name="B_FRONTSWITCH"/>
+                    </Route>
+                </Dest>
+            </Destinations>
+        </Source>
+    </TTApplication>
+    <TTApplication name="TT3">
+        <Source name="ES_FRONTRIGHTWHEEL">
+            <Destinations>
+                <GCL offset="0" duration="1.4" frequency="1"/>
+                <Dest name="ES_ENGINEACTUATOR">
+                    <Route>
+                        <Bridge name="B_FRONTRIGHTSWITCH"/>
+                        <Bridge name="B_FRONTSWITCH"/>
+                    </Route>
+                </Dest>
+            </Destinations>
+        </Source>
+    </TTApplication>
+    <TTApplication name="TT4">
+        <Source name="ES_REARLEFTWHEEL">
+            <Destinations>
+                <GCL offset="0" duration="1.4" frequency="1"/>
+                <Dest name="ES_ENGINEACTUATOR">
+                    <Route>
+                        <Bridge name="B_REARLEFTSWITCH"/>
+                        <Bridge name="B_REARSWITCH"/>
+                        <Bridge name="B_FRONTSWITCH"/>
+                    </Route>
+                </Dest>
+            </Destinations>
+        </Source>
+    </TTApplication>
+    <TTApplication name="TT5">
+        <Source name="ES_REARRIGHTWHEEL">
+            <Destinations>
+                <GCL offset="0" duration="1.4" frequency="1"/>
+                <Dest name="ES_ENGINEACTUATOR">
+                    <Route>
+                        <Bridge name="B_REARRIGHTSWITCH"/>
+                        <Bridge name="B_REARSWITCH"/>
+                        <Bridge name="B_FRONTSWITCH"/>
+                    </Route>
+                </Dest>
+            </Destinations>
+        </Source>
+    </TTApplication>
+</Applications>

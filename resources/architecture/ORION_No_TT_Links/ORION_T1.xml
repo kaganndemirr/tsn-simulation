@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
+        http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+
+    <graph id="G" edgedefault="undirected">
+        <node id="es_du1"/>
+        <node id="es_du2"/>
+        <node id="es_du3"/>
+        <node id="es_sband1"/>
+        <node id="es_sband2"/>
+        <node id="es_mimu1"/>
+        <node id="es_mimu2"/>
+        <node id="es_mimu3"/>
+        <node id="es_startr1"/>
+        <node id="es_startr2"/>
+        <node id="es_gps1"/>
+        <node id="es_gps2"/>
+        <node id="es_cmriu1"/>
+        <node id="es_cmriu2"/>
+        <node id="es_bfcu"/>
+        <node id="es_fcm1"/>
+        <node id="es_lcm1"/>
+        <node id="es_rcm1"/>
+        <node id="es_fcm2"/>
+        <node id="es_lcm2"/>
+        <node id="es_rcm2"/>
+        <node id="es_cm1ca"/>
+        <node id="es_cm1cb"/>
+        <node id="es_cm2ca"/>
+        <node id="es_cm2cb"/>
+        <node id="es_sm1ca"/>
+        <node id="es_sm1cb"/>
+        <node id="es_sm2ca"/>
+        <node id="es_sm2cb"/>
+        <node id="es_smriu1"/>
+        <node id="es_smriu2"/>
+        <node id="sw11"/>
+        <node id="sw12"/>
+        <node id="sw13"/>
+        <node id="sw14"/>
+        <node id="sw21"/>
+        <node id="sw22"/>
+        <node id="sw31"/>
+        <node id="sw32"/>
+        <node id="sw41"/>
+        <node id="sw42"/>
+        <node id="sw51"/>
+        <node id="sw52"/>
+        <node id="sw6"/>
+        <node id="sw7"/>
+        <node id="sw8"/>
+
+
+        <edge source="es_du1" target="sw11"/>
+        <edge source="es_du2" target="sw11"/>
+        <edge source="es_du3" target="sw11"/>
+        <edge source="es_sband1" target="sw12"/>
+        <edge source="es_sband2" target="sw12"/>
+        <edge source="es_mimu1" target="sw13"/>
+        <edge source="es_mimu2" target="sw13"/>
+        <edge source="es_mimu3" target="sw13"/>
+        <edge source="es_startr1" target="sw13"/>
+        <edge source="es_startr2" target="sw13"/>
+        <edge source="es_gps1" target="sw14"/>
+        <edge source="es_gps2" target="sw14"/>
+        <edge source="es_bfcu" target="sw22"/>
+        <edge source="es_cmriu2" target="sw22"/>
+        <edge source="es_cmriu1" target="sw21"/>
+        <edge source="es_fcm1" target="sw31"/>
+        <edge source="es_lcm1" target="sw31"/>
+        <edge source="es_rcm1" target="sw31"/>
+        <edge source="es_fcm2" target="sw32"/>
+        <edge source="es_lcm2" target="sw32"/>
+        <edge source="es_rcm2" target="sw32"/>
+        <edge source="es_cm1ca" target="sw41"/>
+        <edge source="es_cm1cb" target="sw41"/>
+        <edge source="es_cm2ca" target="sw42"/>
+        <edge source="es_cm2cb" target="sw42"/>
+        <edge source="es_sm1ca" target="sw51"/>
+        <edge source="es_sm1cb" target="sw51"/>
+        <edge source="es_sm2ca" target="sw52"/>
+        <edge source="es_sm2cb" target="sw52"/>
+        <edge source="es_smriu1" target="sw6"/>
+        <edge source="es_smriu2" target="sw6"/>
+        <edge source="sw11" target="sw21"/>
+        <edge source="sw12" target="sw21"/>
+        <edge source="sw12" target="sw22"/>
+        <edge source="sw13" target="sw21"/>
+        <edge source="sw13" target="sw22"/>
+        <edge source="sw14" target="sw21"/>
+        <edge source="sw14" target="sw22"/>
+        <edge source="sw31" target="sw21"/>
+        <edge source="sw31" target="sw41"/>
+        <edge source="sw32" target="sw42"/>
+        <edge source="sw31" target="sw6"/>
+        <edge source="sw32" target="sw6"/>
+        <edge source="sw51" target="sw41"/>
+        <edge source="sw52" target="sw42"/>
+        <edge source="sw7" target="sw21"/>
+        <edge source="sw7" target="sw22"/>
+        <edge source="sw7" target="sw31"/>
+        <edge source="sw7" target="sw32"/>
+        <edge source="sw8" target="sw31"/>
+        <edge source="sw8" target="sw52"/>
+    </graph>
+</graphml>

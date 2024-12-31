@@ -42,7 +42,7 @@ public class WPMMethods {
 
     private static GraphPath<Node, GCLEdge> v2SRTTTLengthGraphPath(double wSRT, double wTT, double wLength, List<Double> srtCostList, List<Double> ttCostList, List<GraphPath<Node, GCLEdge>> graphPathList, String wpmValueType) {
         Map<GraphPath<Node, GCLEdge>, Integer> graphPathPathScoreMap = new HashMap<>();
-        GraphPath<Node, GCLEdge> selectedGraphPath = null;
+        GraphPath<Node, GCLEdge> selectedGraphPath;
 
         if(Objects.equals(wpmValueType, Constants.ACTUAL)){
             for(int i = 0; i < graphPathList.size(); i++){
@@ -72,17 +72,7 @@ public class WPMMethods {
                     }
                 }
             }
-            Map<GraphPath<Node, GCLEdge>, Integer> sortedGraphPathPathScoreMap = graphPathPathScoreMap.entrySet()
-                    .stream()
-                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                    .collect(Collectors.toMap(
-                            Map.Entry::getKey,
-                            Map.Entry::getValue,
-                            (e1, e2) -> e1,
-                            LinkedHashMap::new
-                    ));
 
-            selectedGraphPath = sortedGraphPathPathScoreMap.entrySet().stream().findFirst().get().getKey();
         }
         else if(Objects.equals(wpmValueType, Constants.RELATIVE)){
             for(int i = 0; i < graphPathList.size(); i++){
@@ -124,18 +114,24 @@ public class WPMMethods {
                     }
                 }
             }
-            Map<GraphPath<Node, GCLEdge>, Integer> sortedGraphPathPathScoreMap = graphPathPathScoreMap.entrySet()
-                    .stream()
-                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                    .collect(Collectors.toMap(
-                            Map.Entry::getKey,
-                            Map.Entry::getValue,
-                            (e1, e2) -> e1,
-                            LinkedHashMap::new
-                    ));
-
-            selectedGraphPath = sortedGraphPathPathScoreMap.entrySet().stream().findFirst().get().getKey();
         }
+
+        //All graphPaths same so pick first one
+        if(graphPathPathScoreMap.isEmpty()){
+            graphPathPathScoreMap.put(graphPathList.getFirst(), 1);
+        }
+
+        Map<GraphPath<Node, GCLEdge>, Integer> sortedGraphPathPathScoreMap = graphPathPathScoreMap.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new
+                ));
+
+        selectedGraphPath = sortedGraphPathPathScoreMap.entrySet().stream().findFirst().get().getKey();
 
         return selectedGraphPath;
     }

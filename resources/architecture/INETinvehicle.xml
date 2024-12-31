@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
+        http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+
+    <graph id="G" edgedefault="undirected">
+        <node id="ES_rearLeftCamera"/>
+
+        <node id="ES_rearRightCamera"/>
+        <node id="ES_rearLeftWheel"/>
+        <node id="B_rearLeftSwitch"/>
+        <node id="B_rearRightSwitch"/>
+        <node id="ES_rearRightWheel"/>
+
+        <node id="ES_obu"/>
+        <node id="B_rearSwitch"/>
+        <node id="ES_rearDisplay"/>
+        <node id="ES_hud"/>
+        <node id="B_frontSwitch"/>
+        <node id="ES_engineActuator"/>
+        <node id="ES_steering"/>
+        <node id="ES_frontLeftWheel"/>
+        <node id="B_frontLeftSwitch"/>
+        <node id="B_frontRightSwitch"/>
+
+        <node id="ES_frontRightWheel"/>
+        <node id="ES_frontLeftCamera"/>
+        <node id="ES_lidar"/>
+        <node id="ES_frontRightCamera"/>
+
+        <edge source="ES_rearLeftCamera" target="B_rearLeftSwitch"/>
+        <edge source="ES_rearRightCamera" target="B_rearRightSwitch"/>
+        <edge source="ES_rearRightWheel" target="B_rearRightSwitch"/>
+        <edge source="B_rearRightSwitch" target="B_rearLeftSwitch"/>
+        <edge source="B_rearSwitch" target="B_rearLeftSwitch"/>
+        <edge source="ES_rearLeftWheel" target="B_rearLeftSwitch"/>
+
+        <edge source="ES_rearDisplay" target="B_rearSwitch"/>
+        <edge source="ES_obu" target="B_rearSwitch"/>
+        <edge source="ES_engineActuator" target="B_frontSwitch"/>
+        <edge source="ES_hud" target="B_frontSwitch"/>
+        <edge source="ES_steering" target="B_frontSwitch"/>
+
+
+        <edge source="B_frontSwitch" target="B_frontLeftSwitch"/>
+        <edge source="B_rearSwitch" target="B_frontSwitch"/>
+        <edge source="B_rearSwitch" target="B_rearRightSwitch"/>
+        <edge source="B_frontSwitch" target="B_frontRightSwitch"/>
+        <edge source="ES_frontRightWheel" target="B_frontRightSwitch"/>
+        <edge source="B_frontRightSwitch" target="B_frontLeftSwitch"/>
+        <edge source="ES_frontLeftWheel" target="B_frontLeftSwitch"/>
+        <edge source="ES_frontRightCamera" target="B_frontRightSwitch"/>
+        <edge source="ES_lidar" target="B_frontSwitch"/>
+        <edge source="ES_frontLeftCamera" target="B_frontLeftSwitch"/>
+    </graph>
+</graphml>

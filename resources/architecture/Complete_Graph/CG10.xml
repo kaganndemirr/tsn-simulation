@@ -1,0 +1,136 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+    <graph edgedefault="directed">
+        <node id="SW1"/>
+        <node id="SW2"/>
+        <node id="SW3"/>
+        <node id="SW4"/>
+        <node id="SW5"/>
+        <node id="SW6"/>
+        <node id="SW7"/>
+        <node id="SW8"/>
+        <node id="SW9"/>
+        <node id="SW10"/>
+        <node id="ES1"/>
+        <node id="ES2"/>
+        <node id="ES3"/>
+        <node id="ES4"/>
+        <node id="ES5"/>
+        <node id="ES6"/>
+        <node id="ES7"/>
+        <node id="ES8"/>
+        <node id="ES9"/>
+        <node id="ES10"/>
+        <edge source="SW1" target="SW2"/>
+        <edge source="SW1" target="SW3"/>
+        <edge source="SW1" target="SW4"/>
+        <edge source="SW1" target="SW5"/>
+        <edge source="SW1" target="SW6"/>
+        <edge source="SW1" target="SW7"/>
+        <edge source="SW1" target="SW8"/>
+        <edge source="SW1" target="SW9"/>
+        <edge source="SW1" target="SW10"/>
+        <edge source="SW1" target="ES1"/>
+        <edge source="SW2" target="SW1"/>
+        <edge source="SW2" target="SW3"/>
+        <edge source="SW2" target="SW4"/>
+        <edge source="SW2" target="SW5"/>
+        <edge source="SW2" target="SW6"/>
+        <edge source="SW2" target="SW7"/>
+        <edge source="SW2" target="SW8"/>
+        <edge source="SW2" target="SW9"/>
+        <edge source="SW2" target="SW10"/>
+        <edge source="SW2" target="ES2"/>
+        <edge source="SW3" target="SW1"/>
+        <edge source="SW3" target="SW2"/>
+        <edge source="SW3" target="SW4"/>
+        <edge source="SW3" target="SW5"/>
+        <edge source="SW3" target="SW6"/>
+        <edge source="SW3" target="SW7"/>
+        <edge source="SW3" target="SW8"/>
+        <edge source="SW3" target="SW9"/>
+        <edge source="SW3" target="SW10"/>
+        <edge source="SW3" target="ES3"/>
+        <edge source="SW4" target="SW1"/>
+        <edge source="SW4" target="SW2"/>
+        <edge source="SW4" target="SW3"/>
+        <edge source="SW4" target="SW5"/>
+        <edge source="SW4" target="SW6"/>
+        <edge source="SW4" target="SW7"/>
+        <edge source="SW4" target="SW8"/>
+        <edge source="SW4" target="SW9"/>
+        <edge source="SW4" target="SW10"/>
+        <edge source="SW4" target="ES4"/>
+        <edge source="SW5" target="SW1"/>
+        <edge source="SW5" target="SW2"/>
+        <edge source="SW5" target="SW3"/>
+        <edge source="SW5" target="SW4"/>
+        <edge source="SW5" target="SW6"/>
+        <edge source="SW5" target="SW7"/>
+        <edge source="SW5" target="SW8"/>
+        <edge source="SW5" target="SW9"/>
+        <edge source="SW5" target="SW10"/>
+        <edge source="SW5" target="ES5"/>
+        <edge source="SW6" target="SW1"/>
+        <edge source="SW6" target="SW2"/>
+        <edge source="SW6" target="SW3"/>
+        <edge source="SW6" target="SW4"/>
+        <edge source="SW6" target="SW5"/>
+        <edge source="SW6" target="SW7"/>
+        <edge source="SW6" target="SW8"/>
+        <edge source="SW6" target="SW9"/>
+        <edge source="SW6" target="SW10"/>
+        <edge source="SW6" target="ES6"/>
+        <edge source="SW7" target="SW1"/>
+        <edge source="SW7" target="SW2"/>
+        <edge source="SW7" target="SW3"/>
+        <edge source="SW7" target="SW4"/>
+        <edge source="SW7" target="SW5"/>
+        <edge source="SW7" target="SW6"/>
+        <edge source="SW7" target="SW8"/>
+        <edge source="SW7" target="SW9"/>
+        <edge source="SW7" target="SW10"/>
+        <edge source="SW7" target="ES7"/>
+        <edge source="SW8" target="SW1"/>
+        <edge source="SW8" target="SW2"/>
+        <edge source="SW8" target="SW3"/>
+        <edge source="SW8" target="SW4"/>
+        <edge source="SW8" target="SW5"/>
+        <edge source="SW8" target="SW6"/>
+        <edge source="SW8" target="SW7"/>
+        <edge source="SW8" target="SW9"/>
+        <edge source="SW8" target="SW10"/>
+        <edge source="SW8" target="ES8"/>
+        <edge source="SW9" target="SW1"/>
+        <edge source="SW9" target="SW2"/>
+        <edge source="SW9" target="SW3"/>
+        <edge source="SW9" target="SW4"/>
+        <edge source="SW9" target="SW5"/>
+        <edge source="SW9" target="SW6"/>
+        <edge source="SW9" target="SW7"/>
+        <edge source="SW9" target="SW8"/>
+        <edge source="SW9" target="SW10"/>
+        <edge source="SW9" target="ES9"/>
+        <edge source="SW10" target="SW1"/>
+        <edge source="SW10" target="SW2"/>
+        <edge source="SW10" target="SW3"/>
+        <edge source="SW10" target="SW4"/>
+        <edge source="SW10" target="SW5"/>
+        <edge source="SW10" target="SW6"/>
+        <edge source="SW10" target="SW7"/>
+        <edge source="SW10" target="SW8"/>
+        <edge source="SW10" target="SW9"/>
+        <edge source="SW10" target="ES10"/>
+        <edge source="ES1" target="SW1"/>
+        <edge source="ES2" target="SW2"/>
+        <edge source="ES3" target="SW3"/>
+        <edge source="ES4" target="SW4"/>
+        <edge source="ES5" target="SW5"/>
+        <edge source="ES6" target="SW6"/>
+        <edge source="ES7" target="SW7"/>
+        <edge source="ES8" target="SW8"/>
+        <edge source="ES9" target="SW9"/>
+        <edge source="ES10" target="SW10"/>
+    </graph>
+</graphml>

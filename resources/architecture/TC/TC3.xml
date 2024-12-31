@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
+        http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+
+    <graph id="G" edgedefault="undirected">
+        <node id="SW_B1"/>
+        <node id="SW_B2"/>
+        <node id="SW_B3"/>
+        <node id="SW_B4"/>
+        <node id="SW_B5"/>
+        <node id="SW_B6"/>
+        <node id="SW_B7"/>
+        <node id="SW_B8"/>
+        <node id="SW_B9"/>
+        <node id="SW_B10"/>
+        <node id="SW_B11"/>
+        <node id="SW_B12"/>
+        <node id="SW_B13"/>
+        <node id="SW_B14"/>
+        <node id="SW_B15"/>
+        <node id="SW_B16"/>
+        <node id="SW_B17"/>
+        <node id="SW_B18"/>
+        <node id="SW_B19"/>
+        <node id="SW_B20"/>
+        <node id="SW_B1_1"/>
+        <node id="SW_B5_1"/>
+        <node id="SW_B7_1"/>
+        <node id="SW_B10_1"/>
+        <node id="SW_B11_1"/>
+        <node id="SW_B12_1"/>
+        <node id="SW_B13_1"/>
+        <node id="SW_B15_1"/>
+        <node id="SW_B17_1"/>
+        <node id="SW_B18_1"/>
+        <node id="SW_B19_1"/>
+        <node id="SW_B20_1"/>
+        <node id="ES_FRONT_CAM"/>
+        <node id="ES_REAR_CAM"/>
+        <node id="ES_FRONT_SVCAM"/>
+        <node id="ES_LEFT_SVCAM"/>
+        <node id="ES_RIGHT_SVCAM"/>
+        <node id="ES_REAR_SVCAM"/>
+        <node id="ES_FRONT_RAD"/>
+        <node id="ES_LEFT_FRONT_RAD"/>
+        <node id="ES_RIGHT_FRONT_RAD"/>
+        <node id="ES_LEFT_REAR_RAD"/>
+        <node id="ES_RIGHT_REAR_RAD"/>
+        <node id="ES_REAR_RAD"/>
+        <node id="ES_CTRL1"/>
+        <node id="ES_CTRL2"/>
+        <node id="ES_ECM"/>
+        <node id="ES_EBCM"/>
+        <node id="ES_EPS"/>
+        <node id="ES_IMU1"/>
+        <node id="ES_IMU2"/>
+        <node id="ES_MAPLOC"/>
+
+        <node id="ES_CTRL3"/>
+
+        <edge source="SW_B1" target="ES_FRONT_CAM"/>
+        <edge source="SW_B1" target="SW_B18"/>
+        <edge source="SW_B1" target="SW_B18_1"/>
+        <edge source="SW_B1" target="SW_B19"/>
+        <edge source="SW_B1" target="SW_B19_1"/>
+        <edge source="SW_B2" target="ES_FRONT_SVCAM"/>
+        <edge source="SW_B2" target="SW_B18"/>
+        <edge source="SW_B2" target="SW_B18_1"/>
+        <edge source="SW_B3" target="ES_LEFT_SVCAM"/>
+        <edge source="SW_B3" target="SW_B4"/>
+        <edge source="SW_B3" target="SW_B18"/>
+        <edge source="SW_B3" target="SW_B18_1"/>
+        <edge source="SW_B4" target="ES_RIGHT_SVCAM"/>
+        <edge source="SW_B4" target="SW_B3"/>
+        <edge source="SW_B5" target="ES_REAR_CAM"/>
+        <edge source="SW_B5" target="SW_B13"/>
+        <edge source="SW_B5" target="SW_B13_1"/>
+        <edge source="SW_B6" target="ES_REAR_SVCAM"/>
+        <edge source="SW_B6" target="SW_B20"/>
+        <edge source="SW_B6" target="SW_B20_1"/>
+        <edge source="SW_B7" target="ES_EPS"/>
+        <edge source="SW_B7" target="SW_B20"/>
+        <edge source="SW_B7" target="SW_B20_1"/>
+        <edge source="SW_B8" target="ES_IMU1"/>
+        <edge source="SW_B8" target="SW_B16"/>
+        <edge source="SW_B9" target="ES_IMU2"/>
+        <edge source="SW_B9" target="SW_B16"/>
+        <edge source="SW_B10" target="ES_FRONT_RAD"/>
+        <edge source="SW_B10" target="SW_B19"/>
+        <edge source="SW_B10" target="SW_B19_1"/>
+        <edge source="SW_B11" target="ES_LEFT_FRONT_RAD"/>
+        <edge source="SW_B11" target="SW_B18"/>
+        <edge source="SW_B11" target="SW_B18_1"/>
+        <edge source="SW_B12" target="ES_RIGHT_FRONT_RAD"/>
+        <edge source="SW_B12" target="SW_B19"/>
+        <edge source="SW_B12" target="SW_B19_1"/>
+        <edge source="SW_B13" target="ES_LEFT_REAR_RAD"/>
+        <edge source="SW_B13" target="SW_B5"/>
+        <edge source="SW_B13" target="SW_B15"/>
+        <edge source="SW_B13" target="SW_B5_1"/>
+        <edge source="SW_B13" target="SW_B15_1"/>
+        <edge source="SW_B13" target="SW_B19"/>
+        <edge source="SW_B13" target="SW_B19_1"/>
+        <edge source="SW_B14" target="ES_RIGHT_REAR_RAD"/>
+        <edge source="SW_B14" target="SW_B19"/>
+        <edge source="SW_B14" target="SW_B19_1"/>
+        <edge source="SW_B15" target="ES_REAR_RAD"/>
+        <edge source="SW_B15" target="SW_B13"/>
+        <edge source="SW_B15" target="SW_B13_1"/>
+        <edge source="SW_B16" target="ES_MAPLOC"/>
+        <edge source="SW_B16" target="SW_B17"/>
+        <edge source="SW_B16" target="SW_B17_1"/>
+        <edge source="SW_B16" target="SW_B9"/>
+        <edge source="SW_B16" target="SW_B8"/>
+        <edge source="SW_B17" target="ES_EBCM"/>
+        <edge source="SW_B17" target="SW_B20"/>
+        <edge source="SW_B17" target="SW_B20_1"/>
+        <edge source="SW_B17" target="SW_B16"/>
+        <edge source="SW_B18" target="ES_CTRL1"/>
+        <edge source="SW_B18" target="SW_B20"/>
+        <edge source="SW_B18" target="SW_B2"/>
+        <edge source="SW_B18" target="SW_B3"/>
+        <edge source="SW_B18" target="SW_B11"/>
+        <edge source="SW_B18" target="SW_B20_1"/>
+        <edge source="SW_B18" target="SW_B11_1"/>
+        <edge source="SW_B18" target="SW_B1"/>
+        <edge source="SW_B18" target="SW_B1_1"/>
+        <edge source="SW_B19" target="ES_CTRL2"/>
+        <edge source="SW_B19" target="SW_B20"/>
+        <edge source="SW_B19" target="SW_B14"/>
+        <edge source="SW_B19" target="SW_B10"/>
+        <edge source="SW_B19" target="SW_B12"/>
+        <edge source="SW_B19" target="SW_B13"/>
+        <edge source="SW_B19" target="SW_B1"/>
+        <edge source="SW_B19" target="SW_B20_1"/>
+        <edge source="SW_B19" target="SW_B10_1"/>
+        <edge source="SW_B19" target="SW_B12_1"/>
+        <edge source="SW_B19" target="SW_B13_1"/>
+        <edge source="SW_B19" target="SW_B1_1"/>
+        <edge source="SW_B20" target="ES_ECM"/>
+        <edge source="SW_B20" target="SW_B17"/>
+        <edge source="SW_B20" target="SW_B6"/>
+        <edge source="SW_B20" target="SW_B7"/>
+        <edge source="SW_B20" target="SW_B18"/>
+        <edge source="SW_B20" target="SW_B19"/>
+        <edge source="SW_B20" target="SW_B17_1"/>
+        <edge source="SW_B20" target="SW_B7_1"/>
+        <edge source="SW_B20" target="SW_B18_1"/>
+        <edge source="SW_B20" target="SW_B19_1"/>
+        <edge source="SW_B1_1" target="ES_FRONT_CAM"/>
+        <edge source="SW_B1_1" target="SW_B18"/>
+        <edge source="SW_B1_1" target="SW_B18_1"/>
+        <edge source="SW_B1_1" target="SW_B19"/>
+        <edge source="SW_B1_1" target="SW_B19_1"/>
+        <edge source="SW_B5_1" target="ES_REAR_CAM"/>
+        <edge source="SW_B5_1" target="SW_B13"/>
+        <edge source="SW_B5_1" target="SW_B13_1"/>
+        <edge source="SW_B7_1" target="ES_EPS"/>
+        <edge source="SW_B7_1" target="SW_B20"/>
+        <edge source="SW_B7_1" target="SW_B20_1"/>
+        <edge source="SW_B10_1" target="ES_FRONT_RAD"/>
+        <edge source="SW_B10_1" target="SW_B19"/>
+        <edge source="SW_B10_1" target="SW_B19_1"/>
+        <edge source="SW_B11_1" target="ES_LEFT_FRONT_RAD"/>
+        <edge source="SW_B11_1" target="SW_B18"/>
+        <edge source="SW_B11_1" target="SW_B18_1"/>
+        <edge source="SW_B12_1" target="ES_RIGHT_FRONT_RAD"/>
+        <edge source="SW_B12_1" target="SW_B19"/>
+        <edge source="SW_B12_1" target="SW_B19_1"/>
+        <edge source="SW_B13_1" target="ES_LEFT_REAR_RAD"/>
+        <edge source="SW_B13_1" target="SW_B5"/>
+        <edge source="SW_B13_1" target="SW_B15"/>
+        <edge source="SW_B13_1" target="SW_B5_1"/>
+        <edge source="SW_B13_1" target="SW_B15_1"/>
+        <edge source="SW_B13_1" target="SW_B19"/>
+        <edge source="SW_B13_1" target="SW_B19_1"/>
+        <edge source="SW_B15_1" target="ES_REAR_RAD"/>
+        <edge source="SW_B15_1" target="SW_B13"/>
+        <edge source="SW_B15_1" target="SW_B13_1"/>
+        <edge source="SW_B17_1" target="ES_EBCM"/>
+        <edge source="SW_B17_1" target="SW_B20"/>
+        <edge source="SW_B17_1" target="SW_B20_1"/>
+        <edge source="SW_B17_1" target="SW_B16"/>
+        <edge source="SW_B18_1" target="ES_CTRL1"/>
+        <edge source="SW_B18_1" target="SW_B20"/>
+        <edge source="SW_B18_1" target="SW_B2"/>
+        <edge source="SW_B18_1" target="SW_B3"/>
+        <edge source="SW_B18_1" target="SW_B11"/>
+        <edge source="SW_B18_1" target="SW_B20_1"/>
+        <edge source="SW_B18_1" target="SW_B11_1"/>
+        <edge source="SW_B18_1" target="SW_B1"/>
+        <edge source="SW_B18_1" target="SW_B1_1"/>
+        <edge source="SW_B19_1" target="ES_CTRL2"/>
+        <edge source="SW_B19_1" target="SW_B20"/>
+        <edge source="SW_B19_1" target="SW_B14"/>
+        <edge source="SW_B19_1" target="SW_B10"/>
+        <edge source="SW_B19_1" target="SW_B12"/>
+        <edge source="SW_B19_1" target="SW_B13"/>
+        <edge source="SW_B19_1" target="SW_B1"/>
+        <edge source="SW_B19_1" target="SW_B20_1"/>
+        <edge source="SW_B19_1" target="SW_B10_1"/>
+        <edge source="SW_B19_1" target="SW_B12_1"/>
+        <edge source="SW_B19_1" target="SW_B13_1"/>
+        <edge source="SW_B19_1" target="SW_B1_1"/>
+        <edge source="SW_B20_1" target="ES_ECM"/>
+        <edge source="SW_B20_1" target="SW_B17"/>
+        <edge source="SW_B20_1" target="SW_B6"/>
+        <edge source="SW_B20_1" target="SW_B7"/>
+        <edge source="SW_B20_1" target="SW_B18"/>
+        <edge source="SW_B20_1" target="SW_B19"/>
+        <edge source="SW_B20_1" target="SW_B17_1"/>
+        <edge source="SW_B20_1" target="SW_B7_1"/>
+        <edge source="SW_B20_1" target="SW_B18_1"/>
+        <edge source="SW_B20_1" target="SW_B19_1"/>
+        <edge source="ES_FRONT_CAM" target="SW_B1"/>
+        <edge source="ES_FRONT_CAM" target="SW_B1_1"/>
+        <edge source="ES_REAR_CAM" target="SW_B5"/>
+        <edge source="ES_REAR_CAM" target="SW_B5_1"/>
+        <edge source="ES_FRONT_SVCAM" target="SW_B2"/>
+        <edge source="ES_LEFT_SVCAM" target="SW_B3"/>
+        <edge source="ES_RIGHT_SVCAM" target="SW_B4"/>
+        <edge source="ES_REAR_SVCAM" target="SW_B6"/>
+        <edge source="ES_FRONT_RAD" target="SW_B10"/>
+        <edge source="ES_FRONT_RAD" target="SW_B10_1"/>
+        <edge source="ES_LEFT_FRONT_RAD" target="SW_B11"/>
+        <edge source="ES_LEFT_FRONT_RAD" target="SW_B11_1"/>
+        <edge source="ES_RIGHT_FRONT_RAD" target="SW_B12"/>
+        <edge source="ES_RIGHT_FRONT_RAD" target="SW_B12_1"/>
+        <edge source="ES_LEFT_REAR_RAD" target="SW_B13"/>
+        <edge source="ES_LEFT_REAR_RAD" target="SW_B13_1"/>
+        <edge source="ES_RIGHT_REAR_RAD" target="SW_B14"/>
+        <edge source="ES_REAR_RAD" target="SW_B15"/>
+        <edge source="ES_REAR_RAD" target="SW_B15_1"/>
+        <edge source="ES_CTRL1" target="SW_B18"/>
+        <edge source="ES_CTRL1" target="SW_B18_1"/>
+        <edge source="ES_CTRL2" target="SW_B19"/>
+        <edge source="ES_CTRL2" target="SW_B19_1"/>
+        <edge source="ES_ECM" target="SW_B20"/>
+        <edge source="ES_ECM" target="SW_B20_1"/>
+        <edge source="ES_EBCM" target="SW_B17"/>
+        <edge source="ES_EBCM" target="SW_B17_1"/>
+        <edge source="ES_EPS" target="SW_B7"/>
+        <edge source="ES_EPS" target="SW_B7_1"/>
+        <edge source="ES_IMU1" target="SW_B8"/>
+        <edge source="ES_IMU2" target="SW_B9"/>
+        <edge source="ES_MAPLOC" target="SW_B16"/>
+
+        <edge source="ES_CTRL3" target="SW_B20"/>
+        <edge source="ES_CTRL3" target="SW_B20_1"/>
+
+    </graph>
+</graphml>

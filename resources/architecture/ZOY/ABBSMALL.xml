@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
+        http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+
+    <graph id="G" edgedefault="undirected">
+        <node id="SV000"/>
+
+        <node id="SV100"/>
+        <node id="SV101"/>
+        <node id="SV102"/>
+        <node id="SV103"/>
+        <node id="SV104"/>
+
+        <node id="SV200"/>
+        <node id="SV201"/>
+        <node id="SV202"/>
+        <node id="SV203"/>
+        <node id="SV204"/>
+        <node id="SV205"/>
+        <node id="SV206"/>
+        <node id="SV207"/>
+        <node id="SV208"/>
+        <node id="SV209"/>
+
+        <node id="ES400"/>
+        <node id="ES401"/>
+        <node id="ES402"/>
+        <node id="ES403"/>
+        <node id="ES404"/>
+        <node id="ES405"/>
+        <node id="ES406"/>
+        <node id="ES417"/>
+        <node id="ES418"/>
+        <node id="ES419"/>
+
+        <edge source="SV000" target="SV100"/>
+        <edge source="SV000" target="SV101"/>
+        <edge source="SV000" target="SV102"/>
+        <edge source="SV000" target="SV103"/>
+        <edge source="SV000" target="SV104"/>
+
+        <edge source="SV100" target="SV101"/>
+        <edge source="SV101" target="SV102"/>
+        <edge source="SV102" target="SV103"/>
+        <edge source="SV103" target="SV104"/>
+        <edge source="SV104" target="SV100"/>
+
+
+        <edge source="SV100" target="SV200"/>
+        <edge source="SV100" target="SV201"/>
+        <edge source="SV101" target="SV202"/>
+        <edge source="SV101" target="SV203"/>
+        <edge source="SV102" target="SV204"/>
+        <edge source="SV102" target="SV205"/>
+        <edge source="SV103" target="SV206"/>
+        <edge source="SV103" target="SV207"/>
+        <edge source="SV104" target="SV208"/>
+        <edge source="SV104" target="SV209"/>
+
+        <edge source="SV200" target="SV201"/>
+        <edge source="SV201" target="SV202"/>
+        <edge source="SV202" target="SV203"/>
+        <edge source="SV203" target="SV204"/>
+        <edge source="SV204" target="SV205"/>
+        <edge source="SV205" target="SV206"/>
+        <edge source="SV206" target="SV207"/>
+        <edge source="SV207" target="SV208"/>
+        <edge source="SV208" target="SV209"/>
+        <edge source="SV209" target="SV200"/>
+
+
+        <edge source="ES400" target="SV201"/>
+        <edge source="ES400" target="SV202"/>
+        <edge source="ES401" target="SV202"/>
+        <edge source="ES401" target="SV203"/>
+        <edge source="ES402" target="SV203"/>
+        <edge source="ES402" target="SV204"/>
+        <edge source="ES403" target="SV204"/>
+        <edge source="ES403" target="SV205"/>
+        <edge source="ES404" target="SV205"/>
+        <edge source="ES404" target="SV206"/>
+        <edge source="ES405" target="SV206"/>
+        <edge source="ES405" target="SV207"/>
+        <edge source="ES406" target="SV207"/>
+        <edge source="ES406" target="SV208"/>
+        <edge source="ES417" target="SV208"/>
+        <edge source="ES417" target="SV209"/>
+        <edge source="ES418" target="SV209"/>
+        <edge source="ES418" target="SV200"/>
+        <edge source="ES419" target="SV200"/>
+        <edge source="ES419" target="SV201"/>
+    </graph>
+</graphml>
