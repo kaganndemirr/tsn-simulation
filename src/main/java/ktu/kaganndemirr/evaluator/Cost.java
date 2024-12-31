@@ -27,4 +27,8 @@ public interface Cost {
 
     void writePHYWPMCWRv2ResultToFile(PHYWPMCWRv2Holder phyWPMCWRv2MHolder);
 
+    void writePHYWPMLWRCWRv1ResultToFile(PHYWPMLWRCWRv1Holder phyWPMLWRCWRv1Holder);
+
+    void writePHYWPMLWRCWRv2ResultToFile(PHYWPMLWRCWRv2Holder phyWPMLWRCWRv2MHolder);
+
 }
