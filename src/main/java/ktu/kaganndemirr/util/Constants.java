@@ -140,5 +140,7 @@ public class Constants {
     public static final String ALO = "ALO";
 
 
+    public static final int ONE_CANDIDATE_PATH_SIZE = 1;
+
 
 }

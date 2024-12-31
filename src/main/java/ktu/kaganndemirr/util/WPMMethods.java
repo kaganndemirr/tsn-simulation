@@ -119,6 +119,8 @@ public class WPMMethods {
                         else{
                             graphPathPathScoreMap.put(graphPathList.get(j), graphPathPathScoreMap.get(graphPathList.get(j)) + 1);
                         }
+                    } else if (graphPathList.get(i).getLength() == Constants.ONE_CANDIDATE_PATH_SIZE) {
+                        graphPathPathScoreMap.put(graphPathList.get(i), graphPathPathScoreMap.get(graphPathList.get(i)) + 1);
                     }
                 }
             }
