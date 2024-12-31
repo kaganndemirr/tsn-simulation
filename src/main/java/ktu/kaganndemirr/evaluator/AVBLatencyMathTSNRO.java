@@ -6,9 +6,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class AVBLatencyMathTSNConfigurationFramework implements Evaluator {
-    private static final Logger logger = LoggerFactory.getLogger(AVBLatencyMathTSNConfigurationFramework.class.getSimpleName());
-
+public class AVBLatencyMathTSNRO implements Evaluator{
+    private static final Logger logger = LoggerFactory.getLogger(AVBLatencyMathTSNRO.class.getSimpleName());
 
     @Override
     public Cost evaluate(List<Unicast> unicastList) {

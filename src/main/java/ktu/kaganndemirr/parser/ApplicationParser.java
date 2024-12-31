@@ -32,7 +32,7 @@ public class ApplicationParser {
 
         List<Application> applications = new ArrayList<>();
 
-        if(Objects.equals(TSNSimulationVersion, Constants.TSN_CONFIGURATION_FRAMEWORK)){
+        if(Objects.equals(TSNSimulationVersion, Constants.TSNCF)){
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             Document dom;
 
@@ -71,7 +71,7 @@ public class ApplicationParser {
             }
 
             return applications;
-        } else if (Objects.equals(TSNSimulationVersion, Constants.TSN_CONFIGURATION_ROUTING_OPTIMIZATION)) {
+        } else if (Objects.equals(TSNSimulationVersion, Constants.TSNRO)) {
 
         }
 

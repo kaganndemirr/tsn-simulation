@@ -1,4 +1,4 @@
-package ktu.kaganndemirr.routing.phy.yen;
+package ktu.kaganndemirr.routing.phy.pathpenalization;
 
 import ktu.kaganndemirr.application.Application;
 import ktu.kaganndemirr.application.SRTApplication;
@@ -8,8 +8,10 @@ import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
+import ktu.kaganndemirr.util.GraphMethods;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
+import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.alg.shortestpath.YenKShortestPath;
 
 import java.util.ArrayList;
@@ -20,35 +22,41 @@ import static ktu.kaganndemirr.routing.phy.yen.HelperMethods.fillYenKShortestPat
 import static ktu.kaganndemirr.util.GraphMethods.copyGraph;
 import static ktu.kaganndemirr.util.GraphMethods.discardUnnecessaryEndSystems;
 
-public class YenKShortestPaths {
+public class PathPenalizationKShortestPaths {
     private final List<Application> applicationList;
     private final List<UnicastCandidate> srtUnicastCandidateList;
 
-    public YenKShortestPaths(final Graph<Node, GCLEdge> graph, final List<Application> applicationList, final int k) {
+    public PathPenalizationKShortestPaths(final Graph<Node, GCLEdge> graph, final List<Application> applicationList, final int k) {
         srtUnicastCandidateList = new ArrayList<>();
         this.applicationList = applicationList;
 
-        for (Application app : applicationList) {
-            if (app instanceof SRTApplication) {
-                for(EndSystem target: app.getTargetList()){
+        for (Application application : applicationList) {
+            if (application instanceof SRTApplication) {
+                for(EndSystem target: application.getTargetList()){
                     Graph<Node, GCLEdge> newGraph = copyGraph(graph);
-                    Graph<Node, GCLEdge> graphWithoutUnnecessaryEndSystems = discardUnnecessaryEndSystems(newGraph, app.getSource(), target);
+                    Graph<Node, GCLEdge> graphWithoutUnnecessaryEndSystems = discardUnnecessaryEndSystems(newGraph, application.getSource(), target);
 
-                    YenKShortestPath<Node, GCLEdge> allYenKShortestPathList = new YenKShortestPath<>(graphWithoutUnnecessaryEndSystems);
+                    List<GraphPath<Node, GCLEdge>> shortestPathGraphPathList = new ArrayList<>(k);
 
-                    List<GraphPath<Node, GCLEdge>> yenKShortestPathGraphPathList = new ArrayList<>(k);
+                    for (int i = 0; i < k; i++){
+                        DijkstraShortestPath<Node, GCLEdge> allShortestPaths = new DijkstraShortestPath<>(graphWithoutUnnecessaryEndSystems);
 
-                    List<GraphPath<Node, GCLEdge>> yenKShortestPathList = allYenKShortestPathList.getPaths(app.getSource(), target, k);
+                        GraphPath<Node, GCLEdge> shortestGraphPath = allShortestPaths.getPath(application.getSource(), target);
 
+                        if (shortestGraphPath == null) {
+                            throw new InputMismatchException("Aborting, could not find a path from " + application.getSource() + " to " + target);
+                        }
 
-                    if (yenKShortestPathList == null) {
-                        throw new InputMismatchException("Aborting, could not find a path from " + app.getSource() + " to " + target);
-                    } else {
+                        else{
+                            shortestPathGraphPathList.add(shortestGraphPath);
 
-                        yenKShortestPathGraphPathList.addAll(fillYenKShortestPathGraphPathList(yenKShortestPathList, k));
+                            GraphMethods.pathPenalization(graph, graphWithoutUnnecessaryEndSystems, shortestGraphPath);
 
-                        srtUnicastCandidateList.add(new UnicastCandidate(app, target, yenKShortestPathGraphPathList));
+                        }
+
                     }
+
+                    srtUnicastCandidateList.add(new UnicastCandidate(application, target, shortestPathGraphPathList));
                 }
             }
         }
@@ -70,3 +78,4 @@ public class YenKShortestPaths {
         return ttUnicastList;
     }
 }
+

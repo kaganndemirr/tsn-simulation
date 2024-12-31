@@ -6,7 +6,7 @@ import ktu.kaganndemirr.architecture.Node;
 import org.jgrapht.GraphPath;
 
 public class Unicast extends Route{
-    private final GraphPath<Node, GCLEdge> path;
+    private GraphPath<Node, GCLEdge> path;
 
     public Unicast(Application application, Node target, GraphPath<Node, GCLEdge> path) {
         this.application = application;
@@ -16,5 +16,9 @@ public class Unicast extends Route{
 
     public GraphPath<Node, GCLEdge> getPath() {
         return path;
+    }
+
+    public void setPath(GraphPath<Node, GCLEdge> graphPath){
+        path = graphPath;
     }
 }

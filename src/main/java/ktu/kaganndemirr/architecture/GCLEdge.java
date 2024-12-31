@@ -77,10 +77,10 @@ public class GCLEdge extends DefaultWeightedEdge {
     }
 
     public double getTTMessageSizeMbps(double duration) {
-        return (getWCD(duration) / duration - 1) * rate;
+        return (getMaxTTInterference(duration) / duration - 1) * rate;
     }
 
-    public double getWCD(double duration) {
+    public double getMaxTTInterference(double duration) {
         double interference = duration;
         //Use cached value if available
         if (!gclList.isEmpty()) {

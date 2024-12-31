@@ -5,9 +5,11 @@ import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.architecture.Switch;
 import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
 import org.jgrapht.graph.SimpleDirectedWeightedGraph;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class GraphMethods {
@@ -47,5 +49,19 @@ public class GraphMethods {
         }
 
         return graph;
+    }
+
+    public static void pathPenalization(Graph<Node, GCLEdge> graph, Graph<Node, GCLEdge> graphWithoutUnnecessaryEndSystems, GraphPath<Node, GCLEdge> shortestPath) {
+        for (GCLEdge edge : shortestPath.getEdgeList()) {
+            graphWithoutUnnecessaryEndSystems.setEdgeWeight(edge.getSource(), edge.getTarget(), Math.min(graphWithoutUnnecessaryEndSystems.getEdgeWeight(edge) * graph.edgeSet().size(), Double.MAX_VALUE));
+        }
+    }
+
+    public static void randomizeGraph(Graph<Node, GCLEdge> graph, String lwr) {
+        if (Objects.equals(lwr, Constants.RANDOMIZE_WITH_HEADS_OR_TAILS_USING_THREAD_LOCAL_RANDOM)) {
+            for (GCLEdge edge : graph.edgeSet()) {
+                graph.setEdgeWeight(graph.getEdgeSource(edge), graph.getEdgeTarget(edge), RandomNumberGenerator.randomizeWithHeadsOrTailsUsingThreadLocalRandom((int) Constants.UNIT_WEIGHT, graph.edgeSet().size()));
+            }
+        }
     }
 }

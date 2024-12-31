@@ -8,6 +8,7 @@ import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
+import ktu.kaganndemirr.util.GraphMethods;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.YenKShortestPath;
@@ -20,13 +21,13 @@ import static ktu.kaganndemirr.routing.phy.yen.HelperMethods.fillYenKShortestPat
 import static ktu.kaganndemirr.util.GraphMethods.copyGraph;
 import static ktu.kaganndemirr.util.GraphMethods.discardUnnecessaryEndSystems;
 
-public class YenKShortestPaths {
-    private final List<Application> applicationList;
+public class YenRandomizedKShortestPaths {
     private final List<UnicastCandidate> srtUnicastCandidateList;
 
-    public YenKShortestPaths(final Graph<Node, GCLEdge> graph, final List<Application> applicationList, final int k) {
+    public YenRandomizedKShortestPaths(Graph<Node, GCLEdge> graph, List<Application> applicationList, String lwr, int k) {
         srtUnicastCandidateList = new ArrayList<>();
-        this.applicationList = applicationList;
+
+        GraphMethods.randomizeGraph(graph, lwr);
 
         for (Application app : applicationList) {
             if (app instanceof SRTApplication) {
@@ -58,7 +59,7 @@ public class YenKShortestPaths {
         return srtUnicastCandidateList;
     }
 
-    public List<Unicast> getTTUnicastList() {
+    public static List<Unicast> getTTUnicastList(List<Application> applicationList) {
         List<Unicast> ttUnicastList = new ArrayList<>();
         for (Application app : applicationList) {
             if (app instanceof TTApplication) {

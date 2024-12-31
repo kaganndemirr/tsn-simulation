@@ -5,6 +5,7 @@ import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.architecture.Node;
 import org.jgrapht.GraphPath;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -83,6 +84,10 @@ public class Application {
 
     public List<GraphPath<Node, GCLEdge>> getExplicitPathList() {
         return explicitPathList;
+    }
+
+    public String toString() {
+        return name + " (S = " + number0fFrames + "x" + frameSizeByte + "B / P = " + cmi + "us" + " / D = " + deadline + "us)" + " (" + source + " -> " + targetList + ")";
     }
 
     @Override

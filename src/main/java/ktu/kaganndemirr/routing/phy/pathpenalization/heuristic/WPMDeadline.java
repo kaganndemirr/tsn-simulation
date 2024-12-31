@@ -1,4 +1,4 @@
-package ktu.kaganndemirr.routing.phy.yen.heuristic;
+package ktu.kaganndemirr.routing.phy.pathpenalization.heuristic;
 
 import ktu.kaganndemirr.application.Application;
 import ktu.kaganndemirr.architecture.GCLEdge;
@@ -8,6 +8,7 @@ import ktu.kaganndemirr.evaluator.Evaluator;
 import ktu.kaganndemirr.message.Multicast;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
+import ktu.kaganndemirr.routing.phy.pathpenalization.PathPenalizationKShortestPaths;
 import ktu.kaganndemirr.routing.phy.yen.YenKShortestPaths;
 import ktu.kaganndemirr.solver.Solution;
 import ktu.kaganndemirr.util.Constants;
@@ -24,7 +25,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public class WPMDeadline {
-    private static final Logger logger = LoggerFactory.getLogger(WPMDeadline.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(ktu.kaganndemirr.routing.phy.yen.heuristic.WPMDeadline.class.getSimpleName());
 
     private final int k;
 
@@ -36,17 +37,16 @@ public class WPMDeadline {
 
     private final Map<Double, Double> durationMap;
 
-
     public WPMDeadline(int k) {
         this.k = k;
         this.durationMap = new HashMap<>();
     }
 
-    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, String wpmObjective, double wSRT, double wTT, double wLength, double wUtil, int rate,  String wpmVersion, String wpmValueType, final Evaluator evaluator){
+    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, String wpmObjective, double wSRT, double wTT, double wLength, double wUtil, int rate, String wpmType, String wpmValueType, final Evaluator evaluator){
         this.wpmObjective = wpmObjective;
 
         Instant graphPathsStartTime = Instant.now();
-        YenKShortestPaths yenKShortestPaths = new YenKShortestPaths(graph, applicationList, k);
+        PathPenalizationKShortestPaths yenKShortestPaths = new PathPenalizationKShortestPaths(graph, applicationList, k);
         Instant graphPathsEndTime = Instant.now();
         long graphPathsDuration = Duration.between(graphPathsStartTime, graphPathsEndTime).toMillis();
 
@@ -57,7 +57,7 @@ public class WPMDeadline {
         if (Objects.equals(wpmObjective, Constants.SRT_TT)){
             solution = null;
         } else if (Objects.equals(wpmObjective, Constants.SRT_TT_LENGTH)) {
-            solution = WPMMethods.deadlineSRTTTLength(srtUnicastCandidateList, ttUnicastList, wSRT, wTT, wLength, wpmVersion, wpmValueType);
+            solution = WPMMethods.deadlineSRTTTLength(srtUnicastCandidateList, ttUnicastList, wSRT, wTT, wLength, wpmType, wpmValueType);
         } else if (Objects.equals(wpmObjective, Constants.SRT_TT_LENGTH_UTIL)) {
             solution = null;
         }
