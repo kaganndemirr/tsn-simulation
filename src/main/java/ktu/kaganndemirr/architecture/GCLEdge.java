@@ -132,7 +132,7 @@ public class GCLEdge extends DefaultWeightedEdge {
                     totalDuration += gce.getEnd() - gce.getStart();
                 }
 
-                GCE newGateControlEvent = new GCE(mergedGateControlEventList.getFirst().getStart(), totalDuration);
+                GCE newGateControlEvent = new GCE(mergedGateControlEventList.getFirst().getStart(), mergedGateControlEventList.getFirst().getStart() + totalDuration);
                 finalGateControlEventList.add(newGateControlEvent);
             } else {
                 finalGateControlEventList.add(element);
