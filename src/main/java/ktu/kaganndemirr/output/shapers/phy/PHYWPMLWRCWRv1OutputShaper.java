@@ -8,7 +8,6 @@ import ktu.kaganndemirr.message.Multicast;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
 import ktu.kaganndemirr.util.holders.PHYWPMLWRCWRv1Holder;
-import ktu.kaganndemirr.util.holders.PHYWPMLWRv1Holder;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.slf4j.Logger;
@@ -18,8 +17,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.*;
-
-import static ktu.kaganndemirr.util.Constants.*;
 
 public class PHYWPMLWRCWRv1OutputShaper {
     private static final Logger logger = LoggerFactory.getLogger(PHYWPMLWRv1OutputShaper.class.getSimpleName());

@@ -19,7 +19,7 @@ import org.apache.commons.cli.*;
 import org.jgrapht.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ktu.kaganndemirr.util.Constants;
+import ktu.kaganndemirr.util.constants.Constants;
 
 import java.io.File;
 import java.time.Duration;
@@ -168,106 +168,6 @@ public class Main {
 
             File net = new File(line.getOptionValue(NET_ARG));
             File app = new File(line.getOptionValue(APP_ARG));
-
-            //Set rate
-            if (line.hasOption(RATE_ARG)) {
-                rate = Integer.parseInt(line.getOptionValue(RATE_ARG));
-            }
-
-            if (line.hasOption(EVALUATOR_ARG)) {
-                if (Objects.equals(line.getOptionValue(EVALUATOR_ARG), Constants.AVB_LATENCY_MATH_VERSION_TSNCF)) {
-                    evaluatorName = Constants.AVB_LATENCY_MATH_VERSION_TSNCF;
-                    evaluator = new AVBLatencyMathTSNCF();
-                } else if (Objects.equals(line.getOptionValue(EVALUATOR_ARG), Constants.AVB_LATENCY_MATH_VERSION_TSNRO)) {
-                    evaluatorName = Constants.AVB_LATENCY_MATH_VERSION_TSNRO;
-                    evaluator = new AVBLatencyMathTSNRO();
-                }
-            }
-
-            //Set K
-            if (line.hasOption(K_ARG)) {
-                k = Integer.parseInt(line.getOptionValue(K_ARG));
-            }
-
-            //Set Thread Number
-            if (line.hasOption(THREAD_NUMBER_ARG)) {
-                threadNumber = Integer.parseInt(line.getOptionValue(THREAD_NUMBER_ARG));
-            }
-
-            //Set Timeout
-            if (line.hasOption(TIMEOUT_ARG)) {
-                timeout = Integer.parseInt(line.getOptionValue(TIMEOUT_ARG));
-            }
-
-            if (line.hasOption(ROUTING_ARG)) {
-                routing = line.getOptionValue(ROUTING_ARG);
-            }
-
-            if (line.hasOption(PATH_FINDER_METHOD_ARG)) {
-                pathFinderMethod = line.getOptionValue(PATH_FINDER_METHOD_ARG);
-            }
-
-            if (line.hasOption(ALGORITHM_ARG)) {
-                algorithm = line.getOptionValue(ALGORITHM_ARG);
-            }
-
-            if (line.hasOption(WPM_OBJECTIVE_ARG)) {
-                wpmObjective = line.getOptionValue(WPM_OBJECTIVE_ARG);
-            }
-
-            if (line.hasOption(W_SRT_ARG)) {
-                wSRT = Double.parseDouble(line.getOptionValue(W_SRT_ARG));
-            }
-
-            if (line.hasOption(W_TT_ARG)) {
-                wTT = Double.parseDouble(line.getOptionValue(W_TT_ARG));
-            }
-
-            if (line.hasOption(W_LENGTH_ARG)) {
-                wLength = Double.parseDouble(line.getOptionValue(W_LENGTH_ARG));
-            }
-
-            if (line.hasOption(W_UTIL_ARG)) {
-                wUtil = Double.parseDouble(line.getOptionValue(W_UTIL_ARG));
-            }
-
-            if (line.hasOption(LWR_ARG)) {
-                lwr = line.getOptionValue(LWR_ARG);
-            }
-
-            if (line.hasOption(CWR_ARG)) {
-                cwr = line.getOptionValue(CWR_ARG);
-            }
-
-            if (line.hasOption(WPM_VERSION_ARG)) {
-                wpmVersion = line.getOptionValue(WPM_VERSION_ARG);
-            }
-
-            if (line.hasOption(WPM_VALUE_TYPE_ARG)) {
-                wpmValueType = line.getOptionValue(WPM_VALUE_TYPE_ARG);
-            }
-
-            if (line.hasOption(IDLE_SLOPE_ARG)) {
-                idleSlope = Double.parseDouble(line.getOptionValue(IDLE_SLOPE_ARG));
-            }
-
-            if (line.hasOption(LOG_ARG)) {
-                if (Objects.equals(line.getOptionValue(LOG_ARG), Constants.INFO)) {
-                    System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO");
-                } else if (Objects.equals(line.getOptionValue(EVALUATOR_ARG), Constants.DEBUG)) {
-                    System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "DEBUG");
-                }
-            }
-
-            if (line.hasOption(TSN_SIMULATION_VERSION_ARG)) {
-                tsnSimulationVersion = line.getOptionValue(TSN_SIMULATION_VERSION_ARG);
-            }
-
-            if (line.hasOption(METAHEURISTIC_NAME_ARG)) {
-                metaheuristicName = line.getOptionValue(METAHEURISTIC_NAME_ARG);
-            }
-
-            //endregion
 
             //Parse Topology
             logger.info("Parsing Topology from {}", net.getName());

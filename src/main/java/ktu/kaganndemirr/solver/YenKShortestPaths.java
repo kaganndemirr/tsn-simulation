@@ -1,4 +1,4 @@
-package ktu.kaganndemirr.routing.phy.yen;
+package ktu.kaganndemirr.solver;
 
 import ktu.kaganndemirr.application.Application;
 import ktu.kaganndemirr.application.SRTApplication;
@@ -8,6 +8,7 @@ import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
+import ktu.kaganndemirr.util.holders.Bag;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.YenKShortestPath;
@@ -24,28 +25,28 @@ public class YenKShortestPaths {
     private final List<Application> applicationList;
     private final List<UnicastCandidate> srtUnicastCandidateList;
 
-    public YenKShortestPaths(final Graph<Node, GCLEdge> graph, final List<Application> applicationList, final int k) {
+    public YenKShortestPaths(Bag bag) {
         srtUnicastCandidateList = new ArrayList<>();
-        this.applicationList = applicationList;
+        this.applicationList = bag.getApplicationList();
 
         for (Application app : applicationList) {
             if (app instanceof SRTApplication) {
                 for(EndSystem target: app.getTargetList()){
-                    Graph<Node, GCLEdge> newGraph = copyGraph(graph);
+                    Graph<Node, GCLEdge> newGraph = copyGraph(bag.getGraph());
                     Graph<Node, GCLEdge> graphWithoutUnnecessaryEndSystems = discardUnnecessaryEndSystems(newGraph, app.getSource(), target);
 
                     YenKShortestPath<Node, GCLEdge> allYenKShortestPathList = new YenKShortestPath<>(graphWithoutUnnecessaryEndSystems);
 
-                    List<GraphPath<Node, GCLEdge>> yenKShortestPathGraphPathList = new ArrayList<>(k);
+                    List<GraphPath<Node, GCLEdge>> yenKShortestPathGraphPathList = new ArrayList<>(bag.getK());
 
-                    List<GraphPath<Node, GCLEdge>> yenKShortestPathList = allYenKShortestPathList.getPaths(app.getSource(), target, k);
+                    List<GraphPath<Node, GCLEdge>> yenKShortestPathList = allYenKShortestPathList.getPaths(app.getSource(), target, bag.getK());
 
 
                     if (yenKShortestPathList == null) {
                         throw new InputMismatchException("Aborting, could not find a path from " + app.getSource() + " to " + target);
                     } else {
 
-                        yenKShortestPathGraphPathList.addAll(fillYenKShortestPathGraphPathList(yenKShortestPathList, k));
+                        yenKShortestPathGraphPathList.addAll(fillYenKShortestPathGraphPathList(yenKShortestPathList, bag.getK()));
 
                         srtUnicastCandidateList.add(new UnicastCandidate(app, target, yenKShortestPathGraphPathList));
                     }

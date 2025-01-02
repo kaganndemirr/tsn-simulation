@@ -11,7 +11,7 @@ import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
 import ktu.kaganndemirr.routing.phy.yen.YenRandomizedKShortestPaths;
 import ktu.kaganndemirr.solver.Solution;
-import ktu.kaganndemirr.util.Constants;
+import ktu.kaganndemirr.util.constants.Constants;
 import ktu.kaganndemirr.util.MetaheuristicMethods;
 import ktu.kaganndemirr.util.WPMMethods;
 import org.jgrapht.Graph;

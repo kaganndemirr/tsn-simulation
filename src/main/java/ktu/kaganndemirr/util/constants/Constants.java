@@ -1,14 +1,4 @@
-package ktu.kaganndemirr.util;
-
-import ktu.kaganndemirr.application.SRTApplication;
-import ktu.kaganndemirr.architecture.GCLEdge;
-import ktu.kaganndemirr.message.Unicast;
-import ktu.kaganndemirr.solver.Solution;
-
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+package ktu.kaganndemirr.util.constants;
 
 public class Constants {
     public static final String AVB_LATENCY_MATH_VERSION_TSNCF = "avbLatencyMathCF";

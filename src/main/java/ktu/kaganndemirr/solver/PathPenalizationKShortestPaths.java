@@ -1,4 +1,4 @@
-package ktu.kaganndemirr.routing.phy.pathpenalization;
+package ktu.kaganndemirr.solver;
 
 import ktu.kaganndemirr.application.Application;
 import ktu.kaganndemirr.application.SRTApplication;
@@ -9,16 +9,15 @@ import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
 import ktu.kaganndemirr.util.GraphMethods;
+import ktu.kaganndemirr.util.holders.Bag;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
-import org.jgrapht.alg.shortestpath.YenKShortestPath;
 
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 
-import static ktu.kaganndemirr.routing.phy.yen.HelperMethods.fillYenKShortestPathGraphPathList;
 import static ktu.kaganndemirr.util.GraphMethods.copyGraph;
 import static ktu.kaganndemirr.util.GraphMethods.discardUnnecessaryEndSystems;
 
@@ -26,37 +25,37 @@ public class PathPenalizationKShortestPaths {
     private final List<Application> applicationList;
     private final List<UnicastCandidate> srtUnicastCandidateList;
 
-    public PathPenalizationKShortestPaths(final Graph<Node, GCLEdge> graph, final List<Application> applicationList, final int k) {
+    public PathPenalizationKShortestPaths(Bag bag) {
         srtUnicastCandidateList = new ArrayList<>();
-        this.applicationList = applicationList;
+        this.applicationList = bag.getApplicationList();
 
         for (Application application : applicationList) {
             if (application instanceof SRTApplication) {
                 for(EndSystem target: application.getTargetList()){
-                    Graph<Node, GCLEdge> newGraph = copyGraph(graph);
+                    Graph<Node, GCLEdge> newGraph = copyGraph(bag.getGraph());
                     Graph<Node, GCLEdge> graphWithoutUnnecessaryEndSystems = discardUnnecessaryEndSystems(newGraph, application.getSource(), target);
 
-                    List<GraphPath<Node, GCLEdge>> shortestPathGraphPathList = new ArrayList<>(k);
+                    List<GraphPath<Node, GCLEdge>> dijkstraGraphPathList = new ArrayList<>(bag.getK());
 
                     for (int i = 0; i < k; i++){
-                        DijkstraShortestPath<Node, GCLEdge> allShortestPaths = new DijkstraShortestPath<>(graphWithoutUnnecessaryEndSystems);
+                        DijkstraShortestPath<Node, GCLEdge> allDijkstraShortestPathList = new DijkstraShortestPath<>(graphWithoutUnnecessaryEndSystems);
 
-                        GraphPath<Node, GCLEdge> shortestGraphPath = allShortestPaths.getPath(application.getSource(), target);
+                        GraphPath<Node, GCLEdge> dijkstraGraphPath = allDijkstraShortestPathList.getPath(application.getSource(), target);
 
-                        if (shortestGraphPath == null) {
+                        if (dijkstraGraphPath == null) {
                             throw new InputMismatchException("Aborting, could not find a path from " + application.getSource() + " to " + target);
                         }
 
                         else{
-                            shortestPathGraphPathList.add(shortestGraphPath);
+                            dijkstraGraphPathList.add(dijkstraGraphPath);
 
-                            GraphMethods.pathPenalization(graph, graphWithoutUnnecessaryEndSystems, shortestGraphPath);
+                            GraphMethods.pathPenalization(bag.getGraph(), graphWithoutUnnecessaryEndSystems, dijkstraGraphPath);
 
                         }
 
                     }
 
-                    srtUnicastCandidateList.add(new UnicastCandidate(application, target, shortestPathGraphPathList));
+                    srtUnicastCandidateList.add(new UnicastCandidate(application, target, dijkstraGraphPathList));
                 }
             }
         }

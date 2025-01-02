@@ -4,7 +4,7 @@ import ktu.kaganndemirr.application.Application;
 import ktu.kaganndemirr.application.SRTApplication;
 import ktu.kaganndemirr.application.TTApplication;
 import ktu.kaganndemirr.architecture.*;
-import ktu.kaganndemirr.util.Constants;
+import ktu.kaganndemirr.util.constants.Constants;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.graph.GraphWalk;
