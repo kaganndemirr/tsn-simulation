@@ -29,8 +29,7 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static ktu.kaganndemirr.util.Constants.createFoundNoSolutionString;
-import static ktu.kaganndemirr.util.Constants.createFoundSolutionString;
+import static ktu.kaganndemirr.util.HelperMethods.*;
 
 public class Main {
 
@@ -86,7 +85,7 @@ public class Main {
         //Default Routing
         String routing = "phy";
         //Default Method
-        String pathFindingMethod = "yen";
+        String pathFinderMethod = "yen";
         //Default Algorithm
         String algorithm = "GRASP";
 
@@ -205,7 +204,7 @@ public class Main {
             }
 
             if (line.hasOption(PATH_FINDER_METHOD_ARG)) {
-                pathFindingMethod = line.getOptionValue(PATH_FINDER_METHOD_ARG);
+                pathFinderMethod = line.getOptionValue(PATH_FINDER_METHOD_ARG);
             }
 
             if (line.hasOption(ALGORITHM_ARG)) {
@@ -322,58 +321,40 @@ public class Main {
             //region <Set Routing>
             switch (routing) {
                 case "phy" -> {
-                    switch (pathFindingMethod) {
+                    switch (pathFinderMethod) {
                         case "yen" -> {
                             switch (algorithm) {
                                 case "WPMDeadline" -> {
                                     WPMDeadline wpmDeadline = new WPMDeadline(k);
 
+                                    Bag bag = new Bag();
+                                    bag.setTopologyName(topologyName);
+                                    bag.setApplicationName(applicationName);
+                                    bag.setRouting(routing);
+                                    bag.setPathFinderMethod(pathFinderMethod);
+                                    bag.setAlgorithm(algorithm);
+                                    bag.setK(k);
+                                    bag.setWPMObjective(wpmObjective);
+                                    bag.setWSRT(wSRT);
+                                    bag.setWTT(wTT);
+                                    bag.setWLength(wLength);
+                                    bag.setWUtil(wUtil);
+                                    bag.setWLength(wLength);
+                                    bag.setWPMVersion(wpmVersion);
+                                    bag.setWPMValueType(wpmValueType);
+                                    bag.setMetaheuristicName(metaheuristicName);
+                                    bag.setEvaluator(evaluator);
+                                    bag.setEvaluatorName(evaluatorName);
+
+                                    logger.info(createInfoString(bag));
+
+                                    Solution solution = wpmDeadline.solve(bag);
+
                                     if(Objects.equals(wpmVersion, Constants.WPM_VERSION_V1)){
-                                        logger.info("Solving problem using {}, {}, {}, K: {}, wpmObjective: {}, wSRT: {}, wTT: {}, wLength: {}, wUtil: {}, wpmVersion: {}", routing, pathFindingMethod, algorithm, k, wpmObjective, wSRT, wTT, wLength, wUtil, wpmVersion);
-                                    } else if (Objects.equals(wpmVersion, Constants.WPM_VERSION_V2)) {
-                                        logger.info("Solving problem using {}, {}, {}, K: {}, wpmObjective: {}, wSRT: {}, wTT: {}, wLength: {}, wUtil: {}, wpmVersion: {}, wpmValueType: {}", routing, pathFindingMethod, algorithm, k, wpmObjective, wSRT, wTT, wLength, wUtil, wpmVersion, wpmValueType);
-                                    }
-
-                                    Solution solution = wpmDeadline.solve(graph, applicationList, wpmObjective, wSRT, wTT, wLength, wUtil, rate, wpmVersion, wpmValueType, evaluator);
-
-                                    PHYWPMv1Holder phyWPMv1Holder = new PHYWPMv1Holder();
-                                    PHYWPMv2Holder phyWPMv2Holder = new PHYWPMv2Holder();
-                                    if(Objects.equals(wpmVersion, Constants.WPM_VERSION_V1)){
-                                        phyWPMv1Holder.setTopologyName(topologyName);
-                                        phyWPMv1Holder.setApplicationName(applicationName);
-                                        phyWPMv1Holder.setRouting(routing);
-                                        phyWPMv1Holder.setPathFindingMethod(pathFindingMethod);
-                                        phyWPMv1Holder.setAlgorithm(algorithm);
-                                        phyWPMv1Holder.setK(k);
-                                        phyWPMv1Holder.setWPMObjective(wpmObjective);
-                                        phyWPMv1Holder.setWSRT(wSRT);
-                                        phyWPMv1Holder.setWTT(wTT);
-                                        phyWPMv1Holder.setWLength(wLength);
-                                        phyWPMv1Holder.setWUtil(wUtil);
-                                        phyWPMv1Holder.setWPMObjective(wpmObjective);
-                                        phyWPMv1Holder.setWPMVersion(wpmVersion);
-
                                         solution.getCost().writePHYWPMv1ResultToFile(phyWPMv1Holder);
-
                                     } else if (Objects.equals(wpmVersion, Constants.WPM_VERSION_V2)) {
-                                        phyWPMv2Holder.setTopologyName(topologyName);
-                                        phyWPMv2Holder.setApplicationName(applicationName);
-                                        phyWPMv2Holder.setRouting(routing);
-                                        phyWPMv2Holder.setPathFindingMethod(pathFindingMethod);
-                                        phyWPMv2Holder.setAlgorithm(algorithm);
-                                        phyWPMv2Holder.setK(k);
-                                        phyWPMv2Holder.setWPMObjective(wpmObjective);
-                                        phyWPMv2Holder.setWSRT(wSRT);
-                                        phyWPMv2Holder.setWTT(wTT);
-                                        phyWPMv2Holder.setWLength(wLength);
-                                        phyWPMv2Holder.setWUtil(wUtil);
-                                        phyWPMv2Holder.setWPMObjective(wpmObjective);
-                                        phyWPMv2Holder.setWPMVersion(wpmVersion);
-                                        phyWPMv2Holder.setWPMValueType(wpmValueType);
-
                                         solution.getCost().writePHYWPMv2ResultToFile(phyWPMv2Holder);
                                     }
-
 
                                     if (solution.getMulticastList() == null || solution.getMulticastList().isEmpty()) {
                                         logger.info(Constants.NO_SOLUTION_COULD_BE_FOUND);
@@ -421,9 +402,9 @@ public class Main {
                                     WPMLWRDeadline graspWPMLWRDeadline = new WPMLWRDeadline(k);
 
                                     if(Objects.equals(wpmVersion, Constants.WPM_VERSION_V1)){
-                                        logger.info("Solving problem using {}, {}, {}, LWR: {}, K:{}, wpmObjective: {}, wSRT: {}, wTT: {}, wLength: {}, wUtil: {}, wpmVersion: {}, Metaheuristic Name: {}, Evaluator: {} Timeout: {}(sec)", routing, pathFindingMethod, algorithm, lwr, k, wpmObjective, wSRT, wTT, wLength, wUtil, wpmVersion, metaheuristicName, evaluatorName, timeout);
+                                        logger.info("Solving problem using {}, {}, {}, LWR: {}, K:{}, wpmObjective: {}, wSRT: {}, wTT: {}, wLength: {}, wUtil: {}, wpmVersion: {}, Metaheuristic Name: {}, Evaluator: {} Timeout: {}(sec)", routing, pathFinderMethod, algorithm, lwr, k, wpmObjective, wSRT, wTT, wLength, wUtil, wpmVersion, metaheuristicName, evaluatorName, timeout);
                                     } else if (Objects.equals(wpmVersion, Constants.WPM_VERSION_V2)) {
-                                        logger.info("Solving problem using {}, {}, {}, LWR: {}, K:{}, wpmObjective: {}, wSRT: {}, wTT: {}, wLength: {}, wUtil: {}, wpmVersion: {}, wpmValueType: {}, Metaheuristic Name: {}, Evaluator: {}, Timeout: {}(sec)", routing, pathFindingMethod, algorithm, lwr, k, wpmObjective, wSRT, wTT, wLength, wUtil, wpmVersion, wpmValueType, metaheuristicName, evaluatorName, timeout);
+                                        logger.info("Solving problem using {}, {}, {}, LWR: {}, K:{}, wpmObjective: {}, wSRT: {}, wTT: {}, wLength: {}, wUtil: {}, wpmVersion: {}, wpmValueType: {}, Metaheuristic Name: {}, Evaluator: {}, Timeout: {}(sec)", routing, pathFinderMethod, algorithm, lwr, k, wpmObjective, wSRT, wTT, wLength, wUtil, wpmVersion, wpmValueType, metaheuristicName, evaluatorName, timeout);
                                     }
 
                                     Solution solution = graspWPMLWRDeadline.solve(graph, applicationList, threadNumber, lwr, wpmObjective, wSRT, wTT, wLength, wUtil, rate, wpmVersion, wpmValueType, metaheuristicName, evaluator, Duration.ofSeconds(timeout));
@@ -434,7 +415,7 @@ public class Main {
                                         phyWPMLWRv1Holder.setTopologyName(topologyName);
                                         phyWPMLWRv1Holder.setApplicationName(applicationName);
                                         phyWPMLWRv1Holder.setRouting(routing);
-                                        phyWPMLWRv1Holder.setPathFindingMethod(pathFindingMethod);
+                                        phyWPMLWRv1Holder.setPathFindingMethod(pathFinderMethod);
                                         phyWPMLWRv1Holder.setAlgorithm(algorithm);
                                         phyWPMLWRv1Holder.setLWR(lwr);
                                         phyWPMLWRv1Holder.setK(k);
@@ -452,7 +433,7 @@ public class Main {
                                         phyWPMLWRv2Holder.setTopologyName(topologyName);
                                         phyWPMLWRv2Holder.setApplicationName(applicationName);
                                         phyWPMLWRv2Holder.setRouting(routing);
-                                        phyWPMLWRv2Holder.setPathFindingMethod(pathFindingMethod);
+                                        phyWPMLWRv2Holder.setPathFindingMethod(pathFinderMethod);
                                         phyWPMLWRv2Holder.setAlgorithm(algorithm);
                                         phyWPMLWRv2Holder.setLWR(lwr);
                                         phyWPMLWRv2Holder.setK(k);
@@ -515,9 +496,9 @@ public class Main {
                                     WPMCWRDeadline graspWPMCWRDeadline = new WPMCWRDeadline(k);
 
                                     if(Objects.equals(wpmVersion, Constants.WPM_VERSION_V1)){
-                                        logger.info("Solving problem using {}, {}, {}, K:{}, wpmObjective: {}, CWR: {}, wpmVersion: {}, Metaheuristic Name:{}, Evaluator: {}, Timeout: {}", routing, pathFindingMethod, algorithm, k, wpmObjective, cwr, wpmVersion, metaheuristicName, evaluatorName, timeout);
+                                        logger.info("Solving problem using {}, {}, {}, K:{}, wpmObjective: {}, CWR: {}, wpmVersion: {}, Metaheuristic Name:{}, Evaluator: {}, Timeout: {}", routing, pathFinderMethod, algorithm, k, wpmObjective, cwr, wpmVersion, metaheuristicName, evaluatorName, timeout);
                                     } else if (Objects.equals(wpmVersion, Constants.WPM_VERSION_V2)) {
-                                        logger.info("Solving problem using {}, {}, {}, K:{}, wpmObjective: {}, CWR: {}, wpmVersion: {}, wpmValueType: {}, Metaheuristic Name: {}, Evaluator: {}, Timeout: {}", routing, pathFindingMethod, algorithm, k, wpmObjective, cwr, wpmVersion, wpmValueType, metaheuristicName, evaluatorName, timeout);
+                                        logger.info("Solving problem using {}, {}, {}, K:{}, wpmObjective: {}, CWR: {}, wpmVersion: {}, wpmValueType: {}, Metaheuristic Name: {}, Evaluator: {}, Timeout: {}", routing, pathFinderMethod, algorithm, k, wpmObjective, cwr, wpmVersion, wpmValueType, metaheuristicName, evaluatorName, timeout);
                                     }
 
                                     Solution solution = graspWPMCWRDeadline.solve(graph, applicationList, threadNumber, wpmObjective, cwr, rate, wpmVersion, wpmValueType, metaheuristicName, evaluator, Duration.ofSeconds(timeout));
@@ -528,7 +509,7 @@ public class Main {
                                         phyWPMCWRv1Holder.setTopologyName(topologyName);
                                         phyWPMCWRv1Holder.setApplicationName(applicationName);
                                         phyWPMCWRv1Holder.setRouting(routing);
-                                        phyWPMCWRv1Holder.setPathFindingMethod(pathFindingMethod);
+                                        phyWPMCWRv1Holder.setPathFindingMethod(pathFinderMethod);
                                         phyWPMCWRv1Holder.setAlgorithm(algorithm);
                                         phyWPMCWRv1Holder.setK(k);
                                         phyWPMCWRv1Holder.setWPMObjective(wpmObjective);
@@ -541,7 +522,7 @@ public class Main {
                                         phyWPMCWRv2Holder.setTopologyName(topologyName);
                                         phyWPMCWRv2Holder.setApplicationName(applicationName);
                                         phyWPMCWRv2Holder.setRouting(routing);
-                                        phyWPMCWRv2Holder.setPathFindingMethod(pathFindingMethod);
+                                        phyWPMCWRv2Holder.setPathFindingMethod(pathFinderMethod);
                                         phyWPMCWRv2Holder.setAlgorithm(algorithm);
                                         phyWPMCWRv2Holder.setK(k);
                                         phyWPMCWRv2Holder.setWPMObjective(wpmObjective);
@@ -599,9 +580,9 @@ public class Main {
                                     WPMLWRCWRDeadline graspWPMLWRCWRDeadline = new WPMLWRCWRDeadline(k);
 
                                     if(Objects.equals(wpmVersion, Constants.WPM_VERSION_V1)){
-                                        logger.info("Solving problem using {}, {}, {}, LWR: {}, K: {}, wpmObjective: {}, CWR: {}, wSRT: {}, wTT: {}, wLength: {}, wUtil: {}, wpmVersion: {}, Thread Number: {}, Timeout: {}(sec), Metaheuristic Name: {}, Evaluator: {}", routing, pathFindingMethod, algorithm, lwr, k, wpmObjective, cwr, wSRT, wTT, wLength, wUtil, wpmVersion, threadNumber, timeout, metaheuristicName, evaluatorName);
+                                        logger.info("Solving problem using {}, {}, {}, LWR: {}, K: {}, wpmObjective: {}, CWR: {}, wSRT: {}, wTT: {}, wLength: {}, wUtil: {}, wpmVersion: {}, Thread Number: {}, Timeout: {}(sec), Metaheuristic Name: {}, Evaluator: {}", routing, pathFinderMethod, algorithm, lwr, k, wpmObjective, cwr, wSRT, wTT, wLength, wUtil, wpmVersion, threadNumber, timeout, metaheuristicName, evaluatorName);
                                     } else if (Objects.equals(wpmVersion, Constants.WPM_VERSION_V2)) {
-                                        logger.info("Solving problem using {}, {}, {}, LWR: {}, K: {}, wpmObjective: {}, CWR: {}, wSRT: {}, wTT: {}, wLength: {}, wUtil: {}, wpmVersion: {}, wpmValueType: {}, Thread Number: {}, Timeout: {}(sec), Metaheuristic Name: {}, Evaluator: {}", routing, pathFindingMethod, algorithm, lwr, k, wpmObjective, cwr, wSRT, wTT, wLength, wUtil, wpmVersion, wpmValueType, threadNumber, timeout, metaheuristicName, evaluatorName);
+                                        logger.info("Solving problem using {}, {}, {}, LWR: {}, K: {}, wpmObjective: {}, CWR: {}, wSRT: {}, wTT: {}, wLength: {}, wUtil: {}, wpmVersion: {}, wpmValueType: {}, Thread Number: {}, Timeout: {}(sec), Metaheuristic Name: {}, Evaluator: {}", routing, pathFinderMethod, algorithm, lwr, k, wpmObjective, cwr, wSRT, wTT, wLength, wUtil, wpmVersion, wpmValueType, threadNumber, timeout, metaheuristicName, evaluatorName);
                                     }
 
                                     Solution solution = graspWPMLWRCWRDeadline.solve(graph, applicationList, threadNumber, lwr, wpmObjective, cwr, wSRT, wTT, wLength, wUtil, rate, wpmVersion, wpmValueType, metaheuristicName, evaluator, Duration.ofSeconds(timeout));
@@ -612,7 +593,7 @@ public class Main {
                                         phyWPMLWRCWRv1Holder.setTopologyName(topologyName);
                                         phyWPMLWRCWRv1Holder.setApplicationName(applicationName);
                                         phyWPMLWRCWRv1Holder.setRouting(routing);
-                                        phyWPMLWRCWRv1Holder.setPathFindingMethod(pathFindingMethod);
+                                        phyWPMLWRCWRv1Holder.setPathFindingMethod(pathFinderMethod);
                                         phyWPMLWRCWRv1Holder.setAlgorithm(algorithm);
                                         phyWPMLWRCWRv1Holder.setLWR(lwr);
                                         phyWPMLWRCWRv1Holder.setK(k);
@@ -631,7 +612,7 @@ public class Main {
                                         phyWPMLWRCWRv2Holder.setTopologyName(topologyName);
                                         phyWPMLWRCWRv2Holder.setApplicationName(applicationName);
                                         phyWPMLWRCWRv2Holder.setRouting(routing);
-                                        phyWPMLWRCWRv2Holder.setPathFindingMethod(pathFindingMethod);
+                                        phyWPMLWRCWRv2Holder.setPathFindingMethod(pathFinderMethod);
                                         phyWPMLWRCWRv2Holder.setAlgorithm(algorithm);
                                         phyWPMLWRCWRv2Holder.setLWR(lwr);
                                         phyWPMLWRCWRv2Holder.setK(k);
@@ -691,7 +672,7 @@ public class Main {
                                         }
                                     }
                                 }
-                                default -> throw new InputMismatchException("Aborting: " + routing + ", " + pathFindingMethod + ", " + algorithm + " unrecognized!");
+                                default -> throw new InputMismatchException("Aborting: " + routing + ", " + pathFinderMethod + ", " + algorithm + " unrecognized!");
                             }
                         }
                         case "pathPenalization" -> {
@@ -700,9 +681,9 @@ public class Main {
                                     ktu.kaganndemirr.routing.phy.pathpenalization.heuristic.WPMDeadline wpmDeadline = new ktu.kaganndemirr.routing.phy.pathpenalization.heuristic.WPMDeadline(k);
 
                                     if(Objects.equals(wpmVersion, Constants.WPM_VERSION_V1)){
-                                        logger.info("Solving problem using {}, {}, {}, K: {}, wpmObjective: {}, wSRT: {}, wTT: {}, wLength: {}, wUtil: {}, wpmVersion: {}", routing, pathFindingMethod, algorithm, k, wpmObjective, wSRT, wTT, wLength, wUtil, wpmVersion);
+                                        logger.info("Solving problem using {}, {}, {}, K: {}, wpmObjective: {}, wSRT: {}, wTT: {}, wLength: {}, wUtil: {}, wpmVersion: {}", routing, pathFinderMethod, algorithm, k, wpmObjective, wSRT, wTT, wLength, wUtil, wpmVersion);
                                     } else if (Objects.equals(wpmVersion, Constants.WPM_VERSION_V2)) {
-                                        logger.info("Solving problem using {}, {}, {}, K: {}, wpmObjective: {}, wSRT: {}, wTT: {}, wLength: {}, wUtil: {}, wpmVersion: {}, wpmValueType: {}", routing, pathFindingMethod, algorithm, k, wpmObjective, wSRT, wTT, wLength, wUtil, wpmVersion, wpmValueType);
+                                        logger.info("Solving problem using {}, {}, {}, K: {}, wpmObjective: {}, wSRT: {}, wTT: {}, wLength: {}, wUtil: {}, wpmVersion: {}, wpmValueType: {}", routing, pathFinderMethod, algorithm, k, wpmObjective, wSRT, wTT, wLength, wUtil, wpmVersion, wpmValueType);
                                     }
 
                                     Solution solution = wpmDeadline.solve(graph, applicationList, wpmObjective, wSRT, wTT, wLength, wUtil, rate, wpmVersion, wpmValueType, evaluator);
@@ -713,7 +694,7 @@ public class Main {
                                         phyWPMv1Holder.setTopologyName(topologyName);
                                         phyWPMv1Holder.setApplicationName(applicationName);
                                         phyWPMv1Holder.setRouting(routing);
-                                        phyWPMv1Holder.setPathFindingMethod(pathFindingMethod);
+                                        phyWPMv1Holder.setPathFindingMethod(pathFinderMethod);
                                         phyWPMv1Holder.setAlgorithm(algorithm);
                                         phyWPMv1Holder.setK(k);
                                         phyWPMv1Holder.setWPMObjective(wpmObjective);
@@ -730,7 +711,7 @@ public class Main {
                                         phyWPMv2Holder.setTopologyName(topologyName);
                                         phyWPMv2Holder.setApplicationName(applicationName);
                                         phyWPMv2Holder.setRouting(routing);
-                                        phyWPMv2Holder.setPathFindingMethod(pathFindingMethod);
+                                        phyWPMv2Holder.setPathFindingMethod(pathFinderMethod);
                                         phyWPMv2Holder.setAlgorithm(algorithm);
                                         phyWPMv2Holder.setK(k);
                                         phyWPMv2Holder.setWPMObjective(wpmObjective);
@@ -792,9 +773,9 @@ public class Main {
                                     ktu.kaganndemirr.routing.phy.pathpenalization.metaheuristic.WPMLWRDeadline graspWPMLWRDeadline = new ktu.kaganndemirr.routing.phy.pathpenalization.metaheuristic.WPMLWRDeadline(k);
 
                                     if(Objects.equals(wpmVersion, Constants.WPM_VERSION_V1)){
-                                        logger.info("Solving problem using {}, {}, {}, LWR: {}, K:{}, wpmObjective: {}, wSRT: {}, wTT: {}, wLength: {}, wUtil: {}, wpmVersion: {}, Metaheuristic Name: {}, Evaluator: {} Timeout: {}(sec)", routing, pathFindingMethod, algorithm, lwr, k, wpmObjective, wSRT, wTT, wLength, wUtil, wpmVersion, metaheuristicName, evaluatorName, timeout);
+                                        logger.info("Solving problem using {}, {}, {}, LWR: {}, K:{}, wpmObjective: {}, wSRT: {}, wTT: {}, wLength: {}, wUtil: {}, wpmVersion: {}, Metaheuristic Name: {}, Evaluator: {} Timeout: {}(sec)", routing, pathFinderMethod, algorithm, lwr, k, wpmObjective, wSRT, wTT, wLength, wUtil, wpmVersion, metaheuristicName, evaluatorName, timeout);
                                     } else if (Objects.equals(wpmVersion, Constants.WPM_VERSION_V2)) {
-                                        logger.info("Solving problem using {}, {}, {}, LWR: {}, K:{}, wpmObjective: {}, wSRT: {}, wTT: {}, wLength: {}, wUtil: {}, wpmVersion: {}, wpmValueType: {}, Metaheuristic Name: {}, Evaluator: {}, Timeout: {}(sec)", routing, pathFindingMethod, algorithm, lwr, k, wpmObjective, wSRT, wTT, wLength, wUtil, wpmVersion, wpmValueType, metaheuristicName, evaluatorName, timeout);
+                                        logger.info("Solving problem using {}, {}, {}, LWR: {}, K:{}, wpmObjective: {}, wSRT: {}, wTT: {}, wLength: {}, wUtil: {}, wpmVersion: {}, wpmValueType: {}, Metaheuristic Name: {}, Evaluator: {}, Timeout: {}(sec)", routing, pathFinderMethod, algorithm, lwr, k, wpmObjective, wSRT, wTT, wLength, wUtil, wpmVersion, wpmValueType, metaheuristicName, evaluatorName, timeout);
                                     }
 
                                     Solution solution = graspWPMLWRDeadline.solve(graph, applicationList, threadNumber, lwr, wpmObjective, wSRT, wTT, wLength, wUtil, rate, wpmVersion, wpmValueType, metaheuristicName, evaluator, Duration.ofSeconds(timeout));
@@ -805,7 +786,7 @@ public class Main {
                                         phyWPMLWRv1Holder.setTopologyName(topologyName);
                                         phyWPMLWRv1Holder.setApplicationName(applicationName);
                                         phyWPMLWRv1Holder.setRouting(routing);
-                                        phyWPMLWRv1Holder.setPathFindingMethod(pathFindingMethod);
+                                        phyWPMLWRv1Holder.setPathFindingMethod(pathFinderMethod);
                                         phyWPMLWRv1Holder.setAlgorithm(algorithm);
                                         phyWPMLWRv1Holder.setLWR(lwr);
                                         phyWPMLWRv1Holder.setK(k);
@@ -823,7 +804,7 @@ public class Main {
                                         phyWPMLWRv2Holder.setTopologyName(topologyName);
                                         phyWPMLWRv2Holder.setApplicationName(applicationName);
                                         phyWPMLWRv2Holder.setRouting(routing);
-                                        phyWPMLWRv2Holder.setPathFindingMethod(pathFindingMethod);
+                                        phyWPMLWRv2Holder.setPathFindingMethod(pathFinderMethod);
                                         phyWPMLWRv2Holder.setAlgorithm(algorithm);
                                         phyWPMLWRv2Holder.setLWR(lwr);
                                         phyWPMLWRv2Holder.setK(k);
@@ -886,9 +867,9 @@ public class Main {
                                     ktu.kaganndemirr.routing.phy.pathpenalization.metaheuristic.WPMCWRDeadline graspWPMCWRDeadline = new ktu.kaganndemirr.routing.phy.pathpenalization.metaheuristic.WPMCWRDeadline(k);
 
                                     if(Objects.equals(wpmVersion, Constants.WPM_VERSION_V1)){
-                                        logger.info("Solving problem using {}, {}, {}, K:{}, wpmObjective: {}, CWR: {}, wpmVersion: {}, Metaheuristic Name:{}, Evaluator: {}, Timeout: {}(sec)", routing, pathFindingMethod, algorithm, k, wpmObjective, cwr, wpmVersion, metaheuristicName, evaluatorName, timeout);
+                                        logger.info("Solving problem using {}, {}, {}, K:{}, wpmObjective: {}, CWR: {}, wpmVersion: {}, Metaheuristic Name:{}, Evaluator: {}, Timeout: {}(sec)", routing, pathFinderMethod, algorithm, k, wpmObjective, cwr, wpmVersion, metaheuristicName, evaluatorName, timeout);
                                     } else if (Objects.equals(wpmVersion, Constants.WPM_VERSION_V2)) {
-                                        logger.info("Solving problem using {}, {}, {}, K:{}, wpmObjective: {}, CWR: {}, wpmVersion: {}, wpmValueType: {}, Metaheuristic Name: {}, Evaluator: {}, Timeout: {}(sec)", routing, pathFindingMethod, algorithm, k, wpmObjective, cwr, wpmVersion, wpmValueType, metaheuristicName, evaluatorName, timeout);
+                                        logger.info("Solving problem using {}, {}, {}, K:{}, wpmObjective: {}, CWR: {}, wpmVersion: {}, wpmValueType: {}, Metaheuristic Name: {}, Evaluator: {}, Timeout: {}(sec)", routing, pathFinderMethod, algorithm, k, wpmObjective, cwr, wpmVersion, wpmValueType, metaheuristicName, evaluatorName, timeout);
                                     }
 
                                     Solution solution = graspWPMCWRDeadline.solve(graph, applicationList, threadNumber, wpmObjective, cwr, rate, wpmVersion, wpmValueType, metaheuristicName, evaluator, Duration.ofSeconds(timeout));
@@ -899,7 +880,7 @@ public class Main {
                                         phyWPMCWRv1Holder.setTopologyName(topologyName);
                                         phyWPMCWRv1Holder.setApplicationName(applicationName);
                                         phyWPMCWRv1Holder.setRouting(routing);
-                                        phyWPMCWRv1Holder.setPathFindingMethod(pathFindingMethod);
+                                        phyWPMCWRv1Holder.setPathFindingMethod(pathFinderMethod);
                                         phyWPMCWRv1Holder.setAlgorithm(algorithm);
                                         phyWPMCWRv1Holder.setK(k);
                                         phyWPMCWRv1Holder.setWPMObjective(wpmObjective);
@@ -912,7 +893,7 @@ public class Main {
                                         phyWPMCWRv2Holder.setTopologyName(topologyName);
                                         phyWPMCWRv2Holder.setApplicationName(applicationName);
                                         phyWPMCWRv2Holder.setRouting(routing);
-                                        phyWPMCWRv2Holder.setPathFindingMethod(pathFindingMethod);
+                                        phyWPMCWRv2Holder.setPathFindingMethod(pathFinderMethod);
                                         phyWPMCWRv2Holder.setAlgorithm(algorithm);
                                         phyWPMCWRv2Holder.setK(k);
                                         phyWPMCWRv2Holder.setWPMObjective(wpmObjective);
@@ -970,9 +951,9 @@ public class Main {
                                     ktu.kaganndemirr.routing.phy.pathpenalization.metaheuristic.WPMLWRCWRDeadline graspWPMLWRCWRDeadline = new ktu.kaganndemirr.routing.phy.pathpenalization.metaheuristic.WPMLWRCWRDeadline(k);
 
                                     if(Objects.equals(wpmVersion, Constants.WPM_VERSION_V1)){
-                                        logger.info("Solving problem using {}, {}, {}, LWR: {}, K: {}, wpmObjective: {}, CWR: {}, wSRT: {}, wTT: {}, wLength: {}, wUtil: {}, wpmVersion: {}, Thread Number: {}, Timeout: {}(sec), Metaheuristic Name: {}, Evaluator: {}", routing, pathFindingMethod, algorithm, lwr, k, wpmObjective, cwr, wSRT, wTT, wLength, wUtil, wpmVersion, threadNumber, timeout, metaheuristicName, evaluatorName);
+                                        logger.info("Solving problem using {}, {}, {}, LWR: {}, K: {}, wpmObjective: {}, CWR: {}, wSRT: {}, wTT: {}, wLength: {}, wUtil: {}, wpmVersion: {}, Thread Number: {}, Timeout: {}(sec), Metaheuristic Name: {}, Evaluator: {}", routing, pathFinderMethod, algorithm, lwr, k, wpmObjective, cwr, wSRT, wTT, wLength, wUtil, wpmVersion, threadNumber, timeout, metaheuristicName, evaluatorName);
                                     } else if (Objects.equals(wpmVersion, Constants.WPM_VERSION_V2)) {
-                                        logger.info("Solving problem using {}, {}, {}, LWR: {}, K: {}, wpmObjective: {}, CWR: {}, wSRT: {}, wTT: {}, wLength: {}, wUtil: {}, wpmVersion: {}, wpmValueType: {}, Thread Number: {}, Timeout: {}(sec), Metaheuristic Name: {}, Evaluator: {}", routing, pathFindingMethod, algorithm, lwr, k, wpmObjective, cwr, wSRT, wTT, wLength, wUtil, wpmVersion, wpmValueType, threadNumber, timeout, metaheuristicName, evaluatorName);
+                                        logger.info("Solving problem using {}, {}, {}, LWR: {}, K: {}, wpmObjective: {}, CWR: {}, wSRT: {}, wTT: {}, wLength: {}, wUtil: {}, wpmVersion: {}, wpmValueType: {}, Thread Number: {}, Timeout: {}(sec), Metaheuristic Name: {}, Evaluator: {}", routing, pathFinderMethod, algorithm, lwr, k, wpmObjective, cwr, wSRT, wTT, wLength, wUtil, wpmVersion, wpmValueType, threadNumber, timeout, metaheuristicName, evaluatorName);
                                     }
 
                                     Solution solution = graspWPMLWRCWRDeadline.solve(graph, applicationList, threadNumber, lwr, wpmObjective, cwr, wSRT, wTT, wLength, wUtil, rate, wpmVersion, wpmValueType, metaheuristicName, evaluator, Duration.ofSeconds(timeout));
@@ -983,7 +964,7 @@ public class Main {
                                         phyWPMLWRCWRv1Holder.setTopologyName(topologyName);
                                         phyWPMLWRCWRv1Holder.setApplicationName(applicationName);
                                         phyWPMLWRCWRv1Holder.setRouting(routing);
-                                        phyWPMLWRCWRv1Holder.setPathFindingMethod(pathFindingMethod);
+                                        phyWPMLWRCWRv1Holder.setPathFindingMethod(pathFinderMethod);
                                         phyWPMLWRCWRv1Holder.setAlgorithm(algorithm);
                                         phyWPMLWRCWRv1Holder.setLWR(lwr);
                                         phyWPMLWRCWRv1Holder.setK(k);
@@ -1002,7 +983,7 @@ public class Main {
                                         phyWPMLWRCWRv2Holder.setTopologyName(topologyName);
                                         phyWPMLWRCWRv2Holder.setApplicationName(applicationName);
                                         phyWPMLWRCWRv2Holder.setRouting(routing);
-                                        phyWPMLWRCWRv2Holder.setPathFindingMethod(pathFindingMethod);
+                                        phyWPMLWRCWRv2Holder.setPathFindingMethod(pathFinderMethod);
                                         phyWPMLWRCWRv2Holder.setAlgorithm(algorithm);
                                         phyWPMLWRCWRv2Holder.setLWR(lwr);
                                         phyWPMLWRCWRv2Holder.setK(k);
@@ -1062,11 +1043,11 @@ public class Main {
                                         }
                                     }
                                 }
-                                default -> throw new InputMismatchException("Aborting: " + routing + ", " + pathFindingMethod + ", " + algorithm + " unrecognized!");
+                                default -> throw new InputMismatchException("Aborting: " + routing + ", " + pathFinderMethod + ", " + algorithm + " unrecognized!");
                             }
                         }
 
-                        default -> throw new InputMismatchException("Aborting: Solver " + routing + ", " + pathFindingMethod + " unrecognized!");
+                        default -> throw new InputMismatchException("Aborting: Solver " + routing + ", " + pathFinderMethod + " unrecognized!");
                     }
                 }
                 default -> throw new InputMismatchException("Aborting: " + routing + " unrecognized!");

@@ -42,7 +42,7 @@ public class RandomNumberGenerator {
         }
     }
 
-    public static List<Double> generateRandomWeightsAVBTTLengthThreadLocalRandom(){
+    public static List<Double> generateRandomWeightsSRTTTLengthThreadLocalRandom(){
         List<Double> possibleValues = new ArrayList<>();
         for (double i = 0; i <= 1.0; i += 0.01) {
             possibleValues.add(i);
