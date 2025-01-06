@@ -67,6 +67,8 @@ public class Main {
     private static final String TSN_SIMULATION_VERSION_ARG = "tsnSimulationVersion";
 
     private static final String METAHEURISTIC_NAME_ARG = "metaheuristicName";
+
+    private static final String MTR_NAME_ARG = "mtrName";
     //endregion
 
     public static void main(String[] args) {
@@ -122,6 +124,9 @@ public class Main {
         //Default Metaheuristic Name
         String metaheuristicName = "GRASP";
 
+        //Default MTR Name
+        String mtrName = "v1";
+
         //endregion
 
         //region <Options>
@@ -159,6 +164,9 @@ public class Main {
         options.addOption(TSN_SIMULATION_VERSION_ARG, true, "TSN Simulation Version (Default: TSNConfigurationFramework) (Choices: TSNConfigurationFramework, TSNRoutingOptimization)");
 
         options.addOption(METAHEURISTIC_NAME_ARG, true, "Which metaheuristic runs (Default: GRASP) (Choices: GRASP, ALO)");
+
+        options.addOption(MTR_NAME_ARG, true, "MTR Versions (Default: v1) (Choices: v1, Average)");
+
 
         //endregion
 
@@ -267,6 +275,10 @@ public class Main {
 
             if (line.hasOption(METAHEURISTIC_NAME_ARG)) {
                 metaheuristicName = line.getOptionValue(METAHEURISTIC_NAME_ARG);
+            }
+
+            if (line.hasOption(MTR_NAME_ARG)) {
+                mtrName = line.getOptionValue(MTR_NAME_ARG);
             }
 
             //endregion
@@ -692,7 +704,7 @@ public class Main {
                                         }
                                     }
                                 }
-                                case "LaursenRoutingOptimization" -> {
+                                case "LaursenRO" -> {
                                     LaursenRO laursenRO = new LaursenRO(k);
 
                                     logger.info("Solving problem using {}, {}, {}, K: {}, Thread Number: {}, Timeout: {}(sec), Metaheuristic Name: {}, Evaluator: {}", routing, pathFindingMethod, algorithm, k, threadNumber, timeout, metaheuristicName, evaluatorName);
@@ -1132,6 +1144,78 @@ public class Main {
                         }
 
                         default -> throw new InputMismatchException("Aborting: Solver " + routing + ", " + pathFindingMethod + " unrecognized!");
+                    }
+                }
+                case "mtr" -> {
+                    switch (pathFindingMethod) {
+                        case "yen" -> {
+                            switch (algorithm) {
+                                case "LaursenRO" -> {
+                                    ktu.kaganndemirr.routing.mtr.yen.metaheuristic.LaursenRO laursenRO = new ktu.kaganndemirr.routing.mtr.yen.metaheuristic.LaursenRO(k);
+
+                                    logger.info("Solving problem using {}, {}, {}, {}, K: {}, Thread Number: {}, Timeout: {}(sec), Metaheuristic Name: {}, Evaluator: {}", routing, mtrName, pathFindingMethod, algorithm, k, threadNumber, timeout, metaheuristicName, evaluatorName);
+
+                                    Solution solution = laursenRO.solve(graph, applicationList, mtrName, threadNumber, Duration.ofSeconds(timeout), metaheuristicName, evaluator);
+
+                                    PHYWPMLWRCWRv1Holder phyWPMLWRCWRv1Holder = new PHYWPMLWRCWRv1Holder();
+                                    PHYWPMLWRCWRv2Holder phyWPMLWRCWRv2Holder = new PHYWPMLWRCWRv2Holder();
+                                    if(Objects.equals(wpmVersion, Constants.WPM_VERSION_V1)){
+                                        phyWPMLWRCWRv1Holder.setTopologyName(topologyName);
+                                        phyWPMLWRCWRv1Holder.setApplicationName(applicationName);
+                                        phyWPMLWRCWRv1Holder.setRouting(routing);
+                                        phyWPMLWRCWRv1Holder.setPathFindingMethod(pathFindingMethod);
+                                        phyWPMLWRCWRv1Holder.setAlgorithm(algorithm);
+                                        phyWPMLWRCWRv1Holder.setLWR(lwr);
+                                        phyWPMLWRCWRv1Holder.setK(k);
+                                        phyWPMLWRCWRv1Holder.setWPMObjective(wpmObjective);
+                                        phyWPMLWRCWRv1Holder.setCWR(cwr);
+                                        phyWPMLWRCWRv1Holder.setWSRT(wSRT);
+                                        phyWPMLWRCWRv1Holder.setWTT(wTT);
+                                        phyWPMLWRCWRv1Holder.setWLength(wLength);
+                                        phyWPMLWRCWRv1Holder.setWUtil(wUtil);
+                                        phyWPMLWRCWRv1Holder.setWPMVersion(wpmVersion);
+                                        phyWPMLWRCWRv1Holder.setWPMObjective(wpmObjective);
+
+                                        solution.getCost().writePHYWPMLWRCWRv1ResultToFile(phyWPMLWRCWRv1Holder);
+
+                                    } else if (Objects.equals(wpmVersion, Constants.WPM_VERSION_V2)) {
+                                        phyWPMLWRCWRv2Holder.setTopologyName(topologyName);
+                                        phyWPMLWRCWRv2Holder.setApplicationName(applicationName);
+                                        phyWPMLWRCWRv2Holder.setRouting(routing);
+                                        phyWPMLWRCWRv2Holder.setPathFindingMethod(pathFindingMethod);
+                                        phyWPMLWRCWRv2Holder.setAlgorithm(algorithm);
+                                        phyWPMLWRCWRv2Holder.setLWR(lwr);
+                                        phyWPMLWRCWRv2Holder.setK(k);
+                                        phyWPMLWRCWRv2Holder.setWPMObjective(wpmObjective);
+                                        phyWPMLWRCWRv2Holder.setCWR(cwr);
+                                        phyWPMLWRCWRv2Holder.setWSRT(wSRT);
+                                        phyWPMLWRCWRv2Holder.setWTT(wTT);
+                                        phyWPMLWRCWRv2Holder.setWLength(wLength);
+                                        phyWPMLWRCWRv2Holder.setWUtil(wUtil);
+                                        phyWPMLWRCWRv2Holder.setWPMObjective(wpmObjective);
+                                        phyWPMLWRCWRv2Holder.setWPMVersion(wpmVersion);
+                                        phyWPMLWRCWRv2Holder.setWPMValueType(wpmValueType);
+
+                                        solution.getCost().writePHYWPMLWRCWRv2ResultToFile(phyWPMLWRCWRv2Holder);
+                                    }
+
+
+                                    if (solution.getMulticastList() == null || solution.getMulticastList().isEmpty()) {
+                                        logger.info(Constants.NO_SOLUTION_COULD_BE_FOUND);
+                                    } else {
+                                        if (solution.getCost().getTotalCost() == Double.MAX_VALUE) {
+                                            logger.info(createFoundNoSolutionString(solution));
+                                        } else {
+                                            logger.info(createFoundSolutionString(solution));
+
+
+
+
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
                 default -> throw new InputMismatchException("Aborting: " + routing + " unrecognized!");

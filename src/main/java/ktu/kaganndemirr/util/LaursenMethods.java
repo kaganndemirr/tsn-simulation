@@ -11,32 +11,31 @@ import java.util.Collections;
 import java.util.List;
 
 public class LaursenMethods {
-    public static List<Unicast> constructInitialSolution(List<UnicastCandidate> avbList, List<Unicast> ttRoutes, int k, Evaluator eval) {
+    public static List<Unicast> constructInitialSolution(List<UnicastCandidate> srtUnicastCandidateList, List<Unicast> ttUnicastList, int k, Evaluator eval) {
 
-        List<Unicast> initialSolution = new ArrayList<>(ttRoutes);
+        List<Unicast> initialSolution = new ArrayList<>(ttUnicastList);
 
-        List<UnicastCandidate> shuffledAvbList = new ArrayList<>(avbList);
+        List<UnicastCandidate> shuffledAvbList = new ArrayList<>(srtUnicastCandidateList);
         Collections.shuffle(shuffledAvbList);
 
         //Then within an application, we select the
-        for (UnicastCandidate uc : shuffledAvbList) {
-            Cost currBestCost = new AVBLatencyMathCost();
-            Unicast currUnicast;
-            Unicast currBestUnicast = null;
+        for (UnicastCandidate unicastCandidate : shuffledAvbList) {
+            Cost currentBestCost = new AVBLatencyMathCost();
+            Unicast currentUnicast;
+            Unicast currentBestUnicast = null;
             for (int u = 0; u < k; u++) {
-                currUnicast = new Unicast(uc.getApplication(), uc.getTarget(), uc.getCandidatePathList().get(u));
-                //Add solution and evaluate
-                initialSolution.add(currUnicast);
+                currentUnicast = new Unicast(unicastCandidate.getApplication(), unicastCandidate.getTarget(), unicastCandidate.getCandidatePathList().get(u));
+                initialSolution.add(currentUnicast);
                 Cost cost = eval.evaluate(initialSolution);
-                if (cost.getTotalCost() < currBestCost.getTotalCost()) {
-                    currBestCost = cost;
-                    currBestUnicast = currUnicast;
+                if (cost.getTotalCost() < currentBestCost.getTotalCost()) {
+                    currentBestCost = cost;
+                    currentBestUnicast = currentUnicast;
                 }
                 //Remove it again
-                initialSolution.remove(currUnicast);
+                initialSolution.remove(currentUnicast);
 
             }
-            initialSolution.add(currBestUnicast);
+            initialSolution.add(currentBestUnicast);
         }
         return initialSolution;
     }

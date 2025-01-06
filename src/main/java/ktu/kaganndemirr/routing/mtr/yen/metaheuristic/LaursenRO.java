@@ -1,4 +1,4 @@
-package ktu.kaganndemirr.routing.phy.yen.metaheuristic;
+package ktu.kaganndemirr.routing.mtr.yen.metaheuristic;
 
 import ktu.kaganndemirr.application.Application;
 import ktu.kaganndemirr.architecture.GCLEdge;
@@ -9,8 +9,7 @@ import ktu.kaganndemirr.evaluator.Evaluator;
 import ktu.kaganndemirr.message.Multicast;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
-import ktu.kaganndemirr.routing.phy.yen.YenKShortestPaths;
-import ktu.kaganndemirr.routing.phy.yen.YenRandomizedKShortestPaths;
+import ktu.kaganndemirr.routing.mtr.yen.YenKShortestPaths;
 import ktu.kaganndemirr.solver.Solution;
 import ktu.kaganndemirr.util.Constants;
 import ktu.kaganndemirr.util.LaursenMethods;
@@ -28,7 +27,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class LaursenRO {
-    private static final Logger logger = LoggerFactory.getLogger(WPMCWRDeadline.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(LaursenRO.class.getSimpleName());
 
     private final int k;
 
@@ -54,9 +53,9 @@ public class LaursenRO {
         bestSolution = new ArrayList<>();
     }
 
-    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, int threadNumber, Duration timeout, String metaheuristicName, Evaluator evaluator){
+    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, String mtrName, int threadNumber, Duration timeout, String metaheuristicName, Evaluator evaluator){
         Instant yenKShortestPathsStartTime = Instant.now();
-        YenKShortestPaths yenKShortestPaths = new YenKShortestPaths(graph, applicationList, k);
+        YenKShortestPaths yenKShortestPaths = new YenKShortestPaths(graph, applicationList, mtrName, k);
         Instant yenKShortestPathsEndTime = Instant.now();
         long yenKShortestPathsDuration = Duration.between(yenKShortestPathsStartTime, yenKShortestPathsEndTime).toMillis();
 
@@ -170,4 +169,5 @@ public class LaursenRO {
         return durationMap;
     }
 }
+
 

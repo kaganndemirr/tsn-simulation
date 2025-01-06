@@ -24,7 +24,7 @@ public class YenKShortestPaths {
     private final List<Application> applicationList;
     private final List<UnicastCandidate> srtUnicastCandidateList;
 
-    public YenKShortestPaths(final Graph<Node, GCLEdge> graph, final List<Application> applicationList, final int k) {
+    public YenKShortestPaths(Graph<Node, GCLEdge> graph, List<Application> applicationList, int k) {
         srtUnicastCandidateList = new ArrayList<>();
         this.applicationList = applicationList;
 
