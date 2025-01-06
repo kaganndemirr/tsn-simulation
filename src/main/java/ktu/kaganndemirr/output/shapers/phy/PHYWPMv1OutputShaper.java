@@ -19,6 +19,8 @@ import java.util.*;
 
 import ktu.kaganndemirr.util.holders.PHYWPMv1Holder;
 
+import static ktu.kaganndemirr.util.Constants.*;
+
 public class PHYWPMv1OutputShaper {
     private static final Logger logger = LoggerFactory.getLogger(PHYWPMv1OutputShaper.class.getSimpleName());
 

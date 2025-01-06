@@ -214,12 +214,12 @@ public class AVBLatencyMathCost implements Cost, Comparator<AVBLatencyMathCost> 
 
     @Override
     public void writePHYWPMLWRCWRv1ResultToFile(PHYWPMLWRCWRv1Holder phyWPMLWRCWRv1Holder) {
-        String mainFolderOutputLocation = Paths.get("outputs", phyWPMLWRCWRv1Holder.getRouting(), phyWPMLWRCWRv1Holder.getPathFindingMethod(), phyWPMLWRCWRv1Holder.getAlgorithm(), phyWPMLWRCWRv1Holder.getLWR(), String.valueOf(phyWPMLWRCWRv1Holder.getK()), phyWPMLWRCWRv1Holder.getWPMObjective(), phyWPMLWRCWRv1Holder.getCWR(), phyWPMLWRCWRv1Holder.getCWR(), phyWPMLWRCWRv1Holder.getWPMVersion(), phyWPMLWRCWRv1Holder.getTopologyName() + "_" + phyWPMLWRCWRv1Holder.getApplicationName()).toString();
+        String mainFolderOutputLocation = Paths.get("outputs", phyWPMLWRCWRv1Holder.getRouting(), phyWPMLWRCWRv1Holder.getPathFindingMethod(), phyWPMLWRCWRv1Holder.getAlgorithm(), phyWPMLWRCWRv1Holder.getLWR(), String.valueOf(phyWPMLWRCWRv1Holder.getK()), phyWPMLWRCWRv1Holder.getWPMObjective(), phyWPMLWRCWRv1Holder.getCWR(), phyWPMLWRCWRv1Holder.getWPMVersion(), phyWPMLWRCWRv1Holder.getTopologyName() + "_" + phyWPMLWRCWRv1Holder.getApplicationName()).toString();
 
         boolean isCreated = new File(mainFolderOutputLocation).mkdirs();
 
         if (isCreated) {
-            String resultFileOutputLocation = Paths.get("outputs", phyWPMLWRCWRv1Holder.getRouting(), phyWPMLWRCWRv1Holder.getPathFindingMethod(), phyWPMLWRCWRv1Holder.getAlgorithm(), phyWPMLWRCWRv1Holder.getLWR(), String.valueOf(phyWPMLWRCWRv1Holder.getK()), phyWPMLWRCWRv1Holder.getWPMObjective(), phyWPMLWRCWRv1Holder.getCWR(), phyWPMLWRCWRv1Holder.getCWR(), phyWPMLWRCWRv1Holder.getWPMVersion()).toString();
+            String resultFileOutputLocation = Paths.get("outputs", phyWPMLWRCWRv1Holder.getRouting(), phyWPMLWRCWRv1Holder.getPathFindingMethod(), phyWPMLWRCWRv1Holder.getAlgorithm(), phyWPMLWRCWRv1Holder.getLWR(), String.valueOf(phyWPMLWRCWRv1Holder.getK()), phyWPMLWRCWRv1Holder.getWPMObjective(), phyWPMLWRCWRv1Holder.getCWR(), phyWPMLWRCWRv1Holder.getWPMVersion()).toString();
 
 
             try {
@@ -236,12 +236,12 @@ public class AVBLatencyMathCost implements Cost, Comparator<AVBLatencyMathCost> 
 
     @Override
     public void writePHYWPMLWRCWRv2ResultToFile(PHYWPMLWRCWRv2Holder phyWPMLWRCWRv2Holder) {
-        String mainFolderOutputLocation = Paths.get("outputs", phyWPMLWRCWRv2Holder.getRouting(), phyWPMLWRCWRv2Holder.getPathFindingMethod(), phyWPMLWRCWRv2Holder.getAlgorithm(), phyWPMLWRCWRv2Holder.getLWR(), String.valueOf(phyWPMLWRCWRv2Holder.getK()), phyWPMLWRCWRv2Holder.getWPMObjective(), phyWPMLWRCWRv2Holder.getCWR(), phyWPMLWRCWRv2Holder.getCWR(), phyWPMLWRCWRv2Holder.getWPMVersion(), phyWPMLWRCWRv2Holder.getWPMValueType(), phyWPMLWRCWRv2Holder.getTopologyName() + "_" + phyWPMLWRCWRv2Holder.getApplicationName()).toString();
+        String mainFolderOutputLocation = Paths.get("outputs", phyWPMLWRCWRv2Holder.getRouting(), phyWPMLWRCWRv2Holder.getPathFindingMethod(), phyWPMLWRCWRv2Holder.getAlgorithm(), phyWPMLWRCWRv2Holder.getLWR(), String.valueOf(phyWPMLWRCWRv2Holder.getK()), phyWPMLWRCWRv2Holder.getWPMObjective(), phyWPMLWRCWRv2Holder.getCWR(), phyWPMLWRCWRv2Holder.getWPMVersion(), phyWPMLWRCWRv2Holder.getWPMValueType(), phyWPMLWRCWRv2Holder.getTopologyName() + "_" + phyWPMLWRCWRv2Holder.getApplicationName()).toString();
 
         boolean isCreated = new File(mainFolderOutputLocation).mkdirs();
 
         if (isCreated) {
-            String resultFileOutputLocation = Paths.get("outputs", phyWPMLWRCWRv2Holder.getRouting(), phyWPMLWRCWRv2Holder.getPathFindingMethod(), phyWPMLWRCWRv2Holder.getAlgorithm(), phyWPMLWRCWRv2Holder.getLWR(), String.valueOf(phyWPMLWRCWRv2Holder.getK()), phyWPMLWRCWRv2Holder.getWPMObjective(), phyWPMLWRCWRv2Holder.getCWR(), phyWPMLWRCWRv2Holder.getCWR(), phyWPMLWRCWRv2Holder.getWPMVersion(), phyWPMLWRCWRv2Holder.getWPMValueType()).toString();
+            String resultFileOutputLocation = Paths.get("outputs", phyWPMLWRCWRv2Holder.getRouting(), phyWPMLWRCWRv2Holder.getPathFindingMethod(), phyWPMLWRCWRv2Holder.getAlgorithm(), phyWPMLWRCWRv2Holder.getLWR(), String.valueOf(phyWPMLWRCWRv2Holder.getK()), phyWPMLWRCWRv2Holder.getWPMObjective(), phyWPMLWRCWRv2Holder.getCWR(), phyWPMLWRCWRv2Holder.getWPMVersion(), phyWPMLWRCWRv2Holder.getWPMValueType()).toString();
 
 
             try {

@@ -7,7 +7,9 @@ import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.message.Multicast;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
+import ktu.kaganndemirr.util.holders.PHYWPMLWRCWRv1Holder;
 import ktu.kaganndemirr.util.holders.PHYWPMLWRCWRv2Holder;
+import ktu.kaganndemirr.util.holders.PHYWPMLWRv1Holder;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.slf4j.Logger;
@@ -18,6 +20,8 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.*;
 
+import static ktu.kaganndemirr.util.Constants.*;
+
 public class PHYWPMLWRCWRv2OutputShaper {
     private static final Logger logger = LoggerFactory.getLogger(PHYWPMLWRv1OutputShaper.class.getSimpleName());
 
@@ -27,9 +31,9 @@ public class PHYWPMLWRCWRv2OutputShaper {
     private final Map<GCLEdge, Double> utilizationMap;
 
     public PHYWPMLWRCWRv2OutputShaper(PHYWPMLWRCWRv2Holder phyWPMLWRCWRv2Holder) {
-        topologyOutputLocation = Paths.get("outputs", phyWPMLWRCWRv2Holder.getRouting(), phyWPMLWRCWRv2Holder.getPathFindingMethod(), phyWPMLWRCWRv2Holder.getAlgorithm(), phyWPMLWRCWRv2Holder.getLWR(), String.valueOf(phyWPMLWRCWRv2Holder.getK()), phyWPMLWRCWRv2Holder.getWPMObjective(), phyWPMLWRCWRv2Holder.getCWR(), phyWPMLWRCWRv2Holder.getCWR(), phyWPMLWRCWRv2Holder.getWPMVersion(), phyWPMLWRCWRv2Holder.getWPMValueType(), phyWPMLWRCWRv2Holder.getTopologyName() + "_" + phyWPMLWRCWRv2Holder.getApplicationName()).toString();
+        topologyOutputLocation = Paths.get("outputs", phyWPMLWRCWRv2Holder.getRouting(), phyWPMLWRCWRv2Holder.getPathFindingMethod(), phyWPMLWRCWRv2Holder.getAlgorithm(), phyWPMLWRCWRv2Holder.getLWR(), String.valueOf(phyWPMLWRCWRv2Holder.getK()), phyWPMLWRCWRv2Holder.getWPMObjective(), phyWPMLWRCWRv2Holder.getCWR(), phyWPMLWRCWRv2Holder.getWPMVersion(), phyWPMLWRCWRv2Holder.getWPMValueType(), phyWPMLWRCWRv2Holder.getTopologyName() + "_" + phyWPMLWRCWRv2Holder.getApplicationName()).toString();
 
-        mainOutputLocation = Paths.get("outputs", phyWPMLWRCWRv2Holder.getRouting(), phyWPMLWRCWRv2Holder.getPathFindingMethod(), phyWPMLWRCWRv2Holder.getAlgorithm(), phyWPMLWRCWRv2Holder.getLWR(), String.valueOf(phyWPMLWRCWRv2Holder.getK()), phyWPMLWRCWRv2Holder.getWPMObjective(), phyWPMLWRCWRv2Holder.getCWR(), phyWPMLWRCWRv2Holder.getCWR(), phyWPMLWRCWRv2Holder.getWPMVersion(), phyWPMLWRCWRv2Holder.getWPMValueType()).toString();
+        mainOutputLocation = Paths.get("outputs", phyWPMLWRCWRv2Holder.getRouting(), phyWPMLWRCWRv2Holder.getPathFindingMethod(), phyWPMLWRCWRv2Holder.getAlgorithm(), phyWPMLWRCWRv2Holder.getLWR(), String.valueOf(phyWPMLWRCWRv2Holder.getK()), phyWPMLWRCWRv2Holder.getWPMObjective(), phyWPMLWRCWRv2Holder.getCWR(), phyWPMLWRCWRv2Holder.getWPMVersion(), phyWPMLWRCWRv2Holder.getWPMValueType()).toString();
 
         utilizationMap = new HashMap<>();
 

@@ -1,4 +1,4 @@
-package ktu.kaganndemirr.routing.phy.pathpenalization.metaheuristic;
+package ktu.kaganndemirr.routing.phy.yen.metaheuristic;
 
 import ktu.kaganndemirr.application.Application;
 import ktu.kaganndemirr.architecture.GCLEdge;
@@ -9,12 +9,12 @@ import ktu.kaganndemirr.evaluator.Evaluator;
 import ktu.kaganndemirr.message.Multicast;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
-import ktu.kaganndemirr.routing.phy.pathpenalization.PathPenalizationKShortestPaths;
+import ktu.kaganndemirr.routing.phy.yen.YenKShortestPaths;
 import ktu.kaganndemirr.routing.phy.yen.YenRandomizedKShortestPaths;
 import ktu.kaganndemirr.solver.Solution;
 import ktu.kaganndemirr.util.Constants;
+import ktu.kaganndemirr.util.LaursenMethods;
 import ktu.kaganndemirr.util.MetaheuristicMethods;
-import ktu.kaganndemirr.util.WPMMethods;
 import org.jgrapht.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class WPMCWRDeadline {
+public class LaursenRO {
     private static final Logger logger = LoggerFactory.getLogger(WPMCWRDeadline.class.getSimpleName());
 
     private final int k;
@@ -35,10 +35,6 @@ public class WPMCWRDeadline {
     private List<Unicast> ttUnicastList;
 
     private final Map<Double, Double> durationMap;
-
-    private Graph<Node, GCLEdge> graph;
-
-    private List<Application> applicationList;
 
     private List<UnicastCandidate> srtUnicastCandidateList;
 
@@ -50,7 +46,7 @@ public class WPMCWRDeadline {
 
     private Evaluator evaluator;
 
-    public WPMCWRDeadline(int k){
+    public LaursenRO(int k){
         this.k = k;
         costLock = new Object();
         durationMap = new HashMap<>();
@@ -58,15 +54,15 @@ public class WPMCWRDeadline {
         bestSolution = new ArrayList<>();
     }
 
-    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, int threadNumber, String wpmObjective, String cwr, int rate, String wpmVersion, String wpmValueType, String metaheuristicName, Evaluator evaluator, Duration timeout){
+    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, int threadNumber, Duration timeout, String metaheuristicName, Evaluator evaluator){
         ttUnicastList = YenRandomizedKShortestPaths.getTTUnicastList(applicationList);
 
-        Instant pathPenalizationShortestPathsStartTime = Instant.now();
-        PathPenalizationKShortestPaths pathPenalizationKShortestPaths = new PathPenalizationKShortestPaths(graph, applicationList, k);
-        Instant pathPenalizationShortestPathsEndTime = Instant.now();
-        long pathPenalizationKShortestPathsDuration = Duration.between(pathPenalizationShortestPathsStartTime, pathPenalizationShortestPathsEndTime).toMillis();
+        Instant yenKShortestPathsStartTime = Instant.now();
+        YenKShortestPaths yenKShortestPaths = new YenKShortestPaths(graph, applicationList, k);
+        Instant yenKShortestPathsEndTime = Instant.now();
+        long yenKShortestPathsDuration = Duration.between(yenKShortestPathsStartTime, yenKShortestPathsEndTime).toMillis();
 
-        this.srtUnicastCandidateList = pathPenalizationKShortestPaths.getSRTUnicastCandidateList();
+        this.srtUnicastCandidateList = yenKShortestPaths.getSRTUnicastCandidateList();
 
         this.evaluator = evaluator;
 
@@ -74,8 +70,9 @@ public class WPMCWRDeadline {
 
             Timer timer = getTimer(timeout);
 
+
             for (int i = 0; i < threadNumber; i++) {
-                exec.execute(new WPMCWRDeadlineRunnable(wpmObjective, cwr, rate, wpmVersion, wpmValueType, metaheuristicName));
+                exec.execute(new LaursenRoutingOptimizationRunnable(metaheuristicName));
             }
 
             exec.awaitTermination(timeout.toSeconds(), TimeUnit.SECONDS);
@@ -113,24 +110,14 @@ public class WPMCWRDeadline {
         return timer;
     }
 
-    private class WPMCWRDeadlineRunnable implements Runnable {
+    private class LaursenRoutingOptimizationRunnable implements Runnable {
         private int i = 0;
         Instant solutionStartTime = Instant.now();
 
-        String wpmObjective;
-        String cwr;
-        int rate;
-        String wpmVersion;
-        String wpmValueType;
-        String metaheuristicName;
+        private final String metaHeuristicName;
 
-        public WPMCWRDeadlineRunnable(String wpmObjective, String cwr, int rate, String wpmVersion, String wpmValueType, String metaheuristicName) {
-            this.wpmObjective = wpmObjective;
-            this.cwr = cwr;
-            this.rate = rate;
-            this.wpmVersion = wpmVersion;
-            this.wpmValueType = wpmValueType;
-            this.metaheuristicName = metaheuristicName;
+        public LaursenRoutingOptimizationRunnable(String metaHeuristicName){
+            this.metaHeuristicName = metaHeuristicName;
         }
 
         @Override
@@ -138,22 +125,17 @@ public class WPMCWRDeadline {
             while (!Thread.currentThread().isInterrupted()) {
                 i++;
 
-                List<Unicast> initialSolution = null;
-                if (Objects.equals(wpmObjective, Constants.SRT_TT)){
-                    //TODO
-                } else if (Objects.equals(wpmObjective, Constants.SRT_TT_LENGTH)) {
-                    if(Objects.equals(cwr, Constants.THREAD_LOCAL_RANDOM)){
-                        initialSolution = WPMMethods.deadlineCWRSRTTTLength(srtUnicastCandidateList, ttUnicastList, wpmVersion, wpmValueType);
-                    }
-                } else if (Objects.equals(wpmObjective, Constants.SRT_TT_LENGTH_UTIL)) {
-                    //TODO
-                }
 
                 List<Unicast> solution = null;
-                if (Objects.equals(metaheuristicName, Constants.GRASP)){
+
+                if(Objects.equals(metaHeuristicName, Constants.GRASP)){
+                    List<Unicast> initialSolution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, ttUnicastList, k, evaluator);
                     solution = MetaheuristicMethods.GRASP(initialSolution, evaluator, srtUnicastCandidateList, globalBestCost);
-                } else if (Objects.equals(metaheuristicName, Constants.ALO)) {
+                } else if (Objects.equals(metaHeuristicName, Constants.ALO)) {
+                    List<Unicast> initialSolution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, ttUnicastList, k, evaluator);
                     solution = MetaheuristicMethods.ALO(initialSolution, initialSolution, srtUnicastCandidateList, k, evaluator);
+                } else if (Objects.equals(metaHeuristicName, Constants.CONSTRUCT_INITIAL_SOLUTION)) {
+                    solution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, ttUnicastList, k, evaluator);
                 }
 
                 //Evaluate and see if better than anything we have seen before

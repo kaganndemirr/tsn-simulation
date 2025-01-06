@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.*;
 
+import static ktu.kaganndemirr.util.Constants.*;
+
 public class PHYWPMCWRv2OutputShaper {
     private static final Logger logger = LoggerFactory.getLogger(PHYWPMCWRv2OutputShaper.class.getSimpleName());
 

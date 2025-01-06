@@ -6,13 +6,13 @@ import ktu.kaganndemirr.application.TTApplication;
 import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.Multicast;
-import ktu.kaganndemirr.util.constants.Constants;
+import ktu.kaganndemirr.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-import static ktu.kaganndemirr.util.constants.Constants.MAX_BE_FRAME_BYTES;
+import static ktu.kaganndemirr.util.Constants.MAX_BE_FRAME_BYTES;
 
 public class AVBLatencyMathTSNCF implements Evaluator {
 

@@ -1,12 +1,8 @@
 package ktu.kaganndemirr.util;
 
-import ktu.kaganndemirr.util.constants.Constants;
-import ktu.kaganndemirr.util.holders.Bag;
-
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -46,55 +42,30 @@ public class RandomNumberGenerator {
         }
     }
 
-    public static List<Double> generateRandomWeights(Bag bag){
+    public static List<Double> generateRandomWeightsAVBTTLengthThreadLocalRandom(){
         List<Double> possibleValues = new ArrayList<>();
         for (double i = 0; i <= 1.0; i += 0.01) {
             possibleValues.add(i);
         }
-        double first = 0;
-        double second = 0;
-        double third = 0;
-        List<Double> weightList = new ArrayList<>();
-        if(Objects.equals(bag.getWPMObjective(), Constants.SRT_TT)){
-            if(Objects.equals(bag.getCWR(), Constants.THREAD_LOCAL_RANDOM)){
-                first = possibleValues.get(ThreadLocalRandom.current().nextInt(possibleValues.size()));
+
+        double first = possibleValues.get(ThreadLocalRandom.current().nextInt(possibleValues.size()));
+
+        double remainingTotal = 1.0 - first;
+
+        ArrayList<Double> remainingValues = new ArrayList<>();
+        for (double value : possibleValues) {
+            if (value <= remainingTotal) {
+                remainingValues.add(value);
             }
-
-            double remainingTotal = 1.0 - first;
-
-            ArrayList<Double> remainingValues = new ArrayList<>();
-            for (double value : possibleValues) {
-                if (value <= remainingTotal) {
-                    remainingValues.add(value);
-                }
-            }
-
-            if(Objects.equals(bag.getCWR(), Constants.THREAD_LOCAL_RANDOM)){
-            second = remainingValues.get(ThreadLocalRandom.current().nextInt(remainingValues.size()));
-
-            weightList.add(first);
-            weightList.add(second);
-        } else if (Objects.equals(bag.getWPMObjective(), Constants.SRT_TT_LENGTH)) {
-            first = possibleValues.get(ThreadLocalRandom.current().nextInt(possibleValues.size()));
-
-            double remainingTotal = 1.0 - first;
-
-            ArrayList<Double> remainingValues = new ArrayList<>();
-            for (double value : possibleValues) {
-                if (value <= remainingTotal) {
-                    remainingValues.add(value);
-                }
-            }
-
-            second = remainingValues.get(ThreadLocalRandom.current().nextInt(remainingValues.size()));
-
-            weightList.add(first);
-            weightList.add(second);
-
-            third = 1.0 - first - second;
-
-            weightList.add(third);
         }
+
+        double second = remainingValues.get(ThreadLocalRandom.current().nextInt(remainingValues.size()));
+        double third = 1.0 - first - second;
+
+        List<Double> weightList = new ArrayList<>();
+        weightList.add(first);
+        weightList.add(second);
+        weightList.add(third);
 
         return weightList;
     }

@@ -9,10 +9,10 @@ import ktu.kaganndemirr.evaluator.Evaluator;
 import ktu.kaganndemirr.message.Multicast;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
-import ktu.kaganndemirr.solver.YenKShortestPaths;
+import ktu.kaganndemirr.routing.phy.yen.YenKShortestPaths;
 import ktu.kaganndemirr.routing.phy.yen.YenRandomizedKShortestPaths;
 import ktu.kaganndemirr.solver.Solution;
-import ktu.kaganndemirr.util.constants.Constants;
+import ktu.kaganndemirr.util.Constants;
 import ktu.kaganndemirr.util.MetaheuristicMethods;
 import ktu.kaganndemirr.util.WPMMethods;
 import org.jgrapht.Graph;
@@ -35,10 +35,6 @@ public class WPMCWRDeadline {
     private List<Unicast> ttUnicastList;
 
     private final Map<Double, Double> durationMap;
-
-    private Graph<Node, GCLEdge> graph;
-
-    private List<Application> applicationList;
 
     private List<UnicastCandidate> srtUnicastCandidateList;
 
