@@ -784,6 +784,53 @@ public class Main {
                         }
                         case "pathPenalization" -> {
                             switch (algorithm) {
+                                case "WSMv2LWR" -> {
+                                    ktu.kaganndemirr.routing.phy.pathpenalization.metaheuristic.WSMv2LWR wsmV2LWR = new ktu.kaganndemirr.routing.phy.pathpenalization.metaheuristic.WSMv2LWR(k);
+
+                                    logger.info("Solving problem using {}, {}, {}, K: {}, LWR: {}, wsmNormalization: {}, wSRT: {}, wTT: {}, wLength: {}, wUtil: {}, rate: {}, mcdmObjective: {}, Metaheuristic Name: {}, Evaluator: {}, Timeout: {}", routing, pathFindingMethod, algorithm, k, lwr, wsmNormalization, wSRT, wTT, wLength, wUtil, rate, mcdmObjective, metaheuristicName, evaluatorName, timeout);
+
+                                    Solution solution = wsmV2LWR.solve(graph, applicationList, lwr, mcdmObjective, wsmNormalization, wSRT, wTT, wLength, wUtil, rate, threadNumber, metaheuristicName, evaluator, Duration.ofSeconds(timeout));
+
+                                    PHYWSMv2LWRHolder phyWSMv2LWRHolder = new PHYWSMv2LWRHolder();
+                                    phyWSMv2LWRHolder.setTopologyName(topologyName);
+                                    phyWSMv2LWRHolder.setApplicationName(applicationName);
+                                    phyWSMv2LWRHolder.setRouting(routing);
+                                    phyWSMv2LWRHolder.setPathFindingMethod(pathFindingMethod);
+                                    phyWSMv2LWRHolder.setAlgorithm(algorithm);
+                                    phyWSMv2LWRHolder.setLWR(lwr);
+                                    phyWSMv2LWRHolder.setK(k);
+                                    phyWSMv2LWRHolder.setMCDMObjective(mcdmObjective);
+                                    phyWSMv2LWRHolder.setWSMNormalization(wsmNormalization);
+                                    phyWSMv2LWRHolder.setWSRT(wSRT);
+                                    phyWSMv2LWRHolder.setWTT(wTT);
+                                    phyWSMv2LWRHolder.setWLength(wLength);
+                                    phyWSMv2LWRHolder.setWUtil(wUtil);
+
+                                    solution.getCost().writePHYWSMv2LWRResultToFile(phyWSMv2LWRHolder);
+
+                                    if (solution.getMulticastList() == null || solution.getMulticastList().isEmpty()) {
+                                        logger.info(Constants.NO_SOLUTION_COULD_BE_FOUND);
+                                    } else {
+                                        if (solution.getCost().getTotalCost() == Double.MAX_VALUE) {
+                                            logger.info(createFoundNoSolutionString(solution));
+                                        } else {
+                                            logger.info(createFoundSolutionString(solution));
+
+                                            PHYWSMv2LWROutputShaper oS = new PHYWSMv2LWROutputShaper(phyWSMv2LWRHolder);
+
+                                            oS.writeSolutionToFile(wsmV2LWR.getSolution());
+
+                                            oS.writeWCDsToFile(solution.getCost().getWCDMap());
+
+                                            oS.writeLinkUtilizationsToFile(wsmV2LWR.getSolution(), graph, rate);
+
+                                            oS.writeDurationMap(wsmV2LWR.getDurationMap());
+
+                                            oS.writeSRTCandidateRoutesToFile(wsmV2LWR.getSRTUnicastCandidateList());
+
+                                        }
+                                    }
+                                }
                                 case "WPMDeadline" -> {
                                     ktu.kaganndemirr.routing.phy.pathpenalization.heuristic.WPMDeadline wpmDeadline = new ktu.kaganndemirr.routing.phy.pathpenalization.heuristic.WPMDeadline(k);
 

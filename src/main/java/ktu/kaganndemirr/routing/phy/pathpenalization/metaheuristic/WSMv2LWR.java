@@ -1,4 +1,4 @@
-package ktu.kaganndemirr.routing.phy.yen.metaheuristic;
+package ktu.kaganndemirr.routing.phy.pathpenalization.metaheuristic;
 
 import ktu.kaganndemirr.application.Application;
 import ktu.kaganndemirr.architecture.GCLEdge;
@@ -9,6 +9,7 @@ import ktu.kaganndemirr.evaluator.Evaluator;
 import ktu.kaganndemirr.message.Multicast;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
+import ktu.kaganndemirr.routing.phy.pathpenalization.PathPenalizationMCDMKShortestPaths;
 import ktu.kaganndemirr.routing.phy.yen.YenKShortestPaths;
 import ktu.kaganndemirr.routing.phy.yen.YenMCDMKShortestPaths;
 import ktu.kaganndemirr.routing.phy.yen.YenRandomizedKShortestPaths;
@@ -34,7 +35,7 @@ public class WSMv2LWR {
 
     private final int k;
 
-    private long yenMCDMKShortestPathsDuration;
+    private long pathPenalizationMCDMKShortestPathsDuration;
 
     private List<Unicast> ttUnicastList;
 
@@ -52,7 +53,7 @@ public class WSMv2LWR {
 
     public WSMv2LWR(int k){
         this.k = k;
-        this.yenMCDMKShortestPathsDuration = 0;
+        this.pathPenalizationMCDMKShortestPathsDuration = 0;
         costLock = new Object();
         durationMap = new HashMap<>();
         globalBestCost = new AVBLatencyMathCost();
@@ -60,13 +61,13 @@ public class WSMv2LWR {
     }
 
     public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, String lwr, String mcdmObjective, String wsmNormalization, double wSRT, double wTT, double wLength, double wUtil, int rate, int threadNumber, String metaheuristicName, Evaluator evaluator, Duration timeout){
-        Instant yenMCDMKShortestPathsStartTime = Instant.now();
-        YenMCDMKShortestPaths yenMCDMKShortestPaths = new YenMCDMKShortestPaths(graph, applicationList, lwr, k, wsmNormalization, wSRT, wTT, wLength);
-        Instant yenMCDMKShortestPathsEndTime = Instant.now();
-        this.yenMCDMKShortestPathsDuration = Duration.between(yenMCDMKShortestPathsStartTime, yenMCDMKShortestPathsEndTime).toMillis();
+        Instant pathPenalizationMCDMKShortestPathsStartTime = Instant.now();
+        PathPenalizationMCDMKShortestPaths pathPenalizationMCDMKShortestPaths = new PathPenalizationMCDMKShortestPaths(graph, applicationList, lwr, k, wsmNormalization, wSRT, wTT, wLength);
+        Instant pathPenalizationMCDMKShortestPathsEndTime = Instant.now();
+        this.pathPenalizationMCDMKShortestPathsDuration = Duration.between(pathPenalizationMCDMKShortestPathsStartTime, pathPenalizationMCDMKShortestPathsEndTime).toMillis();
 
-        srtUnicastCandidateList = yenMCDMKShortestPaths.getSRTUnicastCandidateList();
-        ttUnicastList = yenMCDMKShortestPaths.getTTUnicastList();
+        srtUnicastCandidateList = pathPenalizationMCDMKShortestPaths.getSRTUnicastCandidateList();
+        ttUnicastList = pathPenalizationMCDMKShortestPaths.getTTUnicastList();
 
         this.evaluator = evaluator;
 
@@ -117,7 +118,7 @@ public class WSMv2LWR {
     private class WSMv2Runnable implements Runnable {
         private int i = 0;
         Instant solutionStartTime = Instant.now();
-        
+
         String metaheuristicName;
 
         public WSMv2Runnable(String metaheuristicName) {
@@ -148,7 +149,7 @@ public class WSMv2LWR {
                         if (cost.getTotalCost() < globalBestCost.getTotalCost()) {
                             globalBestCost = cost;
                             Instant solutionEndTime = Instant.now();
-                            durationMap.put(Double.parseDouble(globalBestCost.toString().split("\\s")[0]), (Duration.between(solutionStartTime, solutionEndTime).toMillis() / 1e3) + yenMCDMKShortestPathsDuration / 1e3);
+                            durationMap.put(Double.parseDouble(globalBestCost.toString().split("\\s")[0]), (Duration.between(solutionStartTime, solutionEndTime).toMillis() / 1e3) + pathPenalizationMCDMKShortestPathsDuration / 1e3);
                             bestSolution.clear();
                             assert solution != null;
                             bestSolution.addAll(solution);
