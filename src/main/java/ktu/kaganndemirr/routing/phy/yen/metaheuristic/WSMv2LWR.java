@@ -29,6 +29,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static ktu.kaganndemirr.util.HelperMethods.writeSolutionsToFile;
+
 public class WSMv2LWR {
     private static final Logger logger = LoggerFactory.getLogger(WPMLWRDeadline.class.getSimpleName());
 
@@ -42,7 +44,10 @@ public class WSMv2LWR {
 
     private List<UnicastCandidate> srtUnicastCandidateList;
 
+    private final Object writeLock;
+
     private final Object costLock;
+
 
     private Cost globalBestCost;
 
@@ -53,6 +58,7 @@ public class WSMv2LWR {
     public WSMv2LWR(int k){
         this.k = k;
         this.yenMCDMKShortestPathsDuration = 0;
+        writeLock = new Object();
         costLock = new Object();
         durationMap = new HashMap<>();
         globalBestCost = new AVBLatencyMathCost();
@@ -129,16 +135,24 @@ public class WSMv2LWR {
             while (!Thread.currentThread().isInterrupted()) {
                 i++;
                 List<Unicast> solution = null;
+                List<Unicast> initialSolution = null;
 
                 if(Objects.equals(metaheuristicName, Constants.GRASP)){
-                    List<Unicast> initialSolution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, ttUnicastList, k, evaluator);
+                    initialSolution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, ttUnicastList, k, evaluator);
                     solution = MetaheuristicMethods.GRASP(initialSolution, evaluator, srtUnicastCandidateList, globalBestCost);
                 } else if (Objects.equals(metaheuristicName, Constants.ALO)) {
-                    List<Unicast> initialSolution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, ttUnicastList, k, evaluator);
+                    initialSolution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, ttUnicastList, k, evaluator);
                     solution = MetaheuristicMethods.ALO(initialSolution, initialSolution, srtUnicastCandidateList, k, evaluator);
                 } else if (Objects.equals(metaheuristicName, Constants.CONSTRUCT_INITIAL_SOLUTION)) {
                     solution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, ttUnicastList, k, evaluator);
+                    initialSolution = solution;
                 }
+
+                synchronized (writeLock) {
+                    writeSolutionsToFile(initialSolution, solution);
+                }
+
+
 
                 //Evaluate and see if better than anything we have seen before
                 Cost cost = evaluator.evaluate(solution);
