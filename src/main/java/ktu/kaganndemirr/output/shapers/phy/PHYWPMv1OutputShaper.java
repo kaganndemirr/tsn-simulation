@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.*;
 
-import ktu.kaganndemirr.util.holders.PHYWPMv1Holder;
+import ktu.kaganndemirr.util.holders.phy.PHYWPMv1Holder;
 
 import static ktu.kaganndemirr.util.Constants.*;
 
@@ -30,9 +30,9 @@ public class PHYWPMv1OutputShaper {
     private final Map<GCLEdge, Double> utilizationMap;
 
     public PHYWPMv1OutputShaper(PHYWPMv1Holder phyWPMv1Holder) {
-        topologyOutputLocation = Paths.get("outputs", phyWPMv1Holder.getRouting(), phyWPMv1Holder.getPathFindingMethod(), phyWPMv1Holder.getAlgorithm(), String.valueOf(phyWPMv1Holder.getK()), phyWPMv1Holder.getWPMObjective(), String.valueOf(phyWPMv1Holder.getWSRT()), String.valueOf(phyWPMv1Holder.getWTT()), String.valueOf(phyWPMv1Holder.getWLength()), String.valueOf(phyWPMv1Holder.getWUtil()), phyWPMv1Holder.getWPMVersion(), phyWPMv1Holder.getTopologyName() + "_" + phyWPMv1Holder.getApplicationName()).toString();
+        topologyOutputLocation = Paths.get("outputs", phyWPMv1Holder.getRouting(), phyWPMv1Holder.getPathFindingMethod(), phyWPMv1Holder.getAlgorithm(), String.valueOf(phyWPMv1Holder.getK()), phyWPMv1Holder.getMCDMObjective(), String.valueOf(phyWPMv1Holder.getWSRT()), String.valueOf(phyWPMv1Holder.getWTT()), String.valueOf(phyWPMv1Holder.getWLength()), String.valueOf(phyWPMv1Holder.getWUtil()), phyWPMv1Holder.getWPMVersion(), phyWPMv1Holder.getTopologyName() + "_" + phyWPMv1Holder.getApplicationName()).toString();
 
-        mainOutputLocation = Paths.get("outputs", phyWPMv1Holder.getRouting(), phyWPMv1Holder.getPathFindingMethod(), phyWPMv1Holder.getAlgorithm(), String.valueOf(phyWPMv1Holder.getK()), phyWPMv1Holder.getWPMObjective(), String.valueOf(phyWPMv1Holder.getWSRT()), String.valueOf(phyWPMv1Holder.getWTT()), String.valueOf(phyWPMv1Holder.getWLength()), String.valueOf(phyWPMv1Holder.getWUtil()), phyWPMv1Holder.getWPMVersion()).toString();
+        mainOutputLocation = Paths.get("outputs", phyWPMv1Holder.getRouting(), phyWPMv1Holder.getPathFindingMethod(), phyWPMv1Holder.getAlgorithm(), String.valueOf(phyWPMv1Holder.getK()), phyWPMv1Holder.getMCDMObjective(), String.valueOf(phyWPMv1Holder.getWSRT()), String.valueOf(phyWPMv1Holder.getWTT()), String.valueOf(phyWPMv1Holder.getWLength()), String.valueOf(phyWPMv1Holder.getWUtil()), phyWPMv1Holder.getWPMVersion()).toString();
 
         utilizationMap = new HashMap<>();
 

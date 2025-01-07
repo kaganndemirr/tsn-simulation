@@ -14,7 +14,7 @@ import ktu.kaganndemirr.routing.phy.yen.YenRandomizedKShortestPaths;
 import ktu.kaganndemirr.solver.Solution;
 import ktu.kaganndemirr.util.Constants;
 import ktu.kaganndemirr.util.MetaheuristicMethods;
-import ktu.kaganndemirr.util.WPMMethods;
+import ktu.kaganndemirr.util.mcdm.WPMMethods;
 import org.jgrapht.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +54,7 @@ public class WPMCWRDeadline {
         bestSolution = new ArrayList<>();
     }
 
-    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, int threadNumber, String wpmObjective, String cwr, int rate, String wpmVersion, String wpmValueType, String metaheuristicName, Evaluator evaluator, Duration timeout){
+    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, int threadNumber, String mcdmObjective, String cwr, int rate, String wpmVersion, String wpmValueType, String metaheuristicName, Evaluator evaluator, Duration timeout){
         ttUnicastList = YenRandomizedKShortestPaths.getTTUnicastList(applicationList);
 
         Instant yenKShortestPathsStartTime = Instant.now();
@@ -71,7 +71,7 @@ public class WPMCWRDeadline {
             Timer timer = getTimer(timeout);
 
             for (int i = 0; i < threadNumber; i++) {
-                exec.execute(new WPMCWRDeadlineRunnable(wpmObjective, cwr, rate, wpmVersion, wpmValueType, metaheuristicName));
+                exec.execute(new WPMCWRDeadlineRunnable(mcdmObjective, cwr, rate, wpmVersion, wpmValueType, metaheuristicName));
             }
 
             exec.awaitTermination(timeout.toSeconds(), TimeUnit.SECONDS);
@@ -113,15 +113,15 @@ public class WPMCWRDeadline {
         private int i = 0;
         Instant solutionStartTime = Instant.now();
 
-        String wpmObjective;
+        String mcdmObjective;
         String cwr;
         int rate;
         String wpmVersion;
         String wpmValueType;
         String metaheuristicName;
 
-        public WPMCWRDeadlineRunnable(String wpmObjective, String cwr, int rate, String wpmVersion, String wpmValueType, String metaheuristicName) {
-            this.wpmObjective = wpmObjective;
+        public WPMCWRDeadlineRunnable(String mcdmObjective, String cwr, int rate, String wpmVersion, String wpmValueType, String metaheuristicName) {
+            this.mcdmObjective = mcdmObjective;
             this.cwr = cwr;
             this.rate = rate;
             this.wpmVersion = wpmVersion;
@@ -135,13 +135,13 @@ public class WPMCWRDeadline {
                 i++;
 
                 List<Unicast> initialSolution = null;
-                if (Objects.equals(wpmObjective, Constants.SRT_TT)){
+                if (Objects.equals(mcdmObjective, Constants.SRT_TT)){
                     //TODO
-                } else if (Objects.equals(wpmObjective, Constants.SRT_TT_LENGTH)) {
+                } else if (Objects.equals(mcdmObjective, Constants.SRT_TT_LENGTH)) {
                     if(Objects.equals(cwr, Constants.THREAD_LOCAL_RANDOM)){
                         initialSolution = WPMMethods.deadlineCWRSRTTTLength(srtUnicastCandidateList, ttUnicastList, wpmVersion, wpmValueType);
                     }
-                } else if (Objects.equals(wpmObjective, Constants.SRT_TT_LENGTH_UTIL)) {
+                } else if (Objects.equals(mcdmObjective, Constants.SRT_TT_LENGTH_UTIL)) {
                     //TODO
                 }
 

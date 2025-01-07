@@ -1,14 +1,18 @@
-package ktu.kaganndemirr.util.holders;
+package ktu.kaganndemirr.util.holders.phy;
 
-public class PHYWPMCWRv1Holder {
+public class PHYWPMLWRv1Holder {
     private String topologyName;
     private String applicationName;
     private String routing;
     private String pathFindingMethod;
     private String algorithm;
+    private String lwr;
     private int k;
-    private String wpmObjective;
-    private String cwr;
+    private String mcdmObjective;
+    private double wSRT;
+    private double wTT;
+    private double wLength;
+    private double wUtil;
     private String wpmVersion;
 
     public String getTopologyName() {
@@ -51,6 +55,14 @@ public class PHYWPMCWRv1Holder {
         this.algorithm = algorithm;
     }
 
+    public String getLWR(){
+        return lwr;
+    }
+
+    public void setLWR(String lwr){
+        this.lwr = lwr;
+    }
+
     public int getK() {
         return k;
     }
@@ -59,20 +71,44 @@ public class PHYWPMCWRv1Holder {
         this.k = k;
     }
 
-    public String getWPMObjective() {
-        return wpmObjective;
+    public String getMCDMObjective() {
+        return mcdmObjective;
     }
 
-    public void setWPMObjective(String wpmObjective) {
-        this.wpmObjective = wpmObjective;
+    public void setMCDMObjective(String mcdmObjective) {
+        this.mcdmObjective = mcdmObjective;
     }
 
-    public String getCWR(){
-        return cwr;
+    public double getWSRT() {
+        return wSRT;
     }
 
-    public void setCWR(String cwr){
-        this.cwr = cwr;
+    public void setWSRT(double wSRT) {
+        this.wSRT = wSRT;
+    }
+
+    public double getWTT() {
+        return wTT;
+    }
+
+    public void setWTT(double wTT) {
+        this.wTT = wTT;
+    }
+
+    public double getWLength() {
+        return wLength;
+    }
+
+    public void setWLength(double wLength) {
+        this.wLength = wLength;
+    }
+
+    public double getWUtil() {
+        return wUtil;
+    }
+
+    public void setWUtil(double wUtil) {
+        this.wUtil = wUtil;
     }
 
     public String getWPMVersion() {
@@ -84,5 +120,4 @@ public class PHYWPMCWRv1Holder {
     }
 
 }
-
 

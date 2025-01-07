@@ -7,7 +7,7 @@ import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.message.Multicast;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
-import ktu.kaganndemirr.util.holders.PHYWPMCWRv1Holder;
+import ktu.kaganndemirr.util.holders.phy.PHYWPMCWRv1Holder;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.slf4j.Logger;
@@ -29,9 +29,9 @@ public class PHYWPMCWRv1OutputShaper {
     private final Map<GCLEdge, Double> utilizationMap;
 
     public PHYWPMCWRv1OutputShaper(PHYWPMCWRv1Holder phyWPMCWRv1Holder) {
-        topologyOutputLocation = Paths.get("outputs", phyWPMCWRv1Holder.getRouting(), phyWPMCWRv1Holder.getPathFindingMethod(), phyWPMCWRv1Holder.getAlgorithm(), String.valueOf(phyWPMCWRv1Holder.getK()), phyWPMCWRv1Holder.getWPMObjective(), phyWPMCWRv1Holder.getCWR(), phyWPMCWRv1Holder.getWPMVersion(), phyWPMCWRv1Holder.getTopologyName() + "_" + phyWPMCWRv1Holder.getApplicationName()).toString();
+        topologyOutputLocation = Paths.get("outputs", phyWPMCWRv1Holder.getRouting(), phyWPMCWRv1Holder.getPathFindingMethod(), phyWPMCWRv1Holder.getAlgorithm(), String.valueOf(phyWPMCWRv1Holder.getK()), phyWPMCWRv1Holder.getMCDMObjective(), phyWPMCWRv1Holder.getCWR(), phyWPMCWRv1Holder.getWPMVersion(), phyWPMCWRv1Holder.getTopologyName() + "_" + phyWPMCWRv1Holder.getApplicationName()).toString();
 
-        mainOutputLocation = Paths.get("outputs", phyWPMCWRv1Holder.getRouting(), phyWPMCWRv1Holder.getPathFindingMethod(), phyWPMCWRv1Holder.getAlgorithm(), String.valueOf(phyWPMCWRv1Holder.getK()), phyWPMCWRv1Holder.getWPMObjective(), phyWPMCWRv1Holder.getCWR(), phyWPMCWRv1Holder.getWPMVersion()).toString();
+        mainOutputLocation = Paths.get("outputs", phyWPMCWRv1Holder.getRouting(), phyWPMCWRv1Holder.getPathFindingMethod(), phyWPMCWRv1Holder.getAlgorithm(), String.valueOf(phyWPMCWRv1Holder.getK()), phyWPMCWRv1Holder.getMCDMObjective(), phyWPMCWRv1Holder.getCWR(), phyWPMCWRv1Holder.getWPMVersion()).toString();
 
         utilizationMap = new HashMap<>();
 

@@ -143,8 +143,9 @@ public class Constants {
     public static final String MTR_V1 = "v1";
     public static final String MTR_AVERAGE = "average";
 
-
-    public static final int ONE_CANDIDATE_PATH_SIZE = 1;
+    public static final String MIN_MAX = "minMax";
+    public static final String MAX = "max";
+    public static final String VECTOR = "vector";
 
 
 }

@@ -11,7 +11,7 @@ import ktu.kaganndemirr.message.UnicastCandidate;
 import ktu.kaganndemirr.routing.phy.yen.YenKShortestPaths;
 import ktu.kaganndemirr.solver.Solution;
 import ktu.kaganndemirr.util.Constants;
-import ktu.kaganndemirr.util.WPMMethods;
+import ktu.kaganndemirr.util.mcdm.WPMMethods;
 import org.jgrapht.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +28,7 @@ public class WPMDeadline {
 
     private final int k;
 
-    String wpmObjective;
+    String mcdmObjective;
 
     private List<UnicastCandidate> srtUnicastCandidateList;
 
@@ -42,8 +42,8 @@ public class WPMDeadline {
         this.durationMap = new HashMap<>();
     }
 
-    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, String wpmObjective, double wSRT, double wTT, double wLength, double wUtil, int rate,  String wpmVersion, String wpmValueType, final Evaluator evaluator){
-        this.wpmObjective = wpmObjective;
+    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, String mcdmObjective, double wSRT, double wTT, double wLength, double wUtil, int rate,  String wpmVersion, String wpmValueType, final Evaluator evaluator){
+        this.mcdmObjective = mcdmObjective;
 
         Instant graphPathsStartTime = Instant.now();
         YenKShortestPaths yenKShortestPaths = new YenKShortestPaths(graph, applicationList, k);
@@ -54,11 +54,11 @@ public class WPMDeadline {
         List<Unicast> ttUnicastList = yenKShortestPaths.getTTUnicastList();
 
         Instant solutionStartTime = Instant.now();
-        if (Objects.equals(wpmObjective, Constants.SRT_TT)){
+        if (Objects.equals(mcdmObjective, Constants.SRT_TT)){
             solution = null;
-        } else if (Objects.equals(wpmObjective, Constants.SRT_TT_LENGTH)) {
+        } else if (Objects.equals(mcdmObjective, Constants.SRT_TT_LENGTH)) {
             solution = WPMMethods.deadlineSRTTTLength(srtUnicastCandidateList, ttUnicastList, wSRT, wTT, wLength, wpmVersion, wpmValueType);
-        } else if (Objects.equals(wpmObjective, Constants.SRT_TT_LENGTH_UTIL)) {
+        } else if (Objects.equals(mcdmObjective, Constants.SRT_TT_LENGTH_UTIL)) {
             solution = null;
         }
 

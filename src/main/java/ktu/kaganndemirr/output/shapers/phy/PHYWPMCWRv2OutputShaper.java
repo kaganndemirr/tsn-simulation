@@ -7,7 +7,7 @@ import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.message.Multicast;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
-import ktu.kaganndemirr.util.holders.PHYWPMCWRv2Holder;
+import ktu.kaganndemirr.util.holders.phy.PHYWPMCWRv2Holder;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.slf4j.Logger;
@@ -29,9 +29,9 @@ public class PHYWPMCWRv2OutputShaper {
     private final Map<GCLEdge, Double> utilizationMap;
 
     public PHYWPMCWRv2OutputShaper(PHYWPMCWRv2Holder phyWPMCWRv2Holder) {
-        topologyOutputLocation = Paths.get("outputs", phyWPMCWRv2Holder.getRouting(), phyWPMCWRv2Holder.getPathFindingMethod(), phyWPMCWRv2Holder.getAlgorithm(), String.valueOf(phyWPMCWRv2Holder.getK()), phyWPMCWRv2Holder.getWPMObjective(), phyWPMCWRv2Holder.getCWR(), phyWPMCWRv2Holder.getWPMVersion(), phyWPMCWRv2Holder.getWPMValueType(),  phyWPMCWRv2Holder.getTopologyName() + "_" + phyWPMCWRv2Holder.getApplicationName()).toString();
+        topologyOutputLocation = Paths.get("outputs", phyWPMCWRv2Holder.getRouting(), phyWPMCWRv2Holder.getPathFindingMethod(), phyWPMCWRv2Holder.getAlgorithm(), String.valueOf(phyWPMCWRv2Holder.getK()), phyWPMCWRv2Holder.getMCDMObjective(), phyWPMCWRv2Holder.getCWR(), phyWPMCWRv2Holder.getWPMVersion(), phyWPMCWRv2Holder.getWPMValueType(),  phyWPMCWRv2Holder.getTopologyName() + "_" + phyWPMCWRv2Holder.getApplicationName()).toString();
 
-        mainOutputLocation = Paths.get("outputs", phyWPMCWRv2Holder.getRouting(), phyWPMCWRv2Holder.getPathFindingMethod(), phyWPMCWRv2Holder.getAlgorithm(), String.valueOf(phyWPMCWRv2Holder.getK()), phyWPMCWRv2Holder.getWPMObjective(), phyWPMCWRv2Holder.getCWR(), phyWPMCWRv2Holder.getWPMVersion(), phyWPMCWRv2Holder.getWPMValueType()).toString();
+        mainOutputLocation = Paths.get("outputs", phyWPMCWRv2Holder.getRouting(), phyWPMCWRv2Holder.getPathFindingMethod(), phyWPMCWRv2Holder.getAlgorithm(), String.valueOf(phyWPMCWRv2Holder.getK()), phyWPMCWRv2Holder.getMCDMObjective(), phyWPMCWRv2Holder.getCWR(), phyWPMCWRv2Holder.getWPMVersion(), phyWPMCWRv2Holder.getWPMValueType()).toString();
 
         utilizationMap = new HashMap<>();
 

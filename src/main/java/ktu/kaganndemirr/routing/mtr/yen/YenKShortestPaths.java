@@ -25,11 +25,11 @@ public class YenKShortestPaths {
     private final List<UnicastCandidate> srtUnicastCandidateList;
 
     public YenKShortestPaths(Graph<Node, GCLEdge> graph, List<Application> applicationList, String mtrName, int k) {
-        srtUnicastCandidateList = new ArrayList<>();
-        this.ttUnicastList = new ArrayList<>();
         this.applicationList = applicationList;
+        srtUnicastCandidateList = new ArrayList<>();
+        ttUnicastList = new ArrayList<>();
 
-        List<Unicast> ttUnicastList = createTTUnicast();
+        createTTUnicast();
 
         List<Graph<Node, GCLEdge>> virtualTopologyList = null;
         if (Objects.equals(mtrName, Constants.MTR_V1)){
@@ -62,7 +62,7 @@ public class YenKShortestPaths {
         }
     }
 
-    private List<Unicast> createTTUnicast() {
+    private void createTTUnicast() {
         for (Application application : applicationList) {
             if (application instanceof TTApplication) {
                 for(int i = 0; i < application.getTargetList().size(); i++){
@@ -70,7 +70,6 @@ public class YenKShortestPaths {
                 }
             }
         }
-        return ttUnicastList;
     }
 
     public List<UnicastCandidate> getSRTUnicastCandidateList() {

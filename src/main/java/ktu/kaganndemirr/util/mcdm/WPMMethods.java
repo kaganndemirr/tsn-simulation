@@ -1,4 +1,4 @@
-package ktu.kaganndemirr.util;
+package ktu.kaganndemirr.util.mcdm;
 
 import ktu.kaganndemirr.application.SRTApplication;
 import ktu.kaganndemirr.application.TTApplication;
@@ -7,39 +7,18 @@ import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
+import ktu.kaganndemirr.util.Constants;
+import ktu.kaganndemirr.util.RandomNumberGenerator;
+import ktu.kaganndemirr.util.UnicastCandidateSortingMethods;
 import org.jgrapht.GraphPath;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static ktu.kaganndemirr.util.mcdm.HelperMethods.getEdgeTTDurationMap;
+import static ktu.kaganndemirr.util.mcdm.HelperMethods.getSameEdgeList;
+
 public class WPMMethods {
-    public static Map<GCLEdge, Double> getEdgeTTDurationMap(List<Unicast> ttUnicastList) {
-        Map<GCLEdge, Double> edgeTTDurationMap = new HashMap<>();
-        for (Unicast unicast : ttUnicastList) {
-            for (GCLEdge edge : unicast.getPath().getEdgeList()) {
-                for (GCL gcl : edge.getGCL()) {
-                    if (!edgeTTDurationMap.containsKey(edge)) {
-                        edgeTTDurationMap.put(edge, (gcl.getDuration() / (unicast.getApplication().getCMI() / gcl.getFrequency())));
-                    } else {
-                        edgeTTDurationMap.put(edge, edgeTTDurationMap.get(edge) + (gcl.getDuration() / (unicast.getApplication().getCMI() / gcl.getFrequency())));
-                    }
-                }
-
-            }
-        }
-        return edgeTTDurationMap;
-    }
-
-    public static ArrayList<GCLEdge> getSameEdgeList(List<GCLEdge> gclEdgeList1, List<GCLEdge> gclEdgeList2) {
-        ArrayList<GCLEdge> sameEdgeList = new ArrayList<>();
-        for (GCLEdge edge : gclEdgeList1) {
-            if (gclEdgeList2.contains(edge)) {
-                sameEdgeList.add(edge);
-            }
-        }
-        return sameEdgeList;
-    }
-
     private static GraphPath<Node, GCLEdge> v2SRTTTLengthGraphPath(double wSRT, double wTT, double wLength, List<Double> srtCostList, List<Double> ttCostList, List<GraphPath<Node, GCLEdge>> graphPathList, String wpmValueType) {
         Map<GraphPath<Node, GCLEdge>, Integer> graphPathPathScoreMap = new HashMap<>();
         GraphPath<Node, GCLEdge> selectedGraphPath;
@@ -109,8 +88,6 @@ public class WPMMethods {
                         else{
                             graphPathPathScoreMap.put(graphPathList.get(j), graphPathPathScoreMap.get(graphPathList.get(j)) + 1);
                         }
-                    } else if (graphPathList.get(i).getLength() == Constants.ONE_CANDIDATE_PATH_SIZE) {
-                        graphPathPathScoreMap.put(graphPathList.get(i), graphPathPathScoreMap.get(graphPathList.get(i)) + 1);
                     }
                 }
             }
@@ -148,8 +125,8 @@ public class WPMMethods {
         Map<GCLEdge, Double> edgeDurationMap = getEdgeTTDurationMap(ttUnicastList);
 
         for (UnicastCandidate unicastCandidate : sortedSRTUnicastCandidateList) {
-            ArrayList<Double> srtCostList = new ArrayList<>();
-            ArrayList<Double> ttCostList = new ArrayList<>();
+            List<Double> srtCostList = new ArrayList<>();
+            List<Double> ttCostList = new ArrayList<>();
             List<GraphPath<Node, GCLEdge>> gpList = unicastCandidate.getCandidatePathList();
 
             for (GraphPath<Node, GCLEdge> gp : gpList) {

@@ -1,18 +1,21 @@
-package ktu.kaganndemirr.util.holders;
+package ktu.kaganndemirr.util.holders.phy;
 
-public class PHYWPMv1Holder {
-    private String topologyName = null;
-    private String applicationName = null;
+public class PHYWPMLWRCWRv2Holder {
+    private String topologyName;
+    private String applicationName;
     private String routing;
     private String pathFindingMethod;
     private String algorithm;
+    private String lwr;
     private int k;
-    private String wpmObjective;
+    private String mcdmObjective;
+    private String cwr;
     private double wSRT;
     private double wTT;
     private double wLength;
     private double wUtil;
     private String wpmVersion;
+    private String wpmValueType;
 
     public String getTopologyName() {
         return topologyName;
@@ -54,6 +57,14 @@ public class PHYWPMv1Holder {
         this.algorithm = algorithm;
     }
 
+    public String getLWR(){
+        return lwr;
+    }
+
+    public void setLWR(String lwr){
+        this.lwr = lwr;
+    }
+
     public int getK() {
         return k;
     }
@@ -62,12 +73,20 @@ public class PHYWPMv1Holder {
         this.k = k;
     }
 
-    public String getWPMObjective() {
-        return wpmObjective;
+    public String getMCDMObjective() {
+        return mcdmObjective;
     }
 
-    public void setWPMObjective(String wpmObjective) {
-        this.wpmObjective = wpmObjective;
+    public void setMCDMObjective(String mcdmObjective) {
+        this.mcdmObjective = mcdmObjective;
+    }
+
+    public String getCWR(){
+        return cwr;
+    }
+
+    public void setCWR(String cwr){
+        this.cwr = cwr;
     }
 
     public double getWSRT() {
@@ -110,4 +129,15 @@ public class PHYWPMv1Holder {
         this.wpmVersion = wpmVersion;
     }
 
+    public String getWPMValueType() {
+        return wpmValueType;
+    }
+
+    public void setWPMValueType(String wpmValueType) {
+        this.wpmValueType = wpmValueType;
+    }
+
 }
+
+
+

@@ -12,9 +12,8 @@ import ktu.kaganndemirr.message.UnicastCandidate;
 import ktu.kaganndemirr.routing.phy.yen.YenRandomizedKShortestPaths;
 import ktu.kaganndemirr.solver.Solution;
 import ktu.kaganndemirr.util.Constants;
-import ktu.kaganndemirr.util.LaursenMethods;
 import ktu.kaganndemirr.util.MetaheuristicMethods;
-import ktu.kaganndemirr.util.WPMMethods;
+import ktu.kaganndemirr.util.mcdm.WPMMethods;
 import org.jgrapht.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +57,7 @@ public class WPMLWRCWRDeadline {
         bestSolution = new ArrayList<>();
     }
 
-    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, int threadNumber, String lwr, String wpmObjective, String cwr, double wSRT, double wTT, double wLength, double wUtil, int rate, String wpmVersion, String wpmValueType, String metaheuristicName, Evaluator evaluator, Duration timeout){
+    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, int threadNumber, String lwr, String mcdmObjective, String cwr, double wSRT, double wTT, double wLength, double wUtil, int rate, String wpmVersion, String wpmValueType, String metaheuristicName, Evaluator evaluator, Duration timeout){
         ttUnicastList = YenRandomizedKShortestPaths.getTTUnicastList(applicationList);
 
         this.graph = graph;
@@ -71,7 +70,7 @@ public class WPMLWRCWRDeadline {
             Timer timer = getTimer(timeout);
 
             for (int i = 0; i < threadNumber; i++) {
-                exec.execute(new WPMLWRCWRDeadlineRunnable(lwr, wpmObjective, cwr, wSRT, wTT, wLength, wUtil, rate, wpmVersion, wpmValueType, metaheuristicName));
+                exec.execute(new WPMLWRCWRDeadlineRunnable(lwr, mcdmObjective, cwr, wSRT, wTT, wLength, wUtil, rate, wpmVersion, wpmValueType, metaheuristicName));
             }
 
             exec.awaitTermination(timeout.toSeconds(), TimeUnit.SECONDS);
@@ -115,7 +114,7 @@ public class WPMLWRCWRDeadline {
         Instant solutionStartTime = Instant.now();
 
         String lwr;
-        String wpmObjective;
+        String mcdmObjective;
         String cwr;
         double wSRT;
         double wTT;
@@ -126,9 +125,9 @@ public class WPMLWRCWRDeadline {
         String wpmValueType;
         String metaheuristicName;
 
-        public WPMLWRCWRDeadlineRunnable(String lwr, String wpmObjective, String cwr, double wSRT, double wTT, double wLength, double wUtil, int rate, String wpmVersion, String wpmValueType, String metaheuristicName) {
+        public WPMLWRCWRDeadlineRunnable(String lwr, String mcdmObjective, String cwr, double wSRT, double wTT, double wLength, double wUtil, int rate, String wpmVersion, String wpmValueType, String metaheuristicName) {
             this.lwr = lwr;
-            this.wpmObjective = wpmObjective;
+            this.mcdmObjective = mcdmObjective;
             this.cwr = cwr;
             this.wSRT = wSRT;
             this.wTT = wTT;
@@ -149,13 +148,13 @@ public class WPMLWRCWRDeadline {
                 srtUnicastCandidateList = yenRandomizedGraphPaths.getSRTUnicastCandidateList();
 
                 List<Unicast> initialSolution = null;
-                if (Objects.equals(wpmObjective, Constants.SRT_TT)){
+                if (Objects.equals(mcdmObjective, Constants.SRT_TT)){
                     //TODO
-                } else if (Objects.equals(wpmObjective, Constants.SRT_TT_LENGTH)) {
+                } else if (Objects.equals(mcdmObjective, Constants.SRT_TT_LENGTH)) {
                     if(Objects.equals(cwr, Constants.THREAD_LOCAL_RANDOM)){
                         initialSolution = WPMMethods.deadlineCWRSRTTTLength(srtUnicastCandidateList, ttUnicastList, wpmVersion, wpmValueType);
                     }
-                } else if (Objects.equals(wpmObjective, Constants.SRT_TT_LENGTH_UTIL)) {
+                } else if (Objects.equals(mcdmObjective, Constants.SRT_TT_LENGTH_UTIL)) {
                     //TODO
                 }
 

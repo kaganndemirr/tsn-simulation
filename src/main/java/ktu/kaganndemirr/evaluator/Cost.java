@@ -1,7 +1,7 @@
 package ktu.kaganndemirr.evaluator;
 
 import ktu.kaganndemirr.message.Multicast;
-import ktu.kaganndemirr.util.holders.*;
+import ktu.kaganndemirr.util.holders.phy.*;
 
 import java.util.Map;
 
@@ -14,6 +14,8 @@ public interface Cost {
     String toDetailedString();
 
     Map<Multicast, Double> getWCDMap();
+
+    void writePHYWSMv2LWRResultToFile(PHYWSMv2LWRHolder phyWSMv2LWRHolder);
 
     void writePHYWPMv1ResultToFile(PHYWPMv1Holder phyWPMv1Holder);
 
