@@ -34,7 +34,7 @@ import static ktu.kaganndemirr.util.HelperMethods.createScenarioOutputPath;
 import static ktu.kaganndemirr.util.HelperMethods.writeSolutionsToFile;
 
 public class LaursenRO {
-    private static final Logger logger = LoggerFactory.getLogger(WPMCWRDeadline.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(LaursenRO.class.getSimpleName());
 
     private final int k;
 
@@ -157,15 +157,17 @@ public class LaursenRO {
                     solution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, ttUnicastList, k, evaluator);
                 }
 
-                synchronized (writeLock) {
-                    assert solution != null;
-                    try {
-                        assert initialSolution != null;
-                        writeSolutionsToFile(initialSolution, solution, scenarioOutputPath, threadName, i);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
+//                if (logger.isDebugEnabled()) {
+//                    synchronized (writeLock) {
+//                        assert solution != null;
+//                        try {
+//                            assert initialSolution != null;
+//                            writeSolutionsToFile(initialSolution, solution, scenarioOutputPath, threadName, i);
+//                        } catch (IOException e) {
+//                            throw new RuntimeException(e);
+//                        }
+//                    }
+//                }
 
                 //Evaluate and see if better than anything we have seen before
                 Cost cost = evaluator.evaluate(solution);

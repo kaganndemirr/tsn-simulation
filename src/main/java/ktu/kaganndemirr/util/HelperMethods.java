@@ -166,15 +166,9 @@ public class HelperMethods {
     }
 
     public static void writeSolutionsToFile(List<Unicast> initialSolution, List<Unicast> solution, String scenarioOutputPath, String threadName, int i) throws IOException {
-        List<Unicast> sortedInitialSolution = new ArrayList<>(initialSolution);
-        sortedInitialSolution.sort(Comparator.comparing(x -> x.getApplication().getName()));
-
-        List<Unicast> sortedSolution = new ArrayList<>(solution);
-        sortedSolution.sort(Comparator.comparing(x -> x.getApplication().getName()));
-
         BufferedWriter initialSolutionWriter = new BufferedWriter(new FileWriter(Paths.get(scenarioOutputPath, "InitialSolution.txt").toString(), true));
         initialSolutionWriter.write("############## ThreadName:" + threadName + " Iteration:" + i + " ##############\n");
-        for (Unicast unicast : sortedInitialSolution) {
+        for (Unicast unicast : initialSolution) {
             if (unicast.getApplication() instanceof SRTApplication) {
                 initialSolutionWriter.write(unicast.getApplication().getName() + ": ");
                 initialSolutionWriter.write(unicast.getPath().getEdgeList() + "\n");
@@ -185,7 +179,7 @@ public class HelperMethods {
 
         BufferedWriter solutionWriter = new BufferedWriter(new FileWriter(Paths.get(scenarioOutputPath, "Solution.txt").toString(), true));
         solutionWriter.write("############## ThreadName:" + threadName + " Iteration:" + i + " ##############\n");
-        for (Unicast unicast : sortedSolution) {
+        for (Unicast unicast : solution) {
             if (unicast.getApplication() instanceof SRTApplication) {
                 solutionWriter.write(unicast.getApplication().getName() + ": ");
                 solutionWriter.write(unicast.getPath().getEdgeList() + "\n");

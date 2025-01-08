@@ -16,9 +16,9 @@ import ktu.kaganndemirr.solver.Solution;
 import ktu.kaganndemirr.util.Bag;
 import org.apache.commons.cli.*;
 import org.jgrapht.Graph;
+import ktu.kaganndemirr.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ktu.kaganndemirr.util.Constants;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,8 +32,6 @@ import java.util.regex.Pattern;
 import static ktu.kaganndemirr.util.HelperMethods.*;
 
 public class Main {
-
-    private static final Logger logger = LoggerFactory.getLogger(Main.class.getSimpleName());
 
     //region <Command line options>
     private static final String APP_ARG = "app";
@@ -267,8 +265,10 @@ public class Main {
             }
 
             if (Objects.equals(line.getOptionValue(LOG_ARG), Constants.DEBUG)) {
-                System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "Debug");
+                System.setProperty("org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY", "DEBUG");
             }
+
+            final Logger logger = LoggerFactory.getLogger(Main.class.getSimpleName());
 
             if (line.hasOption(TSN_SIMULATION_VERSION_ARG)) {
                 tsnSimulationVersion = line.getOptionValue(TSN_SIMULATION_VERSION_ARG);
@@ -353,6 +353,8 @@ public class Main {
                                     bag.setPathFindingMethod(pathFindingMethod);
                                     bag.setAlgorithm(algorithm);
                                     bag.setK(k);
+                                    bag.setThreadNumber(threadNumber);
+                                    bag.setTimeout(timeout);
                                     bag.setMetaheuristicName(metaheuristicName);
                                     bag.setEvaluatorName(evaluatorName);
 
