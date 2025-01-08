@@ -10,6 +10,7 @@ import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
 import ktu.kaganndemirr.routing.phy.yen.YenKShortestPaths;
 import ktu.kaganndemirr.solver.Solution;
+import ktu.kaganndemirr.util.Bag;
 import ktu.kaganndemirr.util.Constants;
 import ktu.kaganndemirr.util.mcdm.WPMMethods;
 import org.jgrapht.Graph;
@@ -28,8 +29,6 @@ public class WPMDeadline {
 
     private final int k;
 
-    String mcdmObjective;
-
     private List<UnicastCandidate> srtUnicastCandidateList;
 
     private List<Unicast> solution;
@@ -42,9 +41,7 @@ public class WPMDeadline {
         this.durationMap = new HashMap<>();
     }
 
-    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, String mcdmObjective, double wSRT, double wTT, double wLength, double wUtil, int rate,  String wpmVersion, String wpmValueType, final Evaluator evaluator){
-        this.mcdmObjective = mcdmObjective;
-
+    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, Bag bag, Evaluator evaluator){
         Instant graphPathsStartTime = Instant.now();
         YenKShortestPaths yenKShortestPaths = new YenKShortestPaths(graph, applicationList, k);
         Instant graphPathsEndTime = Instant.now();
@@ -54,11 +51,11 @@ public class WPMDeadline {
         List<Unicast> ttUnicastList = yenKShortestPaths.getTTUnicastList();
 
         Instant solutionStartTime = Instant.now();
-        if (Objects.equals(mcdmObjective, Constants.SRT_TT)){
+        if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT)){
             solution = null;
-        } else if (Objects.equals(mcdmObjective, Constants.SRT_TT_LENGTH)) {
-            solution = WPMMethods.deadlineSRTTTLength(srtUnicastCandidateList, ttUnicastList, wSRT, wTT, wLength, wpmVersion, wpmValueType);
-        } else if (Objects.equals(mcdmObjective, Constants.SRT_TT_LENGTH_UTIL)) {
+        } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH)) {
+            solution = WPMMethods.deadlineSRTTTLength(srtUnicastCandidateList, ttUnicastList, bag);
+        } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH_UTIL)) {
             solution = null;
         }
 

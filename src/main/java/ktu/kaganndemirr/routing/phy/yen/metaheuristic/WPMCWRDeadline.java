@@ -12,6 +12,7 @@ import ktu.kaganndemirr.message.UnicastCandidate;
 import ktu.kaganndemirr.routing.phy.yen.YenKShortestPaths;
 import ktu.kaganndemirr.routing.phy.yen.YenRandomizedKShortestPaths;
 import ktu.kaganndemirr.solver.Solution;
+import ktu.kaganndemirr.util.Bag;
 import ktu.kaganndemirr.util.Constants;
 import ktu.kaganndemirr.util.MetaheuristicMethods;
 import ktu.kaganndemirr.util.mcdm.WPMMethods;
@@ -32,6 +33,8 @@ public class WPMCWRDeadline {
 
     private final int k;
 
+    private long yenKShortestPathsDuration;
+
     private List<Unicast> ttUnicastList;
 
     private final Map<Double, Double> durationMap;
@@ -48,19 +51,20 @@ public class WPMCWRDeadline {
 
     public WPMCWRDeadline(int k){
         this.k = k;
+        yenKShortestPathsDuration = 0;
         costLock = new Object();
         durationMap = new HashMap<>();
         globalBestCost = new AVBLatencyMathCost();
         bestSolution = new ArrayList<>();
     }
 
-    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, int threadNumber, String mcdmObjective, String cwr, int rate, String wpmVersion, String wpmValueType, String metaheuristicName, Evaluator evaluator, Duration timeout){
+    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, Bag bag, int threadNumber, Evaluator evaluator, Duration timeout){
         ttUnicastList = YenRandomizedKShortestPaths.getTTUnicastList(applicationList);
 
         Instant yenKShortestPathsStartTime = Instant.now();
         YenKShortestPaths yenKShortestPaths = new YenKShortestPaths(graph, applicationList, k);
         Instant yenKShortestPathsEndTime = Instant.now();
-        long yenKShortestPathsDuration = Duration.between(yenKShortestPathsStartTime, yenKShortestPathsEndTime).toMillis();
+        yenKShortestPathsDuration = Duration.between(yenKShortestPathsStartTime, yenKShortestPathsEndTime).toMillis();
 
         this.srtUnicastCandidateList = yenKShortestPaths.getSRTUnicastCandidateList();
 
@@ -71,7 +75,7 @@ public class WPMCWRDeadline {
             Timer timer = getTimer(timeout);
 
             for (int i = 0; i < threadNumber; i++) {
-                exec.execute(new WPMCWRDeadlineRunnable(mcdmObjective, cwr, rate, wpmVersion, wpmValueType, metaheuristicName));
+                exec.execute(new WPMCWRDeadlineRunnable(bag));
             }
 
             exec.awaitTermination(timeout.toSeconds(), TimeUnit.SECONDS);
@@ -113,20 +117,10 @@ public class WPMCWRDeadline {
         private int i = 0;
         Instant solutionStartTime = Instant.now();
 
-        String mcdmObjective;
-        String cwr;
-        int rate;
-        String wpmVersion;
-        String wpmValueType;
-        String metaheuristicName;
+        private final Bag bag;
 
-        public WPMCWRDeadlineRunnable(String mcdmObjective, String cwr, int rate, String wpmVersion, String wpmValueType, String metaheuristicName) {
-            this.mcdmObjective = mcdmObjective;
-            this.cwr = cwr;
-            this.rate = rate;
-            this.wpmVersion = wpmVersion;
-            this.wpmValueType = wpmValueType;
-            this.metaheuristicName = metaheuristicName;
+        public WPMCWRDeadlineRunnable(Bag bag) {
+            this.bag = bag;
         }
 
         @Override
@@ -135,21 +129,21 @@ public class WPMCWRDeadline {
                 i++;
 
                 List<Unicast> initialSolution = null;
-                if (Objects.equals(mcdmObjective, Constants.SRT_TT)){
+                if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT)){
                     //TODO
-                } else if (Objects.equals(mcdmObjective, Constants.SRT_TT_LENGTH)) {
-                    if(Objects.equals(cwr, Constants.THREAD_LOCAL_RANDOM)){
-                        initialSolution = WPMMethods.deadlineCWRSRTTTLength(srtUnicastCandidateList, ttUnicastList, wpmVersion, wpmValueType);
+                } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH)) {
+                    if(Objects.equals(bag.getCWR(), Constants.THREAD_LOCAL_RANDOM)){
+                        initialSolution = WPMMethods.deadlineCWRSRTTTLength(bag, srtUnicastCandidateList, ttUnicastList);
                     }
-                } else if (Objects.equals(mcdmObjective, Constants.SRT_TT_LENGTH_UTIL)) {
+                } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH_UTIL)) {
                     //TODO
                 }
 
 
                 List<Unicast> solution = null;
-                if (Objects.equals(metaheuristicName, Constants.GRASP)){
+                if (Objects.equals(bag.getMetaheuristicName(), Constants.GRASP)){
                     solution = MetaheuristicMethods.GRASP(initialSolution, evaluator, srtUnicastCandidateList, globalBestCost);
-                } else if (Objects.equals(metaheuristicName, Constants.ALO)) {
+                } else if (Objects.equals(bag.getMetaheuristicName(), Constants.ALO)) {
                     solution = MetaheuristicMethods.ALO(initialSolution, initialSolution, srtUnicastCandidateList, k, evaluator);
                 }
 
@@ -161,7 +155,7 @@ public class WPMCWRDeadline {
                         if (cost.getTotalCost() < globalBestCost.getTotalCost()) {
                             globalBestCost = cost;
                             Instant solutionEndTime = Instant.now();
-                            durationMap.put(Double.parseDouble(globalBestCost.toString().split("\\s")[0]), (Duration.between(solutionStartTime, solutionEndTime).toMillis() / 1e3));
+                            durationMap.put(Double.parseDouble(globalBestCost.toString().split("\\s")[0]), (Duration.between(solutionStartTime, solutionEndTime).toMillis() / 1e3) + yenKShortestPathsDuration / 1e3);
                             bestSolution.clear();
                             assert solution != null;
                             bestSolution.addAll(solution);

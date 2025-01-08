@@ -13,6 +13,7 @@ import ktu.kaganndemirr.routing.phy.yen.YenKShortestPaths;
 import ktu.kaganndemirr.routing.phy.yen.YenMCDMKShortestPaths;
 import ktu.kaganndemirr.routing.phy.yen.YenRandomizedKShortestPaths;
 import ktu.kaganndemirr.solver.Solution;
+import ktu.kaganndemirr.util.Bag;
 import ktu.kaganndemirr.util.Constants;
 import ktu.kaganndemirr.util.LaursenMethods;
 import ktu.kaganndemirr.util.MetaheuristicMethods;
@@ -21,6 +22,8 @@ import org.jgrapht.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.Instant;
@@ -29,16 +32,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static ktu.kaganndemirr.util.HelperMethods.writeSolutionsToFile;
+import static ktu.kaganndemirr.routing.phy.yen.YenMCDMKShortestPaths.getTTUnicastList;
+import static ktu.kaganndemirr.util.HelperMethods.*;
 
 public class WSMv2LWR {
-    private static final Logger logger = LoggerFactory.getLogger(WPMLWRDeadline.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(WSMv2LWR.class.getSimpleName());
 
     private final int k;
-
-    private long yenMCDMKShortestPathsDuration;
-
-    private List<Unicast> ttUnicastList;
 
     private final Map<Double, Double> durationMap;
 
@@ -48,16 +48,16 @@ public class WSMv2LWR {
 
     private final Object costLock;
 
-
     private Cost globalBestCost;
 
     private final List<Unicast> bestSolution;
 
     private Evaluator evaluator;
 
+    private String scenarioOutputPath;
+
     public WSMv2LWR(int k){
         this.k = k;
-        this.yenMCDMKShortestPathsDuration = 0;
         writeLock = new Object();
         costLock = new Object();
         durationMap = new HashMap<>();
@@ -65,23 +65,21 @@ public class WSMv2LWR {
         bestSolution = new ArrayList<>();
     }
 
-    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, String lwr, String mcdmObjective, String wsmNormalization, double wSRT, double wTT, double wLength, double wUtil, int rate, int threadNumber, String metaheuristicName, Evaluator evaluator, Duration timeout){
-        Instant yenMCDMKShortestPathsStartTime = Instant.now();
-        YenMCDMKShortestPaths yenMCDMKShortestPaths = new YenMCDMKShortestPaths(graph, applicationList, lwr, k, wsmNormalization, wSRT, wTT, wLength);
-        Instant yenMCDMKShortestPathsEndTime = Instant.now();
-        this.yenMCDMKShortestPathsDuration = Duration.between(yenMCDMKShortestPathsStartTime, yenMCDMKShortestPathsEndTime).toMillis();
-
-        srtUnicastCandidateList = yenMCDMKShortestPaths.getSRTUnicastCandidateList();
-        ttUnicastList = yenMCDMKShortestPaths.getTTUnicastList();
+    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, Bag bag, int threadNumber, Evaluator evaluator, Duration timeout){
+        List<Unicast> ttUnicastList = getTTUnicastList(applicationList);
 
         this.evaluator = evaluator;
+
+        scenarioOutputPath = createScenarioOutputPath(bag);
+
+        new File(scenarioOutputPath).mkdirs();
 
         try (ExecutorService exec = Executors.newFixedThreadPool(threadNumber)) {
 
             Timer timer = getTimer(timeout);
 
             for (int i = 0; i < threadNumber; i++) {
-                exec.execute(new WSMv2Runnable(metaheuristicName));
+                exec.execute(new WSMv2Runnable(graph, applicationList, ttUnicastList, bag));
             }
 
             exec.awaitTermination(timeout.toSeconds(), TimeUnit.SECONDS);
@@ -123,35 +121,53 @@ public class WSMv2LWR {
     private class WSMv2Runnable implements Runnable {
         private int i = 0;
         Instant solutionStartTime = Instant.now();
-        
-        String metaheuristicName;
 
-        public WSMv2Runnable(String metaheuristicName) {
-            this.metaheuristicName = metaheuristicName;
+        Graph<Node, GCLEdge> graph;
+        List<Application> applicationList;
+        List<Unicast> ttUnicastList;
+        Bag bag;
+
+        public WSMv2Runnable(Graph<Node, GCLEdge> graph, List<Application> applicationList, List<Unicast> ttUnicastList, Bag bag) {
+            this.graph = graph;
+            this.applicationList = applicationList;
+            this.bag = bag;
+            this.ttUnicastList = ttUnicastList;
         }
 
         @Override
         public void run() {
+            String threadName = Thread.currentThread().getName();
+
             while (!Thread.currentThread().isInterrupted()) {
                 i++;
+
+                YenMCDMKShortestPaths yenMCDMKShortestPaths = new YenMCDMKShortestPaths(graph, applicationList, ttUnicastList, bag, k);
+
+                srtUnicastCandidateList = yenMCDMKShortestPaths.getSRTUnicastCandidateList();
+
                 List<Unicast> solution = null;
                 List<Unicast> initialSolution = null;
 
-                if(Objects.equals(metaheuristicName, Constants.GRASP)){
+                if(Objects.equals(bag.getMetaheuristicName(), Constants.GRASP)){
                     initialSolution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, ttUnicastList, k, evaluator);
                     solution = MetaheuristicMethods.GRASP(initialSolution, evaluator, srtUnicastCandidateList, globalBestCost);
-                } else if (Objects.equals(metaheuristicName, Constants.ALO)) {
+                } else if (Objects.equals(bag.getMetaheuristicName(), Constants.ALO)) {
                     initialSolution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, ttUnicastList, k, evaluator);
                     solution = MetaheuristicMethods.ALO(initialSolution, initialSolution, srtUnicastCandidateList, k, evaluator);
-                } else if (Objects.equals(metaheuristicName, Constants.CONSTRUCT_INITIAL_SOLUTION)) {
+                } else if (Objects.equals(bag.getMetaheuristicName(), Constants.CONSTRUCT_INITIAL_SOLUTION)) {
                     solution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, ttUnicastList, k, evaluator);
                     initialSolution = solution;
                 }
 
                 synchronized (writeLock) {
-                    writeSolutionsToFile(initialSolution, solution);
+                    assert solution != null;
+                    try {
+                        writeSolutionsToFile(initialSolution, solution, scenarioOutputPath, threadName, i);
+                        writeSRTCandidateRoutesToFile(srtUnicastCandidateList, scenarioOutputPath, threadName, i);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
-
 
 
                 //Evaluate and see if better than anything we have seen before
@@ -162,7 +178,7 @@ public class WSMv2LWR {
                         if (cost.getTotalCost() < globalBestCost.getTotalCost()) {
                             globalBestCost = cost;
                             Instant solutionEndTime = Instant.now();
-                            durationMap.put(Double.parseDouble(globalBestCost.toString().split("\\s")[0]), (Duration.between(solutionStartTime, solutionEndTime).toMillis() / 1e3) + yenMCDMKShortestPathsDuration / 1e3);
+                            durationMap.put(Double.parseDouble(globalBestCost.toString().split("\\s")[0]), (Duration.between(solutionStartTime, solutionEndTime).toMillis() / 1e3));
                             bestSolution.clear();
                             assert solution != null;
                             bestSolution.addAll(solution);
@@ -171,7 +187,7 @@ public class WSMv2LWR {
                 }
             }
 
-            logger.info(" {} finished in {} iterations", Thread.currentThread().getName(), i);
+            logger.info(" {} finished in {} iterations", threadName, i);
         }
     }
 

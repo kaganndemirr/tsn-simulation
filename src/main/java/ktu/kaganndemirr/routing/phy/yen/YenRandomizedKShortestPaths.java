@@ -8,6 +8,7 @@ import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
+import ktu.kaganndemirr.util.Bag;
 import ktu.kaganndemirr.util.GraphMethods;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
@@ -24,10 +25,10 @@ import static ktu.kaganndemirr.util.GraphMethods.discardUnnecessaryEndSystems;
 public class YenRandomizedKShortestPaths {
     private final List<UnicastCandidate> srtUnicastCandidateList;
 
-    public YenRandomizedKShortestPaths(Graph<Node, GCLEdge> graph, List<Application> applicationList, String lwr, int k) {
+    public YenRandomizedKShortestPaths(Graph<Node, GCLEdge> graph, List<Application> applicationList, Bag bag, int k) {
         srtUnicastCandidateList = new ArrayList<>();
 
-        GraphMethods.randomizeGraph(graph, lwr);
+        GraphMethods.randomizeGraph(graph, bag.getLWR());
 
         for (Application app : applicationList) {
             if (app instanceof SRTApplication) {

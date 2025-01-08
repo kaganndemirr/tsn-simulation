@@ -1,7 +1,7 @@
 package ktu.kaganndemirr.evaluator;
 
 import ktu.kaganndemirr.message.Multicast;
-import ktu.kaganndemirr.util.holders.phy.*;
+import ktu.kaganndemirr.util.Bag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,6 +13,9 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+
+import static ktu.kaganndemirr.util.HelperMethods.createResultOutputPath;
+import static ktu.kaganndemirr.util.HelperMethods.createScenarioOutputPath;
 
 public class AVBLatencyMathCost implements Cost, Comparator<AVBLatencyMathCost> {
 
@@ -85,196 +88,15 @@ public class AVBLatencyMathCost implements Cost, Comparator<AVBLatencyMathCost> 
     }
 
     @Override
-    public void writePHYWPMv1ResultToFile(PHYWPMv1Holder phyWPMv1Holder) {
-        String mainFolderOutputLocation = Paths.get("outputs", phyWPMv1Holder.getRouting(), phyWPMv1Holder.getPathFindingMethod(), phyWPMv1Holder.getAlgorithm(), String.valueOf(phyWPMv1Holder.getK()), phyWPMv1Holder.getMCDMObjective(), String.valueOf(phyWPMv1Holder.getWSRT()), String.valueOf(phyWPMv1Holder.getWTT()), String.valueOf(phyWPMv1Holder.getWLength()), String.valueOf(phyWPMv1Holder.getWUtil()), phyWPMv1Holder.getWPMVersion(), phyWPMv1Holder.getTopologyName() + "_" + phyWPMv1Holder.getApplicationName()).toString();
+    public void writeResultToFile(Bag bag) throws IOException {
+        String scenarioOutputPath = createScenarioOutputPath(bag);
 
-        boolean isCreated = new File(mainFolderOutputLocation).mkdirs();
+        String resultOutputPath = createResultOutputPath(bag);
 
-        if (isCreated) {
-            String resultFileOutputLocation = Paths.get("outputs", phyWPMv1Holder.getRouting(), phyWPMv1Holder.getPathFindingMethod(), phyWPMv1Holder.getAlgorithm(), String.valueOf(phyWPMv1Holder.getK()), phyWPMv1Holder.getMCDMObjective(), String.valueOf(phyWPMv1Holder.getWSRT()), String.valueOf(phyWPMv1Holder.getWTT()), String.valueOf(phyWPMv1Holder.getWLength()), String.valueOf(phyWPMv1Holder.getWUtil()), phyWPMv1Holder.getWPMVersion()).toString();
-
-            try {
-                BufferedWriter writer = new BufferedWriter(new FileWriter(Paths.get(resultFileOutputLocation, "Results.txt").toString(), true));
-                writer.write(phyWPMv1Holder.getTopologyName() + "_" + phyWPMv1Holder.getApplicationName() + "\n");
-                writer.write("cost = " + getTotalCost() + ", o1 = " + o1 + ", o2 = " + o2 + ", o3 = " + o3 + "\n");
-                writer.close();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    public void writePHYWPMv2ResultToFile(PHYWPMv2Holder phyWPMv2Holder) {
-        String mainFolderOutputLocation = Paths.get("outputs", phyWPMv2Holder.getRouting(), phyWPMv2Holder.getPathFindingMethod(), phyWPMv2Holder.getAlgorithm(), String.valueOf(phyWPMv2Holder.getK()), phyWPMv2Holder.getMCDMObjective(), String.valueOf(phyWPMv2Holder.getWSRT()), String.valueOf(phyWPMv2Holder.getWTT()), String.valueOf(phyWPMv2Holder.getWLength()), String.valueOf(phyWPMv2Holder.getWUtil()), phyWPMv2Holder.getWPMVersion(), phyWPMv2Holder.getWPMValueType(), phyWPMv2Holder.getTopologyName() + "_" + phyWPMv2Holder.getApplicationName()).toString();
-
-        boolean isCreated = new File(mainFolderOutputLocation).mkdirs();
-
-        if(isCreated){
-            String resultFileOutputLocation = Paths.get("outputs", phyWPMv2Holder.getRouting(), phyWPMv2Holder.getPathFindingMethod(), phyWPMv2Holder.getAlgorithm(), String.valueOf(phyWPMv2Holder.getK()), phyWPMv2Holder.getMCDMObjective(), String.valueOf(phyWPMv2Holder.getWSRT()), String.valueOf(phyWPMv2Holder.getWTT()), String.valueOf(phyWPMv2Holder.getWLength()), String.valueOf(phyWPMv2Holder.getWUtil()), phyWPMv2Holder.getWPMVersion(), phyWPMv2Holder.getWPMValueType()).toString();
-
-            try {
-                BufferedWriter writer = new BufferedWriter(new FileWriter(Paths.get(resultFileOutputLocation, "Results.txt").toString(), true));
-                writer.write(phyWPMv2Holder.getTopologyName() + "_" + phyWPMv2Holder.getApplicationName() + "\n");
-                writer.write("cost = " + getTotalCost() + ", o1 = " + o1 + ", o2 = " + o2 + ", o3 = " + o3 + "\n");
-                writer.close();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    public void writePHYWPMLWRv1ResultToFile(PHYWPMLWRv1Holder phyWPMLWRv1Holder) {
-        String mainFolderOutputLocation = Paths.get("outputs", phyWPMLWRv1Holder.getRouting(), phyWPMLWRv1Holder.getPathFindingMethod(), phyWPMLWRv1Holder.getAlgorithm(), phyWPMLWRv1Holder.getLWR(), String.valueOf(phyWPMLWRv1Holder.getK()), phyWPMLWRv1Holder.getMCDMObjective(), String.valueOf(phyWPMLWRv1Holder.getWSRT()), String.valueOf(phyWPMLWRv1Holder.getWTT()), String.valueOf(phyWPMLWRv1Holder.getWLength()), String.valueOf(phyWPMLWRv1Holder.getWUtil()), phyWPMLWRv1Holder.getWPMVersion(), phyWPMLWRv1Holder.getTopologyName() + "_" + phyWPMLWRv1Holder.getApplicationName()).toString();
-
-        boolean isCreated = new File(mainFolderOutputLocation).mkdirs();
-
-        if (isCreated) {
-            String resultFileOutputLocation = Paths.get("outputs", phyWPMLWRv1Holder.getRouting(), phyWPMLWRv1Holder.getPathFindingMethod(), phyWPMLWRv1Holder.getAlgorithm(), phyWPMLWRv1Holder.getLWR(), String.valueOf(phyWPMLWRv1Holder.getK()), phyWPMLWRv1Holder.getMCDMObjective(), String.valueOf(phyWPMLWRv1Holder.getWSRT()), String.valueOf(phyWPMLWRv1Holder.getWTT()), String.valueOf(phyWPMLWRv1Holder.getWLength()), String.valueOf(phyWPMLWRv1Holder.getWUtil()), phyWPMLWRv1Holder.getWPMVersion()).toString();
-
-            try {
-                BufferedWriter writer = new BufferedWriter(new FileWriter(Paths.get(resultFileOutputLocation, "Results.txt").toString(), true));
-                writer.write(phyWPMLWRv1Holder.getTopologyName() + "_" + phyWPMLWRv1Holder.getApplicationName() + "\n");
-                writer.write("cost = " + getTotalCost() + ", o1 = " + o1 + ", o2 = " + o2 + ", o3 = " + o3 + "\n");
-                writer.close();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    public void writePHYWPMLWRv2ResultToFile(PHYWPMLWRv2Holder phyWPMLWRv2Holder) {
-        String mainFolderOutputLocation = Paths.get("outputs", phyWPMLWRv2Holder.getRouting(), phyWPMLWRv2Holder.getPathFindingMethod(), phyWPMLWRv2Holder.getAlgorithm(), phyWPMLWRv2Holder.getLWR(), String.valueOf(phyWPMLWRv2Holder.getK()), phyWPMLWRv2Holder.getMCDMObjective(), String.valueOf(phyWPMLWRv2Holder.getWSRT()), String.valueOf(phyWPMLWRv2Holder.getWTT()), String.valueOf(phyWPMLWRv2Holder.getWLength()), String.valueOf(phyWPMLWRv2Holder.getWUtil()), phyWPMLWRv2Holder.getWPMVersion(), phyWPMLWRv2Holder.getWPMValueType(), phyWPMLWRv2Holder.getTopologyName() + "_" + phyWPMLWRv2Holder.getApplicationName()).toString();
-
-        boolean isCreated = new File(mainFolderOutputLocation).mkdirs();
-
-        if (isCreated) {
-            String resultFileOutputLocation = Paths.get("outputs", phyWPMLWRv2Holder.getRouting(), phyWPMLWRv2Holder.getPathFindingMethod(), phyWPMLWRv2Holder.getAlgorithm(), phyWPMLWRv2Holder.getLWR(), String.valueOf(phyWPMLWRv2Holder.getK()), phyWPMLWRv2Holder.getMCDMObjective(), String.valueOf(phyWPMLWRv2Holder.getWSRT()), String.valueOf(phyWPMLWRv2Holder.getWTT()), String.valueOf(phyWPMLWRv2Holder.getWLength()), String.valueOf(phyWPMLWRv2Holder.getWUtil()), phyWPMLWRv2Holder.getWPMVersion(), phyWPMLWRv2Holder.getWPMValueType()).toString();
-
-            try {
-                BufferedWriter writer = new BufferedWriter(new FileWriter(Paths.get(resultFileOutputLocation, "Results.txt").toString(), true));
-                writer.write(phyWPMLWRv2Holder.getTopologyName() + "_" + phyWPMLWRv2Holder.getApplicationName() + "\n");
-                writer.write("cost = " + getTotalCost() + ", o1 = " + o1 + ", o2 = " + o2 + ", o3 = " + o3 + "\n");
-                writer.close();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    public void writePHYWPMCWRv1ResultToFile(PHYWPMCWRv1Holder phyWPMCWRv1Holder) {
-        String mainFolderOutputLocation = Paths.get("outputs", phyWPMCWRv1Holder.getRouting(), phyWPMCWRv1Holder.getPathFindingMethod(), phyWPMCWRv1Holder.getAlgorithm(), String.valueOf(phyWPMCWRv1Holder.getK()), phyWPMCWRv1Holder.getMCDMObjective(), phyWPMCWRv1Holder.getCWR(), phyWPMCWRv1Holder.getWPMVersion(), phyWPMCWRv1Holder.getTopologyName() + "_" + phyWPMCWRv1Holder.getApplicationName()).toString();
-
-        boolean isCreated = new File(mainFolderOutputLocation).mkdirs();
-
-        if (isCreated) {
-            String resultFileOutputLocation = Paths.get("outputs", phyWPMCWRv1Holder.getRouting(), phyWPMCWRv1Holder.getPathFindingMethod(), phyWPMCWRv1Holder.getAlgorithm(), String.valueOf(phyWPMCWRv1Holder.getK()), phyWPMCWRv1Holder.getMCDMObjective(), phyWPMCWRv1Holder.getCWR(), phyWPMCWRv1Holder.getWPMVersion()).toString();
-
-
-            try {
-                BufferedWriter writer = new BufferedWriter(new FileWriter(Paths.get(resultFileOutputLocation, "Results.txt").toString(), true));
-                writer.write(phyWPMCWRv1Holder.getTopologyName() + "_" + phyWPMCWRv1Holder.getApplicationName() + "\n");
-                writer.write("cost = " + getTotalCost() + ", o1 = " + o1 + ", o2 = " + o2 + ", o3 = " + o3 + "\n");
-                writer.close();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    public void writePHYWPMCWRv2ResultToFile(PHYWPMCWRv2Holder phyWPMCWRv2Holder) {
-        String mainFolderOutputLocation = Paths.get("outputs", phyWPMCWRv2Holder.getRouting(), phyWPMCWRv2Holder.getPathFindingMethod(), phyWPMCWRv2Holder.getAlgorithm(), String.valueOf(phyWPMCWRv2Holder.getK()), phyWPMCWRv2Holder.getMCDMObjective(), phyWPMCWRv2Holder.getCWR(), phyWPMCWRv2Holder.getWPMVersion(), phyWPMCWRv2Holder.getWPMValueType(), phyWPMCWRv2Holder.getTopologyName() + "_" + phyWPMCWRv2Holder.getApplicationName()).toString();
-
-        boolean isCreated = new File(mainFolderOutputLocation).mkdirs();
-
-        if (isCreated) {
-            String resultFileOutputLocation = Paths.get("outputs", phyWPMCWRv2Holder.getRouting(), phyWPMCWRv2Holder.getPathFindingMethod(), phyWPMCWRv2Holder.getAlgorithm(), String.valueOf(phyWPMCWRv2Holder.getK()), phyWPMCWRv2Holder.getMCDMObjective(), phyWPMCWRv2Holder.getCWR(), phyWPMCWRv2Holder.getWPMVersion(), phyWPMCWRv2Holder.getWPMValueType()).toString();
-
-
-            try {
-                BufferedWriter writer = new BufferedWriter(new FileWriter(Paths.get(resultFileOutputLocation, "Results.txt").toString(), true));
-                writer.write(phyWPMCWRv2Holder.getTopologyName() + "_" + phyWPMCWRv2Holder.getApplicationName() + "\n");
-                writer.write("cost = " + getTotalCost() + ", o1 = " + o1 + ", o2 = " + o2 + ", o3 = " + o3 + "\n");
-                writer.close();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    public void writePHYWPMLWRCWRv1ResultToFile(PHYWPMLWRCWRv1Holder phyWPMLWRCWRv1Holder) {
-        String mainFolderOutputLocation = Paths.get("outputs", phyWPMLWRCWRv1Holder.getRouting(), phyWPMLWRCWRv1Holder.getPathFindingMethod(), phyWPMLWRCWRv1Holder.getAlgorithm(), phyWPMLWRCWRv1Holder.getLWR(), String.valueOf(phyWPMLWRCWRv1Holder.getK()), phyWPMLWRCWRv1Holder.getMCDMObjective(), phyWPMLWRCWRv1Holder.getCWR(), phyWPMLWRCWRv1Holder.getWPMVersion(), phyWPMLWRCWRv1Holder.getTopologyName() + "_" + phyWPMLWRCWRv1Holder.getApplicationName()).toString();
-
-        boolean isCreated = new File(mainFolderOutputLocation).mkdirs();
-
-        if (isCreated) {
-            String resultFileOutputLocation = Paths.get("outputs", phyWPMLWRCWRv1Holder.getRouting(), phyWPMLWRCWRv1Holder.getPathFindingMethod(), phyWPMLWRCWRv1Holder.getAlgorithm(), phyWPMLWRCWRv1Holder.getLWR(), String.valueOf(phyWPMLWRCWRv1Holder.getK()), phyWPMLWRCWRv1Holder.getMCDMObjective(), phyWPMLWRCWRv1Holder.getCWR(), phyWPMLWRCWRv1Holder.getWPMVersion()).toString();
-
-
-            try {
-                BufferedWriter writer = new BufferedWriter(new FileWriter(Paths.get(resultFileOutputLocation, "Results.txt").toString(), true));
-                writer.write(phyWPMLWRCWRv1Holder.getTopologyName() + "_" + phyWPMLWRCWRv1Holder.getApplicationName() + "\n");
-                writer.write("cost = " + getTotalCost() + ", o1 = " + o1 + ", o2 = " + o2 + ", o3 = " + o3 + "\n");
-                writer.close();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    public void writePHYWPMLWRCWRv2ResultToFile(PHYWPMLWRCWRv2Holder phyWPMLWRCWRv2Holder) {
-        String mainFolderOutputLocation = Paths.get("outputs", phyWPMLWRCWRv2Holder.getRouting(), phyWPMLWRCWRv2Holder.getPathFindingMethod(), phyWPMLWRCWRv2Holder.getAlgorithm(), phyWPMLWRCWRv2Holder.getLWR(), String.valueOf(phyWPMLWRCWRv2Holder.getK()), phyWPMLWRCWRv2Holder.getMCDMObjective(), phyWPMLWRCWRv2Holder.getCWR(), phyWPMLWRCWRv2Holder.getWPMVersion(), phyWPMLWRCWRv2Holder.getWPMValueType(), phyWPMLWRCWRv2Holder.getTopologyName() + "_" + phyWPMLWRCWRv2Holder.getApplicationName()).toString();
-
-        boolean isCreated = new File(mainFolderOutputLocation).mkdirs();
-
-        if (isCreated) {
-            String resultFileOutputLocation = Paths.get("outputs", phyWPMLWRCWRv2Holder.getRouting(), phyWPMLWRCWRv2Holder.getPathFindingMethod(), phyWPMLWRCWRv2Holder.getAlgorithm(), phyWPMLWRCWRv2Holder.getLWR(), String.valueOf(phyWPMLWRCWRv2Holder.getK()), phyWPMLWRCWRv2Holder.getMCDMObjective(), phyWPMLWRCWRv2Holder.getCWR(), phyWPMLWRCWRv2Holder.getWPMVersion(), phyWPMLWRCWRv2Holder.getWPMValueType()).toString();
-
-
-            try {
-                BufferedWriter writer = new BufferedWriter(new FileWriter(Paths.get(resultFileOutputLocation, "Results.txt").toString(), true));
-                writer.write(phyWPMLWRCWRv2Holder.getTopologyName() + "_" + phyWPMLWRCWRv2Holder.getApplicationName() + "\n");
-                writer.write("cost = " + getTotalCost() + ", o1 = " + o1 + ", o2 = " + o2 + ", o3 = " + o3 + "\n");
-                writer.close();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    public void writePHYWSMv2LWRResultToFile(PHYWSMv2LWRHolder phyWSMv2LWRHolder) {
-        String mainFolderOutputLocation = Paths.get("outputs", phyWSMv2LWRHolder.getRouting(), phyWSMv2LWRHolder.getPathFindingMethod(), phyWSMv2LWRHolder.getAlgorithm(), phyWSMv2LWRHolder.getLWR(), String.valueOf(phyWSMv2LWRHolder.getK()), phyWSMv2LWRHolder.getMCDMObjective(), phyWSMv2LWRHolder.getWSMNormalization(), String.valueOf(phyWSMv2LWRHolder.getWSRT()), String.valueOf(phyWSMv2LWRHolder.getWTT()), String.valueOf(phyWSMv2LWRHolder.getWLength()), String.valueOf(phyWSMv2LWRHolder.getWUtil()), phyWSMv2LWRHolder.getTopologyName() + "_" + phyWSMv2LWRHolder.getApplicationName()).toString();
-
-        boolean isCreated = new File(mainFolderOutputLocation).mkdirs();
-
-        if (isCreated) {
-            String resultFileOutputLocation = Paths.get("outputs", phyWSMv2LWRHolder.getRouting(), phyWSMv2LWRHolder.getPathFindingMethod(), phyWSMv2LWRHolder.getAlgorithm(), phyWSMv2LWRHolder.getLWR(), String.valueOf(phyWSMv2LWRHolder.getK()), phyWSMv2LWRHolder.getMCDMObjective(), phyWSMv2LWRHolder.getWSMNormalization(), String.valueOf(phyWSMv2LWRHolder.getWSRT()), String.valueOf(phyWSMv2LWRHolder.getWTT()), String.valueOf(phyWSMv2LWRHolder.getWLength()), String.valueOf(phyWSMv2LWRHolder.getWUtil())).toString();
-
-            try {
-                BufferedWriter writer = new BufferedWriter(new FileWriter(Paths.get(resultFileOutputLocation, "Results.txt").toString(), true));
-                writer.write(phyWSMv2LWRHolder.getTopologyName() + "_" + phyWSMv2LWRHolder.getApplicationName() + "\n");
-                writer.write("cost = " + getTotalCost() + ", o1 = " + o1 + ", o2 = " + o2 + ", o3 = " + o3 + "\n");
-                writer.close();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        BufferedWriter writer = new BufferedWriter(new FileWriter(Paths.get(resultOutputPath, "Results.txt").toString(), true));
+        writer.write(bag.getTopologyName() + "_" + bag.getApplicationName() + "\n");
+        writer.write("cost = " + getTotalCost() + ", o1 = " + o1 + ", o2 = " + o2 + ", o3 = " + o3 + "\n");
+        writer.close();
     }
 
 }

@@ -12,6 +12,7 @@ import ktu.kaganndemirr.message.UnicastCandidate;
 import ktu.kaganndemirr.routing.phy.yen.YenKShortestPaths;
 import ktu.kaganndemirr.routing.phy.yen.YenRandomizedKShortestPaths;
 import ktu.kaganndemirr.solver.Solution;
+import ktu.kaganndemirr.util.Bag;
 import ktu.kaganndemirr.util.Constants;
 import ktu.kaganndemirr.util.LaursenMethods;
 import ktu.kaganndemirr.util.MetaheuristicMethods;
@@ -19,6 +20,8 @@ import org.jgrapht.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.Instant;
@@ -27,16 +30,23 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static ktu.kaganndemirr.util.HelperMethods.createScenarioOutputPath;
+import static ktu.kaganndemirr.util.HelperMethods.writeSolutionsToFile;
+
 public class LaursenRO {
     private static final Logger logger = LoggerFactory.getLogger(WPMCWRDeadline.class.getSimpleName());
 
     private final int k;
+
+    private long yenKShortestPathsDuration;
 
     private List<Unicast> ttUnicastList;
 
     private final Map<Double, Double> durationMap;
 
     private List<UnicastCandidate> srtUnicastCandidateList;
+
+    private final Object writeLock;
 
     private final Object costLock;
 
@@ -46,24 +56,32 @@ public class LaursenRO {
 
     private Evaluator evaluator;
 
+    private String scenarioOutputPath;
+
     public LaursenRO(int k){
         this.k = k;
+        yenKShortestPathsDuration = 0;
+        writeLock = new Object();
         costLock = new Object();
         durationMap = new HashMap<>();
         globalBestCost = new AVBLatencyMathCost();
         bestSolution = new ArrayList<>();
     }
 
-    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, int threadNumber, Duration timeout, String metaheuristicName, Evaluator evaluator){
+    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, Bag bag, int threadNumber, Duration timeout, Evaluator evaluator){
         Instant yenKShortestPathsStartTime = Instant.now();
         YenKShortestPaths yenKShortestPaths = new YenKShortestPaths(graph, applicationList, k);
         Instant yenKShortestPathsEndTime = Instant.now();
-        long yenKShortestPathsDuration = Duration.between(yenKShortestPathsStartTime, yenKShortestPathsEndTime).toMillis();
+        yenKShortestPathsDuration = Duration.between(yenKShortestPathsStartTime, yenKShortestPathsEndTime).toMillis();
 
         srtUnicastCandidateList = yenKShortestPaths.getSRTUnicastCandidateList();
         ttUnicastList = yenKShortestPaths.getTTUnicastList();
 
         this.evaluator = evaluator;
+
+        scenarioOutputPath = createScenarioOutputPath(bag);
+
+        new File(scenarioOutputPath).mkdirs();
 
         try (ExecutorService exec = Executors.newFixedThreadPool(threadNumber)) {
 
@@ -71,7 +89,7 @@ public class LaursenRO {
 
 
             for (int i = 0; i < threadNumber; i++) {
-                exec.execute(new LaursenRoutingOptimizationRunnable(metaheuristicName));
+                exec.execute(new LaursenRoutingOptimizationRunnable(bag));
             }
 
             exec.awaitTermination(timeout.toSeconds(), TimeUnit.SECONDS);
@@ -98,7 +116,6 @@ public class LaursenRO {
 
                 @Override
                 public void run() {
-
                     float searchProgress = (++i * (float) Constants.PROGRESS_PERIOD_SECOND) / duration.toMillis();
                     logger.info("Searching {} %: CurrentBest {}", numberFormat.format(searchProgress * 100), globalBestCost);
                 }
@@ -113,28 +130,41 @@ public class LaursenRO {
         private int i = 0;
         Instant solutionStartTime = Instant.now();
 
-        private final String metaheuristicName;
+        private final Bag bag;
 
-        public LaursenRoutingOptimizationRunnable(String metaheuristicName){
-            this.metaheuristicName = metaheuristicName;
+        public LaursenRoutingOptimizationRunnable(Bag bag){
+            this.bag = bag;
         }
 
         @Override
         public void run() {
+            String threadName = Thread.currentThread().getName();
+
             while (!Thread.currentThread().isInterrupted()) {
                 i++;
 
 
                 List<Unicast> solution = null;
+                List<Unicast> initialSolution = null;
 
-                if(Objects.equals(metaheuristicName, Constants.GRASP)){
-                    List<Unicast> initialSolution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, ttUnicastList, k, evaluator);
+                if(Objects.equals(bag.getMetaheuristicName(), Constants.GRASP)){
+                    initialSolution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, ttUnicastList, k, evaluator);
                     solution = MetaheuristicMethods.GRASP(initialSolution, evaluator, srtUnicastCandidateList, globalBestCost);
-                } else if (Objects.equals(metaheuristicName, Constants.ALO)) {
-                    List<Unicast> initialSolution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, ttUnicastList, k, evaluator);
+                } else if (Objects.equals(bag.getMetaheuristicName(), Constants.ALO)) {
+                    initialSolution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, ttUnicastList, k, evaluator);
                     solution = MetaheuristicMethods.ALO(initialSolution, initialSolution, srtUnicastCandidateList, k, evaluator);
-                } else if (Objects.equals(metaheuristicName, Constants.CONSTRUCT_INITIAL_SOLUTION)) {
+                } else if (Objects.equals(bag.getMetaheuristicName(), Constants.CONSTRUCT_INITIAL_SOLUTION)) {
                     solution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, ttUnicastList, k, evaluator);
+                }
+
+                synchronized (writeLock) {
+                    assert solution != null;
+                    try {
+                        assert initialSolution != null;
+                        writeSolutionsToFile(initialSolution, solution, scenarioOutputPath, threadName, i);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
 
                 //Evaluate and see if better than anything we have seen before
@@ -145,9 +175,8 @@ public class LaursenRO {
                         if (cost.getTotalCost() < globalBestCost.getTotalCost()) {
                             globalBestCost = cost;
                             Instant solutionEndTime = Instant.now();
-                            durationMap.put(Double.parseDouble(globalBestCost.toString().split("\\s")[0]), (Duration.between(solutionStartTime, solutionEndTime).toMillis() / 1e3));
+                            durationMap.put(Double.parseDouble(globalBestCost.toString().split("\\s")[0]), (Duration.between(solutionStartTime, solutionEndTime).toMillis() / 1e3) + yenKShortestPathsDuration / 1e3);
                             bestSolution.clear();
-                            assert solution != null;
                             bestSolution.addAll(solution);
                         }
                     }

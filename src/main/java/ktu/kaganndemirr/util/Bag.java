@@ -1,19 +1,27 @@
-package ktu.kaganndemirr.util.holders.phy;
+package ktu.kaganndemirr.util;
 
-public class PHYWPMv2Holder {
-    private String topologyName = null;
-    private String applicationName = null;
+public class Bag {
+    private String topologyName;
+    private String applicationName;
     private String routing;
+    private String mtrName;
     private String pathFindingMethod;
     private String algorithm;
+    private String lwr;
     private int k;
     private String mcdmObjective;
+    private String wsmNormalization;
+    private String cwr;
     private double wSRT;
     private double wTT;
     private double wLength;
     private double wUtil;
+    private int threadNumber;
+    private int timeout;
     private String wpmVersion;
     private String wpmValueType;
+    private String metaheuristicName;
+    private String evaluatorName;
 
     public String getTopologyName() {
         return topologyName;
@@ -39,6 +47,14 @@ public class PHYWPMv2Holder {
         this.routing = routing;
     }
 
+    public String getMTRName() {
+        return mtrName;
+    }
+
+    public void setMTRName(String mtrName) {
+        this.mtrName = mtrName;
+    }
+
     public String getPathFindingMethod() {
         return pathFindingMethod;
     }
@@ -55,6 +71,14 @@ public class PHYWPMv2Holder {
         this.algorithm = algorithm;
     }
 
+    public String getLWR(){
+        return lwr;
+    }
+
+    public void setLWR(String lwr){
+        this.lwr = lwr;
+    }
+
     public int getK() {
         return k;
     }
@@ -69,6 +93,22 @@ public class PHYWPMv2Holder {
 
     public void setMCDMObjective(String mcdmObjective) {
         this.mcdmObjective = mcdmObjective;
+    }
+
+    public String getWSMNormalization() {
+        return wsmNormalization;
+    }
+
+    public void setWSMNormalization(String wsmNormalization) {
+        this.wsmNormalization = wsmNormalization;
+    }
+
+    public String getCWR(){
+        return cwr;
+    }
+
+    public void setCWR(String cwr){
+        this.cwr = cwr;
     }
 
     public double getWSRT() {
@@ -103,6 +143,22 @@ public class PHYWPMv2Holder {
         this.wUtil = wUtil;
     }
 
+    public int getThreadNumber() {
+        return threadNumber;
+    }
+
+    public void setThreadNumber(int threadNumber) {
+        this.threadNumber = threadNumber;
+    }
+
+    public int getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
+
     public String getWPMVersion() {
         return wpmVersion;
     }
@@ -119,4 +175,24 @@ public class PHYWPMv2Holder {
         this.wpmValueType = wpmValueType;
     }
 
+    public String getMetaheuristicName() {
+        return metaheuristicName;
+    }
+
+    public void setMetaheuristicName(String metaheuristicName) {
+        this.metaheuristicName = metaheuristicName;
+    }
+
+    public String getEvaluatorName() {
+        return evaluatorName;
+    }
+
+    public void setEvaluatorName(String evaluatorName) {
+        this.evaluatorName = evaluatorName;
+    }
+
 }
+
+
+
+

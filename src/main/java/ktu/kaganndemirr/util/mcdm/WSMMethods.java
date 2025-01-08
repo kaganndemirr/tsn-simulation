@@ -7,6 +7,7 @@ import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
+import ktu.kaganndemirr.util.Bag;
 import ktu.kaganndemirr.util.Constants;
 import ktu.kaganndemirr.util.UnicastCandidateSortingMethods;
 import org.jgrapht.GraphPath;
@@ -132,7 +133,7 @@ public class WSMMethods {
         return solution;
     }
 
-    public static GraphPath<Node, GCLEdge> srtTTLengthGraphPathV1(Application application, List<GraphPath<Node, GCLEdge>> kShortestPathsGraphPathList,  List<Unicast> ttUnicastList, String wsmNormalization, double wSRT, double wTT, double wLength) {
+    public static GraphPath<Node, GCLEdge> srtTTLengthGraphPathV1(Application application, List<GraphPath<Node, GCLEdge>> kShortestPathsGraphPathList,  List<Unicast> ttUnicastList, Bag bag) {
         List<Unicast> solution = new ArrayList<>();
 
         if(!ttUnicastList.isEmpty()){
@@ -145,7 +146,7 @@ public class WSMMethods {
         List<Double> ttCostList = new ArrayList<>();
 
         List<Double> normalizedCostGPList;
-        switch (wsmNormalization) {
+        switch (bag.getWSMNormalization()) {
             case Constants.MIN_MAX -> normalizedCostGPList = null;
             case Constants.VECTOR -> normalizedCostGPList = null;
             default -> normalizedCostGPList = normalizeGPCostMax(kShortestPathsGraphPathList);
@@ -174,7 +175,7 @@ public class WSMMethods {
         List<Double> normalizedSRTCostList;
         List<Double> normalizedTTCostList;
 
-        switch (wsmNormalization) {
+        switch (bag.getWSMNormalization()) {
             case Constants.MIN_MAX -> {
                 normalizedSRTCostList = null;
                 normalizedTTCostList = null;
@@ -194,7 +195,8 @@ public class WSMMethods {
 
         for (int i = 0; i < kShortestPathsGraphPathList.size(); i++) {
             assert normalizedSRTCostList != null;
-            double cost = wSRT * normalizedSRTCostList.get(i) + wTT * normalizedTTCostList.get(i) + wLength * normalizedCostGPList.get(i);
+            assert normalizedCostGPList != null;
+            double cost = bag.getWSRT() * normalizedSRTCostList.get(i) + bag.getWTT() * normalizedTTCostList.get(i) + bag.getWLength() * normalizedCostGPList.get(i);
             if (cost < maxCost) {
                 maxCost = cost;
                 selectedGraphPath = kShortestPathsGraphPathList.get(i);

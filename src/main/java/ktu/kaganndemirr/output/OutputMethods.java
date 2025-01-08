@@ -1,4 +1,4 @@
-package ktu.kaganndemirr.output.shapers.phy;
+package ktu.kaganndemirr.output;
 
 import ktu.kaganndemirr.application.SRTApplication;
 import ktu.kaganndemirr.application.TTApplication;
@@ -7,7 +7,7 @@ import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.message.Multicast;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
-import ktu.kaganndemirr.util.holders.phy.PHYWPMLWRCWRv1Holder;
+import ktu.kaganndemirr.util.Bag;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.slf4j.Logger;
@@ -19,29 +19,52 @@ import java.nio.file.Paths;
 import java.util.*;
 
 import static ktu.kaganndemirr.util.Constants.*;
+import static ktu.kaganndemirr.util.HelperMethods.*;
 
-public class PHYWPMLWRCWRv1OutputShaper {
-    private static final Logger logger = LoggerFactory.getLogger(PHYWPMLWRv1OutputShaper.class.getSimpleName());
+public class OutputMethods {
+    private static final Logger logger = LoggerFactory.getLogger(OutputMethods.class.getSimpleName());
 
-    private final String topologyOutputLocation;
-    private final String mainOutputLocation;
+    private final String scenarioOutputPath;
+    private final String resultOutputPath;
 
     private final Map<GCLEdge, Double> utilizationMap;
+    private final List<Unicast> bestSolution;
+    private final Map<Multicast, Double> wcdMap;
+    private final Graph<Node, GCLEdge> graph;
+    private final int rate;
+    private final Map<Double, Double> durationMap;
+    private final List<UnicastCandidate> srtUnicastCandidateList;
 
-    public PHYWPMLWRCWRv1OutputShaper(PHYWPMLWRCWRv1Holder phyWPMLWRCWRv1Holder) {
-        topologyOutputLocation = Paths.get("outputs", phyWPMLWRCWRv1Holder.getRouting(), phyWPMLWRCWRv1Holder.getPathFindingMethod(), phyWPMLWRCWRv1Holder.getAlgorithm(), phyWPMLWRCWRv1Holder.getLWR(), String.valueOf(phyWPMLWRCWRv1Holder.getK()), phyWPMLWRCWRv1Holder.getMCDMObjective(), phyWPMLWRCWRv1Holder.getCWR(), phyWPMLWRCWRv1Holder.getWPMVersion(), phyWPMLWRCWRv1Holder.getTopologyName() + "_" + phyWPMLWRCWRv1Holder.getApplicationName()).toString();
+    public OutputMethods(Bag bag, List<Unicast> bestSolution, Map<Multicast, Double> wcdMap, Graph<Node, GCLEdge> graph, int rate, Map<Double, Double> durationMap, List<UnicastCandidate> srtUnicastCandidateList) {
+        scenarioOutputPath = createScenarioOutputPath(bag);
 
-        mainOutputLocation = Paths.get("outputs", phyWPMLWRCWRv1Holder.getRouting(), phyWPMLWRCWRv1Holder.getPathFindingMethod(), phyWPMLWRCWRv1Holder.getAlgorithm(), phyWPMLWRCWRv1Holder.getLWR(), String.valueOf(phyWPMLWRCWRv1Holder.getK()), phyWPMLWRCWRv1Holder.getMCDMObjective(), phyWPMLWRCWRv1Holder.getCWR(), phyWPMLWRCWRv1Holder.getWPMVersion()).toString();
+        resultOutputPath = createResultOutputPath(bag);
 
         utilizationMap = new HashMap<>();
+        
+        this.bestSolution = bestSolution;
+        this.wcdMap = wcdMap;
+        this.graph = graph;
+        this.rate = rate;
+        this.durationMap = durationMap;
+        this.srtUnicastCandidateList = srtUnicastCandidateList;
+
+        writeSolutionToFile();
+        writeWCDsToFile();
+        writeLinkUtilizationsToFile();
+        writeDurationMap();
+
+        if (bag.getLWR() == null && bag.getCWR() == null){
+            writeSRTCandidateRoutesToFile();
+        }
 
     }
 
-    public void writeSolutionToFile(List<Unicast> solution) {
+    public void writeSolutionToFile() {
         try {
-            BufferedWriter writer = new BufferedWriter(new java.io.FileWriter(Paths.get(topologyOutputLocation, "Routes.txt").toString()));
+            BufferedWriter writer = new BufferedWriter(new java.io.FileWriter(Paths.get(scenarioOutputPath, "Routes.txt").toString()));
 
-            for (Unicast unicast : solution) {
+            for (Unicast unicast : bestSolution) {
                 if (unicast.getApplication() instanceof SRTApplication) {
                     writer.write(unicast.getApplication().getName() + ": ");
                     writer.write(unicast.getPath().getEdgeList() + ", ");
@@ -50,13 +73,13 @@ public class PHYWPMLWRCWRv1OutputShaper {
                 }
             }
 
-            writer.write("Average Length (ESs included): " + findAveragePathLengthIncludingES(solution) + ", ");
-            writer.write("Average Length (between switches): " + findAveragePathLengthWithoutES(solution));
+            writer.write("Average Length (ESs included): " + findAveragePathLengthIncludingES(bestSolution) + ", ");
+            writer.write("Average Length (between switches): " + findAveragePathLengthWithoutES(bestSolution));
 
             writer.write("\n");
             writer.write("\n");
 
-            for (Unicast unicast : solution) {
+            for (Unicast unicast : bestSolution) {
                 if (unicast.getApplication() instanceof TTApplication) {
                     writer.write(unicast.getApplication().getName() + ": ");
                     writer.write(String.valueOf(unicast.getPath().getEdgeList()));
@@ -65,17 +88,17 @@ public class PHYWPMLWRCWRv1OutputShaper {
             }
             writer.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException();
         }
 
-        logger.info(createSolutionInfoString(topologyOutputLocation));
+        logger.info(createSolutionInfoString(scenarioOutputPath));
     }
 
-    public void writeWCDsToFile(Map<Multicast, Double> wcdMap) {
+    public void writeWCDsToFile() {
         try {
             double total = 0;
-            BufferedWriter wcdWriter = new BufferedWriter(new java.io.FileWriter(Paths.get(topologyOutputLocation, "WCDs.txt").toString()));
-            BufferedWriter mainResultWriter = new BufferedWriter(new java.io.FileWriter(Paths.get(mainOutputLocation, "Results.txt").toString(), true));
+            BufferedWriter wcdWriter = new BufferedWriter(new java.io.FileWriter(Paths.get(scenarioOutputPath, "WCDs.txt").toString()));
+            BufferedWriter mainResultWriter = new BufferedWriter(new java.io.FileWriter(Paths.get(resultOutputPath, "Results.txt").toString(), true));
 
             for (Map.Entry<Multicast, Double> entry : wcdMap.entrySet()) {
                 total += entry.getValue();
@@ -103,16 +126,16 @@ public class PHYWPMLWRCWRv1OutputShaper {
             mainResultWriter.close();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException();
         }
 
-        logger.info(createWCDInfoString(topologyOutputLocation));
-        logger.info(createWCDResultString(mainOutputLocation));
+        logger.info(createWCDInfoString(scenarioOutputPath));
+        logger.info(createWCDResultString(resultOutputPath));
     }
 
-    public void writeLinkUtilizationsToFile(List<Unicast> solution, Graph<Node, GCLEdge> graph, int rate) {
+    public void writeLinkUtilizationsToFile() {
         try {
-            for (Unicast unicast : solution) {
+            for (Unicast unicast : bestSolution) {
                 for (GCLEdge edge : unicast.getPath().getEdgeList()) {
                     if (!utilizationMap.containsKey(edge)) {
                         utilizationMap.put(edge, unicast.getApplication().getMessageSizeMbps() / rate);
@@ -135,8 +158,8 @@ public class PHYWPMLWRCWRv1OutputShaper {
                 utilizationMapString.put(edge.toString(), utilizationMap.getOrDefault(edge, (double) 0));
             }
 
-            BufferedWriter sortedByNamesWriter = new BufferedWriter(new java.io.FileWriter(Paths.get(topologyOutputLocation, "LinkUtilsSortedByNames.txt").toString()));
-            BufferedWriter sortedByUtilsWriter = new BufferedWriter(new java.io.FileWriter(Paths.get(topologyOutputLocation, "LinkUtilsSortedByUtils.txt").toString()));
+            BufferedWriter sortedByNamesWriter = new BufferedWriter(new java.io.FileWriter(Paths.get(scenarioOutputPath, "LinkUtilsSortedByNames.txt").toString()));
+            BufferedWriter sortedByUtilsWriter = new BufferedWriter(new java.io.FileWriter(Paths.get(scenarioOutputPath, "LinkUtilsSortedByUtils.txt").toString()));
 
             Map<String, Double> treeMap = new TreeMap<>(utilizationMapString);
             for (Map.Entry<String, Double> entry : treeMap.entrySet()) {
@@ -189,7 +212,7 @@ public class PHYWPMLWRCWRv1OutputShaper {
 
             double std = Math.sqrt(variance);
 
-            BufferedWriter mainResultWriter = new BufferedWriter(new java.io.FileWriter(Paths.get(mainOutputLocation, "Results.txt").toString(), true));
+            BufferedWriter mainResultWriter = new BufferedWriter(new java.io.FileWriter(Paths.get(resultOutputPath, "Results.txt").toString(), true));
 
             mainResultWriter.write("Unused Links: " + unusedLinks + "/" + graph.edgeSet().size() + ", ");
             mainResultWriter.write("Max Loaded Link Number: " + maxLoadedLinkCounter + ", ");
@@ -217,15 +240,15 @@ public class PHYWPMLWRCWRv1OutputShaper {
             mainResultWriter.close();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException();
         }
 
-        logger.info(createLinkUtilizationNameInfoString(topologyOutputLocation));
-        logger.info(createLinkUtilizationUtilInfoString(topologyOutputLocation));
-        logger.info(createLinkUtilizationResultString(mainOutputLocation));
+        logger.info(createLinkUtilizationNameInfoString(scenarioOutputPath));
+        logger.info(createLinkUtilizationUtilInfoString(scenarioOutputPath));
+        logger.info(createLinkUtilizationResultString(resultOutputPath));
     }
 
-    public void writeDurationMap(Map<Double, Double> durationMap) {
+    public void writeDurationMap() {
         try {
             LinkedHashMap<Double, Double> sortedDurationMap = new LinkedHashMap<>();
             durationMap.entrySet()
@@ -233,19 +256,19 @@ public class PHYWPMLWRCWRv1OutputShaper {
                     .sorted(Map.Entry.comparingByKey())
                     .forEachOrdered(x -> sortedDurationMap.put(x.getKey(), x.getValue()));
 
-            BufferedWriter writer2 = new BufferedWriter(new java.io.FileWriter(Paths.get(mainOutputLocation, "Results.txt").toString(), true));
+            BufferedWriter writer2 = new BufferedWriter(new java.io.FileWriter(Paths.get(resultOutputPath, "Results.txt").toString(), true));
             writer2.write("Costs and computation times(sec): " + sortedDurationMap + "\n");
             writer2.close();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException();
         }
-        logger.info(createDurationResultString(mainOutputLocation));
+        logger.info(createDurationResultString(resultOutputPath));
     }
 
-    public void writeSRTCandidateRoutesToFile(List<UnicastCandidate> srtUnicastCandidateList) {
+    public void writeSRTCandidateRoutesToFile() {
         try {
-            BufferedWriter writer = new BufferedWriter(new java.io.FileWriter(Paths.get(topologyOutputLocation, "SRTCandidateRoutes.txt").toString()));
+            BufferedWriter writer = new BufferedWriter(new java.io.FileWriter(Paths.get(scenarioOutputPath, "SRTCandidateRoutes.txt").toString()));
             for (UnicastCandidate unicastCandidate : srtUnicastCandidateList) {
                 int candidatePathIndex = 0;
                 for (GraphPath<Node, GCLEdge> gp : unicastCandidate.getCandidatePathList()) {
@@ -256,8 +279,8 @@ public class PHYWPMLWRCWRv1OutputShaper {
             }
             writer.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException();
         }
-        logger.info(createSRTCandidateInfoString(topologyOutputLocation));
+        logger.info(createSRTCandidateInfoString(scenarioOutputPath));
     }
 }

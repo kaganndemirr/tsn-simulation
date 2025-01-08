@@ -10,6 +10,7 @@ import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
 import ktu.kaganndemirr.routing.phy.pathpenalization.PathPenalizationKShortestPaths;
 import ktu.kaganndemirr.solver.Solution;
+import ktu.kaganndemirr.util.Bag;
 import ktu.kaganndemirr.util.Constants;
 import ktu.kaganndemirr.util.mcdm.WPMMethods;
 import org.jgrapht.Graph;
@@ -41,7 +42,7 @@ public class WPMDeadline {
         this.durationMap = new HashMap<>();
     }
 
-    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, String mcdmObjective, double wSRT, double wTT, double wLength, double wUtil, int rate, String wpmType, String wpmValueType, final Evaluator evaluator){
+    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, Bag bag, final Evaluator evaluator){
         this.mcdmObjective = mcdmObjective;
 
         Instant graphPathsStartTime = Instant.now();
@@ -56,7 +57,7 @@ public class WPMDeadline {
         if (Objects.equals(mcdmObjective, Constants.SRT_TT)){
             solution = null;
         } else if (Objects.equals(mcdmObjective, Constants.SRT_TT_LENGTH)) {
-            solution = WPMMethods.deadlineSRTTTLength(srtUnicastCandidateList, ttUnicastList, wSRT, wTT, wLength, wpmType, wpmValueType);
+            solution = WPMMethods.deadlineSRTTTLength(srtUnicastCandidateList, ttUnicastList, bag);
         } else if (Objects.equals(mcdmObjective, Constants.SRT_TT_LENGTH_UTIL)) {
             solution = null;
         }

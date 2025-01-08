@@ -11,6 +11,7 @@ import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
 import ktu.kaganndemirr.routing.phy.pathpenalization.RandomizedPathPenalizationKShortestPaths;
 import ktu.kaganndemirr.solver.Solution;
+import ktu.kaganndemirr.util.Bag;
 import ktu.kaganndemirr.util.Constants;
 import ktu.kaganndemirr.util.MetaheuristicMethods;
 import ktu.kaganndemirr.util.mcdm.WPMMethods;
@@ -57,7 +58,7 @@ public class WPMLWRCWRDeadline {
         bestSolution = new ArrayList<>();
     }
 
-    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, int threadNumber, String lwr, String mcdmObjective, String cwr, double wSRT, double wTT, double wLength, double wUtil, int rate, String wpmVersion, String wpmValueType, String metaheuristicName, Evaluator evaluator, Duration timeout){
+    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, Bag bag, int threadNumber, Evaluator evaluator, Duration timeout){
         ttUnicastList = RandomizedPathPenalizationKShortestPaths.getTTUnicastList(applicationList);
 
         this.graph = graph;
@@ -70,7 +71,7 @@ public class WPMLWRCWRDeadline {
             Timer timer = getTimer(timeout);
 
             for (int i = 0; i < threadNumber; i++) {
-                exec.execute(new WPMLWRCWRDeadlineRunnable(lwr, mcdmObjective, cwr, wSRT, wTT, wLength, wUtil, rate, wpmVersion, wpmValueType, metaheuristicName));
+                exec.execute(new WPMLWRCWRDeadlineRunnable(bag));
             }
 
             exec.awaitTermination(timeout.toSeconds(), TimeUnit.SECONDS);
@@ -113,55 +114,35 @@ public class WPMLWRCWRDeadline {
         private int i = 0;
         Instant solutionStartTime = Instant.now();
 
-        String lwr;
-        String mcdmObjective;
-        String cwr;
-        double wSRT;
-        double wTT;
-        double wLength;
-        double wUtil;
-        int rate;
-        String wpmVersion;
-        String wpmValueType;
-        String metaheuristicName;
+        private final Bag bag;
 
-        public WPMLWRCWRDeadlineRunnable(String lwr, String mcdmObjective, String cwr, double wSRT, double wTT, double wLength, double wUtil, int rate, String wpmVersion, String wpmValueType, String metaheuristicName) {
-            this.lwr = lwr;
-            this.mcdmObjective = mcdmObjective;
-            this.cwr = cwr;
-            this.wSRT = wSRT;
-            this.wTT = wTT;
-            this.wLength = wLength;
-            this.wUtil = wUtil;
-            this.rate = rate;
-            this.wpmVersion = wpmVersion;
-            this.wpmValueType = wpmValueType;
-            this.metaheuristicName = metaheuristicName;
+        public WPMLWRCWRDeadlineRunnable(Bag bag) {
+            this.bag = bag;
         }
 
         @Override
         public void run() {
             while (!Thread.currentThread().isInterrupted()) {
                 i++;
-                RandomizedPathPenalizationKShortestPaths randomizedPathPenalizationKShortestPaths = new RandomizedPathPenalizationKShortestPaths(graph, applicationList, lwr, k);
+                RandomizedPathPenalizationKShortestPaths randomizedPathPenalizationKShortestPaths = new RandomizedPathPenalizationKShortestPaths(graph, applicationList, bag, k);
 
                 srtUnicastCandidateList = randomizedPathPenalizationKShortestPaths.getSRTUnicastCandidateList();
 
                 List<Unicast> initialSolution = null;
-                if (Objects.equals(mcdmObjective, Constants.SRT_TT)){
+                if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT)){
                     //TODO
-                } else if (Objects.equals(mcdmObjective, Constants.SRT_TT_LENGTH)) {
-                    if(Objects.equals(cwr, Constants.THREAD_LOCAL_RANDOM)){
-                        initialSolution = WPMMethods.deadlineCWRSRTTTLength(srtUnicastCandidateList, ttUnicastList, wpmVersion, wpmValueType);
+                } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH)) {
+                    if(Objects.equals(bag.getCWR(), Constants.THREAD_LOCAL_RANDOM)){
+                        initialSolution = WPMMethods.deadlineCWRSRTTTLength(bag, srtUnicastCandidateList, ttUnicastList);
                     }
-                } else if (Objects.equals(mcdmObjective, Constants.SRT_TT_LENGTH_UTIL)) {
+                } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH_UTIL)) {
                     //TODO
                 }
 
                 List<Unicast> solution = null;
-                if (Objects.equals(metaheuristicName, Constants.GRASP)){
+                if (Objects.equals(bag.getMetaheuristicName(), Constants.GRASP)){
                     solution = MetaheuristicMethods.GRASP(initialSolution, evaluator, srtUnicastCandidateList, globalBestCost);
-                } else if (Objects.equals(metaheuristicName, Constants.ALO)) {
+                } else if (Objects.equals(bag.getMetaheuristicName(), Constants.ALO)) {
                     solution = MetaheuristicMethods.ALO(initialSolution, initialSolution, srtUnicastCandidateList, k, evaluator);
                 }
 

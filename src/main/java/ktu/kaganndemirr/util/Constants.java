@@ -14,7 +14,6 @@ public class Constants {
     public static final String AVB_LATENCY_MATH_VERSION_TSNCF = "avbLatencyMathCF";
     public static final String AVB_LATENCY_MATH_VERSION_TSNRO = "avbLatencyMathTSNRO";
 
-    public static final String INFO = "info";
     public static final String DEBUG = "debug";
 
     public static final String TSNCF = "TSNCF";
@@ -50,14 +49,6 @@ public class Constants {
 
     public static final String NO_SOLUTION_COULD_BE_FOUND = "No solution could be found!";
 
-    public static String createFoundNoSolutionString(Solution solution){
-        return "Found No solution: " + solution.getCost().toDetailedString();
-    }
-
-    public static String createFoundSolutionString(Solution solution){
-        return "Found solution: " + solution.getCost().toDetailedString();
-    }
-
     public static double findAveragePathLengthIncludingES(List<Unicast> solution) {
         double total = 0;
         int size = 0;
@@ -88,38 +79,6 @@ public class Constants {
         }
 
         return total / lengthMap.size();
-    }
-
-    public static String createSolutionInfoString(String topologyOutputLocation){
-        return "Routes written to " + Paths.get(topologyOutputLocation, "Routes.txt file.");
-    }
-
-    public static String createWCDInfoString(String topologyOutputLocation){
-        return "WCDs, average WCD, variance and std written to " + Paths.get(topologyOutputLocation, "WCDs.txt file.");
-    }
-
-    public static String createWCDResultString(String mainOutputLocation){
-        return "Also average WCD, variance and std written to " + Paths.get(mainOutputLocation, "Results.txt file.");
-    }
-
-    public static String createLinkUtilizationNameInfoString(String topologyOutputLocation){
-        return "Link utilization's sorted by link names " + Paths.get(topologyOutputLocation, "LinkUtilsSortedByNames.txt file.");
-    }
-
-    public static String createLinkUtilizationUtilInfoString(String topologyOutputLocation){
-        return "Link utilization's sorted by link utilization's " + Paths.get(topologyOutputLocation, "LinkUtilsSortedByUtils.txt file.");
-    }
-
-    public static String createLinkUtilizationResultString(String mainOutputLocation){
-        return "Unused Links, Max Loaded Link Number, Max Loaded Link Utilization, Average Link Utilization, Variance and Std written to " + Paths.get(mainOutputLocation, "Results.txt");
-    }
-
-    public static String createDurationResultString(String mainOutputLocation){
-        return "Costs and computation times written to " + Paths.get(mainOutputLocation, "Results.txt file.");
-    }
-
-    public static String createSRTCandidateInfoString(String topologyOutputLocation){
-        return "SRT Candidate Routes written to " + Paths.get(topologyOutputLocation, "SRTCandidateRoutes.txt file.");
     }
 
     public static final int DEVICE_DELAY = 512;

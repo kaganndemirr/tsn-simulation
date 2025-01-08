@@ -8,6 +8,7 @@ import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
+import ktu.kaganndemirr.util.Bag;
 import ktu.kaganndemirr.util.GraphMethods;
 import ktu.kaganndemirr.util.mcdm.WSMMethods;
 import org.jgrapht.Graph;
@@ -28,7 +29,7 @@ public class PathPenalizationMCDMKShortestPaths {
     private final List<UnicastCandidate> srtUnicastCandidateList;
     private final List<Unicast> ttUnicastList;
 
-    public PathPenalizationMCDMKShortestPaths(Graph<Node, GCLEdge> graph, List<Application> applicationList, String lwr, int k, String wsmNormalization, double wSRT, double wTT, double wLength) {
+    public PathPenalizationMCDMKShortestPaths(Graph<Node, GCLEdge> graph, List<Application> applicationList, Bag bag, int k) {
         this.applicationList = applicationList;
         srtUnicastCandidateList = new ArrayList<>();
         ttUnicastList = new ArrayList<>();
@@ -40,7 +41,7 @@ public class PathPenalizationMCDMKShortestPaths {
                 List<GraphPath<Node, GCLEdge>> mcdmGraphPathList = new ArrayList<>();
                 for(EndSystem target: application.getTargetList()){
                     for (int i = 0; i < k; i++){
-                        GraphMethods.randomizeGraph(graph, lwr);
+                        GraphMethods.randomizeGraph(graph, bag.getLWR());
 
                         Graph<Node, GCLEdge> newGraph = copyGraph(graph);
                         Graph<Node, GCLEdge> graphWithoutUnnecessaryEndSystems = discardUnnecessaryEndSystems(newGraph, application.getSource(), target);
@@ -65,7 +66,7 @@ public class PathPenalizationMCDMKShortestPaths {
 
                         }
 
-                        GraphPath<Node, GCLEdge> selectedGraphPath = WSMMethods.srtTTLengthGraphPathV1(application, shortestPathGraphPathList, ttUnicastList, wsmNormalization, wSRT, wTT, wLength);
+                        GraphPath<Node, GCLEdge> selectedGraphPath = WSMMethods.srtTTLengthGraphPathV1(application, shortestPathGraphPathList, ttUnicastList, bag);
 
                         mcdmGraphPathList.add(selectedGraphPath);
                     }

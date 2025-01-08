@@ -14,6 +14,7 @@ import ktu.kaganndemirr.routing.phy.yen.YenKShortestPaths;
 import ktu.kaganndemirr.routing.phy.yen.YenMCDMKShortestPaths;
 import ktu.kaganndemirr.routing.phy.yen.YenRandomizedKShortestPaths;
 import ktu.kaganndemirr.solver.Solution;
+import ktu.kaganndemirr.util.Bag;
 import ktu.kaganndemirr.util.Constants;
 import ktu.kaganndemirr.util.LaursenMethods;
 import ktu.kaganndemirr.util.MetaheuristicMethods;
@@ -60,9 +61,9 @@ public class WSMv2LWR {
         bestSolution = new ArrayList<>();
     }
 
-    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, String lwr, String mcdmObjective, String wsmNormalization, double wSRT, double wTT, double wLength, double wUtil, int rate, int threadNumber, String metaheuristicName, Evaluator evaluator, Duration timeout){
+    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, Bag bag, int threadNumber, Evaluator evaluator, Duration timeout){
         Instant pathPenalizationMCDMKShortestPathsStartTime = Instant.now();
-        PathPenalizationMCDMKShortestPaths pathPenalizationMCDMKShortestPaths = new PathPenalizationMCDMKShortestPaths(graph, applicationList, lwr, k, wsmNormalization, wSRT, wTT, wLength);
+        PathPenalizationMCDMKShortestPaths pathPenalizationMCDMKShortestPaths = new PathPenalizationMCDMKShortestPaths(graph, applicationList, bag, k);
         Instant pathPenalizationMCDMKShortestPathsEndTime = Instant.now();
         this.pathPenalizationMCDMKShortestPathsDuration = Duration.between(pathPenalizationMCDMKShortestPathsStartTime, pathPenalizationMCDMKShortestPathsEndTime).toMillis();
 
@@ -76,7 +77,7 @@ public class WSMv2LWR {
             Timer timer = getTimer(timeout);
 
             for (int i = 0; i < threadNumber; i++) {
-                exec.execute(new WSMv2Runnable(metaheuristicName));
+                exec.execute(new WSMv2Runnable(bag));
             }
 
             exec.awaitTermination(timeout.toSeconds(), TimeUnit.SECONDS);
@@ -119,10 +120,10 @@ public class WSMv2LWR {
         private int i = 0;
         Instant solutionStartTime = Instant.now();
 
-        String metaheuristicName;
+        private Bag bag;
 
-        public WSMv2Runnable(String metaheuristicName) {
-            this.metaheuristicName = metaheuristicName;
+        public WSMv2Runnable(Bag bag) {
+            this.bag = bag;
         }
 
         @Override
@@ -131,13 +132,13 @@ public class WSMv2LWR {
                 i++;
                 List<Unicast> solution = null;
 
-                if(Objects.equals(metaheuristicName, Constants.GRASP)){
+                if(Objects.equals(bag.getMetaheuristicName(), Constants.GRASP)){
                     List<Unicast> initialSolution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, ttUnicastList, k, evaluator);
                     solution = MetaheuristicMethods.GRASP(initialSolution, evaluator, srtUnicastCandidateList, globalBestCost);
-                } else if (Objects.equals(metaheuristicName, Constants.ALO)) {
+                } else if (Objects.equals(bag.getMetaheuristicName(), Constants.ALO)) {
                     List<Unicast> initialSolution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, ttUnicastList, k, evaluator);
                     solution = MetaheuristicMethods.ALO(initialSolution, initialSolution, srtUnicastCandidateList, k, evaluator);
-                } else if (Objects.equals(metaheuristicName, Constants.CONSTRUCT_INITIAL_SOLUTION)) {
+                } else if (Objects.equals(bag.getMetaheuristicName(), Constants.CONSTRUCT_INITIAL_SOLUTION)) {
                     solution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, ttUnicastList, k, evaluator);
                 }
 

@@ -8,6 +8,7 @@ import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
+import ktu.kaganndemirr.util.Bag;
 import ktu.kaganndemirr.util.GraphMethods;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
@@ -26,11 +27,11 @@ public class RandomizedPathPenalizationKShortestPaths {
     private final List<Application> applicationList;
     private final List<UnicastCandidate> srtUnicastCandidateList;
 
-    public RandomizedPathPenalizationKShortestPaths(final Graph<Node, GCLEdge> graph, final List<Application> applicationList, String lwr, final int k) {
+    public RandomizedPathPenalizationKShortestPaths(final Graph<Node, GCLEdge> graph, final List<Application> applicationList, Bag bag, final int k) {
         srtUnicastCandidateList = new ArrayList<>();
         this.applicationList = applicationList;
 
-        GraphMethods.randomizeGraph(graph, lwr);
+        GraphMethods.randomizeGraph(graph, bag.getLWR());
 
         for (Application application : applicationList) {
             if (application instanceof SRTApplication) {
