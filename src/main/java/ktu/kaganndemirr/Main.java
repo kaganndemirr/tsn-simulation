@@ -87,7 +87,7 @@ public class Main {
         //Default Method
         String pathFindingMethod = "yen";
         //Default Algorithm
-        String algorithm = "GRASP";
+        String algorithm = "LaursenRO";
 
         //Default weightedProductModelObjective
         String mcdmObjective = "srtTTLength";
@@ -267,7 +267,7 @@ public class Main {
 
             if (Objects.equals(line.getOptionValue(LOG_ARG), Constants.DEBUG)) {
                 log = "debug";
-                System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "Debug");
+                System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "DEBUG");
             }
 
             final Logger logger = LoggerFactory.getLogger(Main.class.getSimpleName());
