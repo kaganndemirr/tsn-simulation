@@ -134,7 +134,7 @@ public class WSMMethods {
         return solution;
     }
 
-    public static GraphPath<Node, GCLEdge> srtTTLengthGraphPathV1(Application application, EndSystem target, List<GraphPath<Node, GCLEdge>> kShortestPathsGraphPathList, List<Unicast> ttUnicastList, Bag bag, List<GraphPath<Node, GCLEdge>> mcdmGraphPathList, String scenarioOutputPath) {
+    public static GraphPath<Node, GCLEdge> srtTTLengthGraphPathV1(Bag bag, Application application, EndSystem target, List<GraphPath<Node, GCLEdge>> kShortestPathsGraphPathList, List<Unicast> ttUnicastList, List<GraphPath<Node, GCLEdge>> mcdmGraphPathList, String scenarioOutputPath) {
         List<Unicast> solution = new ArrayList<>();
 
         if(!ttUnicastList.isEmpty()){

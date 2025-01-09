@@ -51,7 +51,7 @@ public class YenMCDMKShortestPaths {
 
                             yenKShortestPathGraphPathList.addAll(fillYenKShortestPathGraphPathList(yenKShortestPathList, k));
 
-                            GraphPath<Node, GCLEdge> seletedGraphPath = WSMMethods.srtTTLengthGraphPathV1(application, target, yenKShortestPathGraphPathList, ttUnicastList, bag, mcdmGraphPathList, scenarioOutputPath);
+                            GraphPath<Node, GCLEdge> seletedGraphPath = WSMMethods.srtTTLengthGraphPathV1(bag, application, target, yenKShortestPathGraphPathList, ttUnicastList, mcdmGraphPathList, scenarioOutputPath);
 
                             mcdmGraphPathList.add(seletedGraphPath);
                         }

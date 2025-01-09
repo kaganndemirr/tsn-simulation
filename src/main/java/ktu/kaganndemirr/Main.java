@@ -16,6 +16,7 @@ import org.jgrapht.Graph;
 import ktu.kaganndemirr.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.simple.SimpleLogger;
 
 import java.io.File;
 import java.io.IOException;
@@ -266,7 +267,7 @@ public class Main {
 
             if (Objects.equals(line.getOptionValue(LOG_ARG), Constants.DEBUG)) {
                 log = "debug";
-                System.setProperty("org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY", "DEBUG");
+                System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "Debug");
             }
 
             final Logger logger = LoggerFactory.getLogger(Main.class.getSimpleName());
@@ -346,6 +347,8 @@ public class Main {
                             switch (algorithm) {
                                 case "LaursenRO" -> {
                                     Bag bag = new Bag();
+                                    bag.setGraph(graph);
+                                    bag.setApplicationList(applicationList);
                                     bag.setTopologyName(topologyName);
                                     bag.setApplicationName(applicationName);
                                     bag.setRouting(routing);
@@ -357,6 +360,7 @@ public class Main {
                                     bag.setMetaheuristicName(metaheuristicName);
                                     bag.setEvaluator(evaluator);
                                     bag.setEvaluatorName(evaluatorName);
+                                    bag.setLog(log);
 
                                     if (evaluatorName.equals(Constants.NETWORK_CALCULUS)){
                                         createGCLSynthesisAndNetworkCalculusDirectories(bag);
@@ -386,6 +390,8 @@ public class Main {
                                     WSMv2LWR wsmV2LWR = new WSMv2LWR(k);
 
                                     Bag bag = new Bag();
+                                    bag.setGraph(graph);
+                                    bag.setApplicationList(applicationList);
                                     bag.setTopologyName(topologyName);
                                     bag.setApplicationName(applicationName);
                                     bag.setTopologyName(topologyName);
@@ -1128,10 +1134,8 @@ public class Main {
             }
             //endregion
 
-        } catch (ParseException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (ParseException | IOException pe) {
+            throw new RuntimeException(pe);
         }
     }
 

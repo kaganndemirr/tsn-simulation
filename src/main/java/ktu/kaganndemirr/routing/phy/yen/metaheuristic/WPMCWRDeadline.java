@@ -62,7 +62,7 @@ public class WPMCWRDeadline {
         ttUnicastList = YenRandomizedKShortestPaths.getTTUnicastList(applicationList);
 
         Instant yenKShortestPathsStartTime = Instant.now();
-        YenKShortestPaths yenKShortestPaths = new YenKShortestPaths(graph, applicationList, k);
+        YenKShortestPaths yenKShortestPaths = new YenKShortestPaths(bag, k);
         Instant yenKShortestPathsEndTime = Instant.now();
         yenKShortestPathsDuration = Duration.between(yenKShortestPathsStartTime, yenKShortestPathsEndTime).toMillis();
 

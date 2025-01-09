@@ -132,11 +132,11 @@ public class WSMv2LWR {
 
         @Override
         public void run() {
-            if(Objects.equals(bag.getLog(), Constants.DEBUG)){
-                System.setProperty("org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY", "DEBUG");
-            }
-
-            final Logger logger = LoggerFactory.getLogger(WSMv2Runnable.class.getSimpleName());
+//            if(Objects.equals(bag.getLog(), Constants.DEBUG)){
+//                System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "DEBUG");
+//            }
+//
+//            final Logger logger = LoggerFactory.getLogger(WSMv2Runnable.class.getSimpleName());
 
             String threadName = Thread.currentThread().getName();
 

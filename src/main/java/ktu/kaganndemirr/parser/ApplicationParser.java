@@ -94,7 +94,7 @@ public class ApplicationParser {
                     }
                 }
             } catch (ParserConfigurationException | SAXException | IOException pce) {
-                pce.printStackTrace();
+                throw new RuntimeException(pce);
             }
 
             return applications;

@@ -43,7 +43,7 @@ public class WPMDeadline {
 
     public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, Bag bag, Evaluator evaluator){
         Instant graphPathsStartTime = Instant.now();
-        YenKShortestPaths yenKShortestPaths = new YenKShortestPaths(graph, applicationList, k);
+        YenKShortestPaths yenKShortestPaths = new YenKShortestPaths(bag, k);
         Instant graphPathsEndTime = Instant.now();
         long graphPathsDuration = Duration.between(graphPathsStartTime, graphPathsEndTime).toMillis();
 

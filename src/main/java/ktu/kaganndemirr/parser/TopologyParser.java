@@ -85,7 +85,7 @@ public class TopologyParser {
             nodeMap.clear();
 
         } catch (ParserConfigurationException | SAXException | IOException pce) {
-            pce.printStackTrace();
+            throw new RuntimeException(pce);
 
         }
         return graph;
