@@ -265,6 +265,7 @@ public class Main {
             }
 
             if (Objects.equals(line.getOptionValue(LOG_ARG), Constants.DEBUG)) {
+                log = "debug";
                 System.setProperty("org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY", "DEBUG");
             }
 
@@ -354,6 +355,7 @@ public class Main {
                                     bag.setThreadNumber(threadNumber);
                                     bag.setTimeout(timeout);
                                     bag.setMetaheuristicName(metaheuristicName);
+                                    bag.setEvaluator(evaluator);
                                     bag.setEvaluatorName(evaluatorName);
 
                                     if (evaluatorName.equals(Constants.NETWORK_CALCULUS)){
@@ -364,7 +366,7 @@ public class Main {
 
                                     logger.info(createInfo(bag));
 
-                                    Solution solution = laursenRO.solve(graph, applicationList, bag, threadNumber, Duration.ofSeconds(timeout), evaluator);
+                                    Solution solution = laursenRO.solve(bag);
 
                                     solution.getCost().writeResultToFile(bag);
 
@@ -386,6 +388,8 @@ public class Main {
                                     Bag bag = new Bag();
                                     bag.setTopologyName(topologyName);
                                     bag.setApplicationName(applicationName);
+                                    bag.setTopologyName(topologyName);
+                                    bag.setApplicationName(applicationName);
                                     bag.setRouting(routing);
                                     bag.setPathFindingMethod(pathFindingMethod);
                                     bag.setAlgorithm(algorithm);
@@ -400,11 +404,13 @@ public class Main {
                                     bag.setThreadNumber(threadNumber);
                                     bag.setTimeout(timeout);
                                     bag.setMetaheuristicName(metaheuristicName);
+                                    bag.setEvaluator(evaluator);
                                     bag.setEvaluatorName(evaluatorName);
+                                    bag.setLog(log);
 
                                     logger.info(createInfo(bag));
 
-                                    Solution solution = wsmV2LWR.solve(graph, applicationList, bag, threadNumber, evaluator, Duration.ofSeconds(timeout));
+                                    Solution solution = wsmV2LWR.solve(bag);
 
                                     solution.getCost().writeResultToFile(bag);
 

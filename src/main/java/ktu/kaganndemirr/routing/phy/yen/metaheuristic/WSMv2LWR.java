@@ -65,24 +65,24 @@ public class WSMv2LWR {
         bestSolution = new ArrayList<>();
     }
 
-    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, Bag bag, int threadNumber, Evaluator evaluator, Duration timeout){
-        List<Unicast> ttUnicastList = getTTUnicastList(applicationList);
+    public Solution solve(Bag bag){
+        List<Unicast> ttUnicastList = getTTUnicastList(bag.getApplicationList());
 
-        this.evaluator = evaluator;
+        this.evaluator = bag.getEvaluator();
 
         scenarioOutputPath = createScenarioOutputPath(bag);
 
         new File(scenarioOutputPath).mkdirs();
 
-        try (ExecutorService exec = Executors.newFixedThreadPool(threadNumber)) {
+        try (ExecutorService exec = Executors.newFixedThreadPool(bag.getThreadNumber())) {
 
-            Timer timer = getTimer(timeout);
+            Timer timer = getTimer(Duration.ofSeconds(bag.getTimeout()));
 
-            for (int i = 0; i < threadNumber; i++) {
-                exec.execute(new WSMv2Runnable(graph, applicationList, ttUnicastList, bag));
+            for (int i = 0; i < bag.getThreadNumber(); i++) {
+                exec.execute(new WSMv2Runnable(bag, ttUnicastList));
             }
 
-            exec.awaitTermination(timeout.toSeconds(), TimeUnit.SECONDS);
+            exec.awaitTermination(Duration.ofSeconds(bag.getTimeout()).toSeconds(), TimeUnit.SECONDS);
             exec.shutdown();
 
             if (!exec.isTerminated()) {
@@ -122,26 +122,28 @@ public class WSMv2LWR {
         private int i = 0;
         Instant solutionStartTime = Instant.now();
 
-        Graph<Node, GCLEdge> graph;
-        List<Application> applicationList;
-        List<Unicast> ttUnicastList;
         Bag bag;
+        List<Unicast> ttUnicastList;
 
-        public WSMv2Runnable(Graph<Node, GCLEdge> graph, List<Application> applicationList, List<Unicast> ttUnicastList, Bag bag) {
-            this.graph = graph;
-            this.applicationList = applicationList;
+        public WSMv2Runnable(Bag bag, List<Unicast> ttUnicastList) {
             this.bag = bag;
             this.ttUnicastList = ttUnicastList;
         }
 
         @Override
         public void run() {
+            if(Objects.equals(bag.getLog(), Constants.DEBUG)){
+                System.setProperty("org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY", "DEBUG");
+            }
+
+            final Logger logger = LoggerFactory.getLogger(WSMv2Runnable.class.getSimpleName());
+
             String threadName = Thread.currentThread().getName();
 
             while (!Thread.currentThread().isInterrupted()) {
                 i++;
 
-                YenMCDMKShortestPaths yenMCDMKShortestPaths = new YenMCDMKShortestPaths(graph, applicationList, ttUnicastList, bag, k);
+                YenMCDMKShortestPaths yenMCDMKShortestPaths = new YenMCDMKShortestPaths(bag, ttUnicastList, k, scenarioOutputPath);
 
                 srtUnicastCandidateList = yenMCDMKShortestPaths.getSRTUnicastCandidateList();
 
@@ -159,15 +161,18 @@ public class WSMv2LWR {
                     initialSolution = solution;
                 }
 
-                synchronized (writeLock) {
-                    assert solution != null;
-                    try {
-                        writeSolutionsToFile(initialSolution, solution, scenarioOutputPath, threadName, i);
-                        writeSRTCandidateRoutesToFile(srtUnicastCandidateList, scenarioOutputPath, threadName, i);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+                if(logger.isDebugEnabled()){
+                    synchronized (writeLock) {
+                        assert solution != null;
+                        try {
+                            writeSolutionsToFile(initialSolution, solution, scenarioOutputPath, threadName, i);
+                            writeSRTCandidateRoutesToFile(srtUnicastCandidateList, scenarioOutputPath, threadName, i);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
                 }
+
 
 
                 //Evaluate and see if better than anything we have seen before

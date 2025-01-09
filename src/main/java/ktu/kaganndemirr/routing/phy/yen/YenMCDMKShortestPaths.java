@@ -27,16 +27,16 @@ import static ktu.kaganndemirr.util.GraphMethods.discardUnnecessaryEndSystems;
 public class YenMCDMKShortestPaths {
     private final List<UnicastCandidate> srtUnicastCandidateList;
 
-    public YenMCDMKShortestPaths(Graph<Node, GCLEdge> graph, List<Application> applicationList, List<Unicast> ttUnicastList, Bag bag, int k) {
+    public YenMCDMKShortestPaths(Bag bag, List<Unicast> ttUnicastList, int k, String scenarioOutputPath) {
         srtUnicastCandidateList = new ArrayList<>();
 
-        for (Application application : applicationList) {
+        for (Application application : bag.getApplicationList()) {
             if (application instanceof SRTApplication) {
                 for(EndSystem target: application.getTargetList()){
                     List<GraphPath<Node, GCLEdge>> mcdmGraphPathList = new ArrayList<>();
                     for (int i = 0; i < k; i++){
-                        GraphMethods.randomizeGraph(graph, bag.getLWR());
-                        Graph<Node, GCLEdge> newGraph = copyGraph(graph);
+                        GraphMethods.randomizeGraph(bag.getGraph(), bag.getLWR());
+                        Graph<Node, GCLEdge> newGraph = copyGraph(bag.getGraph());
                         Graph<Node, GCLEdge> graphWithoutUnnecessaryEndSystems = discardUnnecessaryEndSystems(newGraph, application.getSource(), target);
 
                         YenKShortestPath<Node, GCLEdge> allYenKShortestPathList = new YenKShortestPath<>(graphWithoutUnnecessaryEndSystems);
@@ -51,7 +51,7 @@ public class YenMCDMKShortestPaths {
 
                             yenKShortestPathGraphPathList.addAll(fillYenKShortestPathGraphPathList(yenKShortestPathList, k));
 
-                            GraphPath<Node, GCLEdge> seletedGraphPath = WSMMethods.srtTTLengthGraphPathV1(application, yenKShortestPathGraphPathList, ttUnicastList, bag);
+                            GraphPath<Node, GCLEdge> seletedGraphPath = WSMMethods.srtTTLengthGraphPathV1(application, target, yenKShortestPathGraphPathList, ttUnicastList, bag, mcdmGraphPathList, scenarioOutputPath);
 
                             mcdmGraphPathList.add(seletedGraphPath);
                         }

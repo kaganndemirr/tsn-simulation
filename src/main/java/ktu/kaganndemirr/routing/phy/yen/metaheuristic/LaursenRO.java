@@ -68,31 +68,31 @@ public class LaursenRO {
         bestSolution = new ArrayList<>();
     }
 
-    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, Bag bag, int threadNumber, Duration timeout, Evaluator evaluator){
+    public Solution solve(Bag bag){
         Instant yenKShortestPathsStartTime = Instant.now();
-        YenKShortestPaths yenKShortestPaths = new YenKShortestPaths(graph, applicationList, k);
+        YenKShortestPaths yenKShortestPaths = new YenKShortestPaths(bag, k);
         Instant yenKShortestPathsEndTime = Instant.now();
         yenKShortestPathsDuration = Duration.between(yenKShortestPathsStartTime, yenKShortestPathsEndTime).toMillis();
 
         srtUnicastCandidateList = yenKShortestPaths.getSRTUnicastCandidateList();
         ttUnicastList = yenKShortestPaths.getTTUnicastList();
 
-        this.evaluator = evaluator;
+        this.evaluator = bag.getEvaluator();
 
         scenarioOutputPath = createScenarioOutputPath(bag);
 
         new File(scenarioOutputPath).mkdirs();
 
-        try (ExecutorService exec = Executors.newFixedThreadPool(threadNumber)) {
+        try (ExecutorService exec = Executors.newFixedThreadPool(bag.getThreadNumber())) {
 
-            Timer timer = getTimer(timeout);
+            Timer timer = getTimer(Duration.ofSeconds(bag.getTimeout()));
 
 
-            for (int i = 0; i < threadNumber; i++) {
+            for (int i = 0; i < bag.getThreadNumber(); i++) {
                 exec.execute(new LaursenRoutingOptimizationRunnable(bag));
             }
 
-            exec.awaitTermination(timeout.toSeconds(), TimeUnit.SECONDS);
+            exec.awaitTermination(Duration.ofSeconds(bag.getTimeout()).toSeconds(), TimeUnit.SECONDS);
             exec.shutdown();
 
             if (!exec.isTerminated()) {

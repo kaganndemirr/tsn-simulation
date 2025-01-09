@@ -1,5 +1,6 @@
 package ktu.kaganndemirr.util;
 
+import ktu.kaganndemirr.application.Application;
 import ktu.kaganndemirr.application.SRTApplication;
 import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.architecture.Node;
@@ -196,6 +197,15 @@ public class HelperMethods {
                 writer.write(unicastCandidate.getApplication().getName() + "_" + candidatePathIndex + "\t" + gp.getEdgeList() + "\n");
                 candidatePathIndex++;
             }
+        }
+        writer.close();
+    }
+
+    public static void writeNormalizedCostsToFile(Application application, List<Double> normalizedSRTCostList, List<Double> normalizedTTCostList, List<Double> normalizedLengthCostList,  String scenarioOutputPath, String threadName, int i) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(Paths.get(scenarioOutputPath, "NormalizedCosts.txt").toString(), true));
+        writer.write("############## ThreadName:" + threadName + " Iteration:" + i + " ##############\n");
+        for(int j = 0; j < normalizedSRTCostList.size(); j++){
+
         }
         writer.close();
     }

@@ -3,6 +3,7 @@ package ktu.kaganndemirr.util.mcdm;
 import ktu.kaganndemirr.application.Application;
 import ktu.kaganndemirr.application.SRTApplication;
 import ktu.kaganndemirr.application.TTApplication;
+import ktu.kaganndemirr.architecture.EndSystem;
 import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.message.Unicast;
@@ -133,11 +134,17 @@ public class WSMMethods {
         return solution;
     }
 
-    public static GraphPath<Node, GCLEdge> srtTTLengthGraphPathV1(Application application, List<GraphPath<Node, GCLEdge>> kShortestPathsGraphPathList,  List<Unicast> ttUnicastList, Bag bag) {
+    public static GraphPath<Node, GCLEdge> srtTTLengthGraphPathV1(Application application, EndSystem target, List<GraphPath<Node, GCLEdge>> kShortestPathsGraphPathList, List<Unicast> ttUnicastList, Bag bag, List<GraphPath<Node, GCLEdge>> mcdmGraphPathList, String scenarioOutputPath) {
         List<Unicast> solution = new ArrayList<>();
 
         if(!ttUnicastList.isEmpty()){
             solution.addAll(ttUnicastList);
+        }
+
+        if(!mcdmGraphPathList.isEmpty()){
+            for(GraphPath<Node, GCLEdge> graphPath: mcdmGraphPathList){
+                solution.add(new Unicast(application, target, graphPath));
+            }
         }
 
         Map<GCLEdge, Double> edgeDurationMap = getEdgeTTDurationMap(ttUnicastList);
@@ -189,6 +196,8 @@ public class WSMMethods {
                 normalizedTTCostList = normalizeCostMax(ttCostList);
             }
         }
+
+
 
         double maxCost = Double.MAX_VALUE;
         GraphPath<Node, GCLEdge> selectedGraphPath = null;

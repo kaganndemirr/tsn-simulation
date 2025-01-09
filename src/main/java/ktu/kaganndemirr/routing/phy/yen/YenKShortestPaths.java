@@ -8,6 +8,7 @@ import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
+import ktu.kaganndemirr.util.Bag;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.YenKShortestPath;
@@ -24,14 +25,14 @@ public class YenKShortestPaths {
     private final List<Application> applicationList;
     private final List<UnicastCandidate> srtUnicastCandidateList;
 
-    public YenKShortestPaths(Graph<Node, GCLEdge> graph, List<Application> applicationList, int k) {
+    public YenKShortestPaths(Bag bag, int k) {
         srtUnicastCandidateList = new ArrayList<>();
-        this.applicationList = applicationList;
+        this.applicationList = bag.getApplicationList();
 
         for (Application app : applicationList) {
             if (app instanceof SRTApplication) {
                 for(EndSystem target: app.getTargetList()){
-                    Graph<Node, GCLEdge> newGraph = copyGraph(graph);
+                    Graph<Node, GCLEdge> newGraph = copyGraph(bag.getGraph());
                     Graph<Node, GCLEdge> graphWithoutUnnecessaryEndSystems = discardUnnecessaryEndSystems(newGraph, app.getSource(), target);
 
                     YenKShortestPath<Node, GCLEdge> allYenKShortestPathList = new YenKShortestPath<>(graphWithoutUnnecessaryEndSystems);

@@ -1,6 +1,17 @@
 package ktu.kaganndemirr.util;
 
+import ktu.kaganndemirr.application.Application;
+import ktu.kaganndemirr.architecture.GCLEdge;
+import ktu.kaganndemirr.architecture.Node;
+import ktu.kaganndemirr.evaluator.Evaluator;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+
+import java.util.List;
+
 public class Bag {
+    private Graph<Node, GCLEdge> graph;
+    private List<Application> applicationList;
     private String topologyName;
     private String applicationName;
     private String routing;
@@ -21,7 +32,25 @@ public class Bag {
     private String wpmVersion;
     private String wpmValueType;
     private String metaheuristicName;
+    private Evaluator evaluator;
     private String evaluatorName;
+    private String log;
+
+    public Graph<Node, GCLEdge> getGraph() {
+        return graph;
+    }
+
+    public void setGraph(Graph<Node, GCLEdge> graph) {
+        this.graph = graph;
+    }
+
+    public List<Application> getApplicationList() {
+        return applicationList;
+    }
+
+    public void setApplicationList(List<Application> applicationList) {
+        this.applicationList = applicationList;
+    }
 
     public String getTopologyName() {
         return topologyName;
@@ -183,12 +212,28 @@ public class Bag {
         this.metaheuristicName = metaheuristicName;
     }
 
+    public Evaluator getEvaluator() {
+        return evaluator;
+    }
+
+    public void setEvaluator(Evaluator evaluator) {
+        this.evaluator = evaluator;
+    }
+
     public String getEvaluatorName() {
         return evaluatorName;
     }
 
     public void setEvaluatorName(String evaluatorName) {
         this.evaluatorName = evaluatorName;
+    }
+
+    public String getLog() {
+        return log;
+    }
+
+    public void setLog(String log) {
+        this.log = log;
     }
 
 }
