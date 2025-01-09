@@ -3,10 +3,7 @@ package ktu.kaganndemirr;
 import ktu.kaganndemirr.application.Application;
 import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.architecture.Node;
-import ktu.kaganndemirr.evaluator.AVBLatencyMathCost;
-import ktu.kaganndemirr.evaluator.AVBLatencyMathTSNCF;
-import ktu.kaganndemirr.evaluator.AVBLatencyMathTSNRO;
-import ktu.kaganndemirr.evaluator.Evaluator;
+import ktu.kaganndemirr.evaluator.*;
 import ktu.kaganndemirr.output.OutputMethods;
 import ktu.kaganndemirr.parser.ApplicationParser;
 import ktu.kaganndemirr.parser.TopologyParser;
@@ -138,7 +135,7 @@ public class Main {
         options.addOption(applicationFile);
         options.addOption(architectureFile);
         options.addOption(RATE_ARG, true, "The rate in mbps (Type: mbps) (Default: 1000)");
-        options.addOption(EVALUATOR_ARG, true, "WCD Analysis Method (Default: avbLatencyMathTSNCF)");
+        options.addOption(EVALUATOR_ARG, true, "WCD Analysis Method (Default: avbLatencyMathTSNCF) (Choices: avbLatencyMathTSNCF, avbLatencyMathTSNRO, networkCalculus)");
         options.addOption(K_ARG, true, "Value of K for search-space reduction (Default: 50)");
         options.addOption(THREAD_NUMBER_ARG, true, "Thread number (Default: Number of Processor Thread)");
         options.addOption(TIMEOUT_ARG, true, "Metaheuristic algorithm timeout (Type: Second) (Default: 60");
@@ -194,6 +191,9 @@ public class Main {
                 } else if (Objects.equals(line.getOptionValue(EVALUATOR_ARG), Constants.AVB_LATENCY_MATH_VERSION_TSNRO)) {
                     evaluatorName = Constants.AVB_LATENCY_MATH_VERSION_TSNRO;
                     evaluator = new AVBLatencyMathTSNRO();
+                } else if (Objects.equals(line.getOptionValue(EVALUATOR_ARG), Constants.NETWORK_CALCULUS)) {
+                    evaluatorName = Constants.NETWORK_CALCULUS;
+                    evaluator = new NetworkCalculus();
                 }
             }
 
@@ -344,8 +344,6 @@ public class Main {
                         case "yen" -> {
                             switch (algorithm) {
                                 case "LaursenRO" -> {
-                                    LaursenRO laursenRO = new LaursenRO(k);
-
                                     Bag bag = new Bag();
                                     bag.setTopologyName(topologyName);
                                     bag.setApplicationName(applicationName);
@@ -357,6 +355,12 @@ public class Main {
                                     bag.setTimeout(timeout);
                                     bag.setMetaheuristicName(metaheuristicName);
                                     bag.setEvaluatorName(evaluatorName);
+
+                                    if (evaluatorName.equals(Constants.NETWORK_CALCULUS)){
+                                        createGCLSynthesisAndNetworkCalculusDirectories(bag);
+                                    }
+
+                                    LaursenRO laursenRO = new LaursenRO(k);
 
                                     logger.info(createInfo(bag));
 

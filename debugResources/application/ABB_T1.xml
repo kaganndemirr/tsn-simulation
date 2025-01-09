@@ -1,0 +1,82 @@
+<Applications>
+    <Application name="AVB_1">
+        <PCP>4</PCP>
+        <CMI>1000</CMI>
+        <FrameSize>1500</FrameSize>
+        <NumberOfFrames>1</NumberOfFrames>
+        <Deadline>1000</Deadline>
+        <Source name="ES400" />
+        <Targets>
+            <Target name="ES406" />
+        </Targets>
+    </Application>
+
+    <Application name="AVB_2">
+        <PCP>6</PCP>
+        <CMI>1000</CMI>
+        <FrameSize>1500</FrameSize>
+        <NumberOfFrames>60</NumberOfFrames>
+        <Deadline>1000</Deadline>
+        <Source name="ES401" />
+        <Targets>
+            <Target name="ES418" />
+        </Targets>
+    </Application>
+
+    <Application name="AVB_3">
+        <PCP>6</PCP>
+        <CMI>1000</CMI>
+        <FrameSize>550</FrameSize>
+        <NumberOfFrames>1</NumberOfFrames>
+        <Deadline>8000</Deadline>
+        <Source name="ES402" />
+        <Targets>
+            <Target name="ES417" />
+        </Targets>
+    </Application>
+
+    <Application name="TT_1">
+        <PCP>7</PCP>
+        <CMI>1000</CMI>
+        <FrameSize>500</FrameSize>
+        <NumberOfFrames>1</NumberOfFrames>
+        <Deadline>8000</Deadline>
+        <Source name="ES400" />
+        <Targets>
+            <Target name="ES417" />
+        </Targets>
+    </Application>
+
+    <Application name="TT_2">
+        <PCP>7</PCP>
+        <CMI>20</CMI>
+        <FrameSize>500</FrameSize>
+        <NumberOfFrames>1</NumberOfFrames>
+        <Deadline>8000</Deadline>
+        <Source name="ES404" />
+        <Targets>
+            <Target name="ES418" />
+        </Targets>
+    </Application>
+
+    <Application name="TT_3">
+        <PCP>7</PCP>
+        <CMI>200</CMI>
+        <FrameSize>1522</FrameSize>
+        <NumberOfFrames>5</NumberOfFrames>
+        <Deadline>6000</Deadline>
+        <Source name="ES411" />
+        <Targets>
+            <Target name="ES403">
+                <Path>
+                    <Switch name="B311" />
+                    <Switch name="B205" />
+                    <Switch name="B102" />
+                    <Switch name="B101" />
+                    <Switch name="B202" />
+                    <Switch name="B304" />
+                </Path>
+            </Target>
+        </Targets>
+    </Application>
+</Applications>

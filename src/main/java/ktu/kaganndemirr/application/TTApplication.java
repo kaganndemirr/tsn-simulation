@@ -8,7 +8,7 @@ import org.jgrapht.GraphPath;
 import java.util.List;
 
 public class TTApplication extends Application{
-    public TTApplication(String name, int pcp, String applicationType, int frameSizeByte, int number0fFrames, int messageSizeByte, double messageSizeMbps, double cmi, int deadline, EndSystem source, List<EndSystem> targetList, List<GraphPath<Node, GCLEdge>> explicitPathList) {
-        super(name, pcp, applicationType, frameSizeByte, number0fFrames, messageSizeByte, messageSizeMbps, cmi, deadline, source, targetList, explicitPathList);
+    public TTApplication(String name, int pcp, String applicationType, int frameSizeByte, int number0fFrames, int messageSizeByte, double messageSizeMbps, double cmi, int deadline, EndSystem source, List<EndSystem> targetList, List<GraphPath<Node, GCLEdge>> explicitPathList, String vlanId, double offset) {
+        super(name, pcp, applicationType, frameSizeByte, number0fFrames, messageSizeByte, messageSizeMbps, cmi, deadline, source, targetList, explicitPathList, vlanId, offset);
     }
 }

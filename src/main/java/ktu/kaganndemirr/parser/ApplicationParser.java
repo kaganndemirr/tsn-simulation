@@ -32,7 +32,7 @@ public class ApplicationParser {
 
         List<Application> applications = new ArrayList<>();
 
-        if(Objects.equals(TSNSimulationVersion, Constants.TSNCF)){
+        if(Objects.equals(TSNSimulationVersion, Constants.TSNCF) || Objects.equals(TSNSimulationVersion, Constants.TSNCF_V2)){
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             Document dom;
 
@@ -48,7 +48,7 @@ public class ApplicationParser {
                         //Get the SRTApplication element
                         Element srtAppEle = (Element) nl.item(i);
                         //Get the SRTApplication object
-                        Application avbApp = getSRTApplication(srtAppEle);
+                        Application avbApp = getSRTApplication(srtAppEle, i);
                         //Add it to the application list
                         applications.add(avbApp);
                     }
@@ -61,9 +61,36 @@ public class ApplicationParser {
                         //Get the TTApplication element
                         Element ttAppEle = (Element) nl.item(i);
                         //Get the TTApplication object
-                        Application ttApp = getTTApplication(ttAppEle, rate, graph);
+                        Application ttApp = getTTApplication(ttAppEle, rate, graph, i);
                         //Add it to the application list
                         applications.add(ttApp);
+                    }
+                }
+
+            } catch (ParserConfigurationException | SAXException | IOException pce) {
+                throw new RuntimeException();
+            }
+
+            return applications;
+        } else if (Objects.equals(TSNSimulationVersion, Constants.TSNNC)) {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            Document dom;
+
+            try {
+                DocumentBuilder db = dbf.newDocumentBuilder();
+                dom = db.parse(f);
+                Element docEle = dom.getDocumentElement();
+
+                //Get node list of AVBApplicationElements
+                NodeList nl = docEle.getElementsByTagName("Application");
+                if (nl.getLength() > 0) {
+                    for (int i = 0; i < nl.getLength(); i++) {
+                        //Get the SRTApplication element
+                        Element applicationElement = (Element) nl.item(i);
+                        //Get the SRTApplication object
+                        Application application = getApplicationTSNNC(applicationElement, graph, i);
+                        //Add it to the application list
+                        applications.add(application);
                     }
                 }
             } catch (ParserConfigurationException | SAXException | IOException pce) {
@@ -71,36 +98,36 @@ public class ApplicationParser {
             }
 
             return applications;
-        } else if (Objects.equals(TSNSimulationVersion, Constants.TSNRO)) {
-
         }
 
         return null;
     }
 
-    private static SRTApplication getSRTApplication(Element srtAppEle) {
+    private static SRTApplication getSRTApplication(Element srtAppEle, int i) {
         String name = srtAppEle.getAttribute("name");
         int pcp = Constants.CLASS_A_PCP;
-        String applicationType = Constants.CLASS_A;
-        int frameSizeByte = parseFrameSize(srtAppEle);
-        int numberOfFrames = parseNumberOfFrames(srtAppEle);
+        String applicationType = Constants.applicationTypeMap.get(pcp);
+        int frameSizeByte = parsePayloadSize(srtAppEle);
+        int numberOfFrames = parseNoOfFrames(srtAppEle);
         int messageSizeByte = frameSizeByte * numberOfFrames;
-        double cmi = parseCMI(srtAppEle);
-        double messageSizeMbps = getMessageSizeMBPS(frameSizeByte, numberOfFrames, cmi);
+        double cmi = parseInterval(srtAppEle);
+        double messageSizeMbps = getMessageSizeMbps(frameSizeByte, numberOfFrames, cmi);
         int deadline = parseDeadline(srtAppEle);
         EndSystem source = parseSource(srtAppEle);
         List<EndSystem> targetList = parseTargetList(srtAppEle);
+        String vlanId = "vl" + i;
+        double offset = 0.0;
 
         //TODO
         List<GraphPath<Node, GCLEdge>> graphPathList = null;
 
-        return new SRTApplication(name, pcp, applicationType, frameSizeByte, numberOfFrames, messageSizeByte, messageSizeMbps, cmi, deadline, source, targetList, graphPathList);
+        return new SRTApplication(name, pcp, applicationType, frameSizeByte, numberOfFrames, messageSizeByte, messageSizeMbps, cmi, deadline, source, targetList, graphPathList, vlanId, offset);
     }
 
-    private static TTApplication getTTApplication(Element ttAppEle, int rate, Graph<Node, GCLEdge> graph) {
+    private static TTApplication getTTApplication(Element ttAppEle, int rate, Graph<Node, GCLEdge> graph, int i) {
         String name = ttAppEle.getAttribute("name");
         int pcp = Constants.TT_PCP;
-        String applicationType = Constants.TT;
+        String applicationType = Constants.applicationTypeMap.get(pcp);
         int frameSizeByte = 0;
         int messageSizeByte = 0;
         double cmi = Constants.TSN_CONFIGURATION_FRAMEWORK_CMI;
@@ -112,28 +139,31 @@ public class ApplicationParser {
 
         GCL gcl = getGCL(ttAppEle);
 
-        List<GraphPath<Node, GCLEdge>> graphPathList = createExplicitPathGraphPathList(source, gclEdgeListList, targetList, graph, gcl);
+        List<GraphPath<Node, GCLEdge>> graphPathList = createExplicitPathGraphPathListForTT(source, gclEdgeListList, targetList, graph, gcl);
 
         int numberOfFrames = gcl.getFrequency();
 
-        double messageSizeMbps = getMessageSizeMbps(gcl.getDuration(), numberOfFrames, Constants.TSN_CONFIGURATION_FRAMEWORK_CMI, rate);
+        double messageSizeMbps = getTTMessageSizeMbps(gcl.getDuration(), numberOfFrames, Constants.TSN_CONFIGURATION_FRAMEWORK_CMI, rate);
 
-        return new TTApplication(name, pcp, applicationType, frameSizeByte, numberOfFrames, messageSizeByte, messageSizeMbps, cmi, deadline, source, targetList, graphPathList);
+        String vlanId = "vl" + i;
+        double offset = 0.0;
+
+        return new TTApplication(name, pcp, applicationType, frameSizeByte, numberOfFrames, messageSizeByte, messageSizeMbps, cmi, deadline, source, targetList, graphPathList, vlanId, offset);
     }
 
-    private static int parseFrameSize(Element appEle) {
+    private static int parsePayloadSize(Element appEle) {
         return Integer.parseInt(appEle.getElementsByTagName("PayloadSize").item(0).getFirstChild().getNodeValue());
     }
 
-    private static int parseNumberOfFrames(Element appEle) {
+    private static int parseNoOfFrames(Element appEle) {
         return Integer.parseInt(appEle.getElementsByTagName("NoOfFrames").item(0).getFirstChild().getNodeValue());
     }
 
-    private static double parseCMI(Element appEle) {
+    private static double parseInterval(Element appEle) {
         return Integer.parseInt(appEle.getElementsByTagName("Interval").item(0).getFirstChild().getNodeValue());
     }
 
-    private static double getMessageSizeMBPS(int frameSizeByte, int numberOfFrames, double cmi){
+    private static double getMessageSizeMbps(int frameSizeByte, int numberOfFrames, double cmi){
         return (frameSizeByte * Constants.ONE_BYTE_TO_BIT) * numberOfFrames / cmi;
     }
 
@@ -157,7 +187,7 @@ public class ApplicationParser {
         return targetList;
     }
 
-    private static double getMessageSizeMbps(double gclDuration, int numberOfFrames, int hyperPeriod, int rate){
+    private static double getTTMessageSizeMbps(double gclDuration, int numberOfFrames, int hyperPeriod, int rate){
         double gateOpenTimeAsSecond = (Constants.ONE_SECOND * (gclDuration * numberOfFrames)) / hyperPeriod;
 
         return (rate * gateOpenTimeAsSecond) / Constants.ONE_SECOND;
@@ -225,7 +255,7 @@ public class ApplicationParser {
         return gclEdgeListList;
     }
 
-    private static List<GraphPath<Node, GCLEdge>> createExplicitPathGraphPathList(EndSystem source, List<List<GCLEdge>> gclEdgeListList, List<EndSystem> targetList, Graph<Node, GCLEdge> graph, GCL gcl) {
+    private static List<GraphPath<Node, GCLEdge>> createExplicitPathGraphPathListForTT(EndSystem source, List<List<GCLEdge>> gclEdgeListList, List<EndSystem> targetList, Graph<Node, GCLEdge> graph, GCL gcl) {
         List<GraphPath<Node, GCLEdge>> graphPathList = new ArrayList<>();
         for (int i = 0; i < targetList.size(); i++){
             GraphPath<Node, GCLEdge> graphPath = new GraphWalk<>(graph, source, targetList.get(i), gclEdgeListList.get(i), gclEdgeListList.size() * Constants.UNIT_WEIGHT);
@@ -239,5 +269,95 @@ public class ApplicationParser {
         }
 
         return graphPathList;
+    }
+
+    private static List<GraphPath<Node, GCLEdge>> createExplicitPathGraphPathList(EndSystem source, List<List<GCLEdge>> gclEdgeListList, List<EndSystem> targetList, Graph<Node, GCLEdge> graph) {
+        List<GraphPath<Node, GCLEdge>> graphPathList = new ArrayList<>();
+        for (int i = 0; i < targetList.size(); i++){
+            GraphPath<Node, GCLEdge> graphPath = new GraphWalk<>(graph, source, targetList.get(i), gclEdgeListList.get(i), gclEdgeListList.size() * Constants.UNIT_WEIGHT);
+            graphPathList.add(graphPath);
+        }
+
+        return graphPathList;
+    }
+
+    private static Application getApplicationTSNNC(Element applicationElement, Graph<Node, GCLEdge> graph, int i) {
+        String name = applicationElement.getAttribute("name");
+        int pcp = parsePCP(applicationElement);
+        String applicationType = Constants.applicationTypeMap.get(pcp);
+        int frameSizeByte = parseFrameSize(applicationElement);
+        int numberOfFrames = parseNumberOfFrames(applicationElement);
+        int messageSizeByte = frameSizeByte * numberOfFrames;
+        double cmi = parseCMI(applicationElement);
+        double messageSizeMbps = getMessageSizeMbps(frameSizeByte, numberOfFrames, cmi);
+        int deadline = parseDeadline(applicationElement);
+        EndSystem source = parseSource(applicationElement);
+        List<EndSystem> targetList = parseTargetListTSNTSNSchedTSNNC(applicationElement);
+        List<List<Node>> explicitPathRawList = parseExplicitPathRawTSNTSNSchedTSNNC(source, applicationElement);
+        List<List<GCLEdge>> gclEdgeListList = createExplicitPathEdgeList(explicitPathRawList, graph);
+        List<GraphPath<Node, GCLEdge>> graphPathList = createExplicitPathGraphPathList(source, gclEdgeListList, targetList, graph);
+        String vlanId = "vl" + i;
+        double offset = 0.0;
+        
+        if (pcp != Constants.TT_PCP){
+            return new SRTApplication(name, pcp, applicationType, frameSizeByte, numberOfFrames, messageSizeByte, messageSizeMbps, cmi, deadline, source, targetList, graphPathList, vlanId, offset);
+        } else {
+            return new TTApplication(name, pcp, applicationType, frameSizeByte, numberOfFrames, messageSizeByte, messageSizeMbps, cmi, deadline, source, targetList, graphPathList, vlanId, offset);
+        }
+
+    }
+
+    private static int parsePCP(Element applicationElement) {
+        return Integer.parseInt(applicationElement.getElementsByTagName("PCP").item(0).getFirstChild().getNodeValue());
+    }
+
+    private static int parseFrameSize(Element applicationElement) {
+        return Integer.parseInt(applicationElement.getElementsByTagName("FrameSize").item(0).getFirstChild().getNodeValue());
+    }
+
+    private static int parseNumberOfFrames(Element appEle) {
+        return Integer.parseInt(appEle.getElementsByTagName("NumberOfFrames").item(0).getFirstChild().getNodeValue());
+    }
+
+    private static double parseCMI(Element applicationElement) {
+        return Double.parseDouble(applicationElement.getElementsByTagName("CMI").item(0).getFirstChild().getNodeValue());
+    }
+
+    private static List<EndSystem> parseTargetListTSNTSNSchedTSNNC(Element appEle) {
+        List<EndSystem> targetList = new ArrayList<>();
+        Element el = (Element) appEle.getElementsByTagName("Targets").item(0);
+        NodeList nl = el.getElementsByTagName("Target");
+        if (nl.getLength() > 0) {
+            for (int i = 0; i < nl.getLength(); i++) {
+                targetList.add(new EndSystem(((Element) nl.item(i)).getAttribute("name")));
+            }
+        }
+        return targetList;
+    }
+
+    private static List<List<Node>> parseExplicitPathRawTSNTSNSchedTSNNC(EndSystem source,Element ele) {
+        List<List<Node>> path = new ArrayList<>();
+        Element destEl = (Element) ele.getElementsByTagName("Targets").item(0);
+        NodeList destNL = destEl.getElementsByTagName("Target");
+
+        if (destNL.getLength() > 0) {
+            path = new ArrayList<>(destNL.getLength());
+            for (int i = 0; i < destNL.getLength(); i++) {
+                EndSystem target = new EndSystem(((Element) destNL.item(i)).getAttribute("name"));
+                Element routeEL = (Element) ele.getElementsByTagName("Path").item(0);
+                if (routeEL != null) {
+                    NodeList routeNL = routeEL.getElementsByTagName("Switch");
+                    if (routeNL.getLength() > 0) {
+                        path.add(i, new LinkedList<>());
+                        path.get(i).add(source);
+                        for (int u = 0; u < routeNL.getLength(); u++) {
+                            path.get(i).add(new Switch(((Element) routeNL.item(u)).getAttribute("name")));
+                        }
+                    }
+                }
+                path.get(i).add(target);
+            }
+        }
+        return path;
     }
 }

@@ -1,7 +1,6 @@
 package ktu.kaganndemirr.util;
 
 import ktu.kaganndemirr.application.SRTApplication;
-import ktu.kaganndemirr.application.TTApplication;
 import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.message.Unicast;
@@ -13,10 +12,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 public class HelperMethods {
@@ -261,5 +259,136 @@ public class HelperMethods {
         result += ", Evaluator Name: " + bag.getEvaluatorName();
 
         return result;
+    }
+
+    public static String createGCLSynthesisPath(Bag bag){
+        List<String> resultList = new ArrayList<>();
+        resultList.add("gclSynthesis");
+        resultList.add(bag.getRouting());
+        if (bag.getMTRName() != null){
+            resultList.add(bag.getMTRName());
+        }
+        resultList.add(bag.getPathFindingMethod());
+        resultList.add(bag.getAlgorithm());
+        if (bag.getLWR() != null){
+            resultList.add(bag.getLWR());
+        }
+        if (bag.getK() != 0){
+            resultList.add(String.valueOf(bag.getK()));
+        }
+        if (bag.getMCDMObjective() != null){
+            resultList.add(bag.getMCDMObjective());
+        }
+        if (bag.getWSMNormalization() != null){
+            resultList.add(bag.getWSMNormalization());
+        }
+        if (bag.getCWR() != null){
+            resultList.add(bag.getCWR());
+        }
+        if (bag.getWSRT() != 0){
+            resultList.add(String.valueOf(bag.getWSRT()));
+        }
+        if (bag.getWTT() != 0){
+            resultList.add(String.valueOf(bag.getWTT()));
+        }
+        if (bag.getWLength() != 0){
+            resultList.add(String.valueOf(bag.getWLength()));
+        }
+        if (bag.getWUtil() != 0){
+            resultList.add(String.valueOf(bag.getWUtil()));
+        }
+        if (bag.getWPMVersion() != null){
+            resultList.add(bag.getWPMVersion());
+        }
+        if (bag.getWPMValueType() != null){
+            resultList.add(bag.getWPMValueType());
+        }
+        if (bag.getMetaheuristicName() != null){
+            resultList.add(bag.getMetaheuristicName());
+        }
+        if (bag.getEvaluatorName() != null){
+            resultList.add(bag.getEvaluatorName());
+        }
+        resultList.add(bag.getTopologyName() + "_" + bag.getApplicationName());
+
+        return buildPath(resultList);
+    }
+
+    public static String creatNCPath(Bag bag){
+        List<String> resultList = new ArrayList<>();
+        resultList.add("networkCalculus");
+        resultList.add(bag.getRouting());
+        if (bag.getMTRName() != null){
+            resultList.add(bag.getMTRName());
+        }
+        resultList.add(bag.getPathFindingMethod());
+        resultList.add(bag.getAlgorithm());
+        if (bag.getLWR() != null){
+            resultList.add(bag.getLWR());
+        }
+        if (bag.getK() != 0){
+            resultList.add(String.valueOf(bag.getK()));
+        }
+        if (bag.getMCDMObjective() != null){
+            resultList.add(bag.getMCDMObjective());
+        }
+        if (bag.getWSMNormalization() != null){
+            resultList.add(bag.getWSMNormalization());
+        }
+        if (bag.getCWR() != null){
+            resultList.add(bag.getCWR());
+        }
+        if (bag.getWSRT() != 0){
+            resultList.add(String.valueOf(bag.getWSRT()));
+        }
+        if (bag.getWTT() != 0){
+            resultList.add(String.valueOf(bag.getWTT()));
+        }
+        if (bag.getWLength() != 0){
+            resultList.add(String.valueOf(bag.getWLength()));
+        }
+        if (bag.getWUtil() != 0){
+            resultList.add(String.valueOf(bag.getWUtil()));
+        }
+        if (bag.getWPMVersion() != null){
+            resultList.add(bag.getWPMVersion());
+        }
+        if (bag.getWPMValueType() != null){
+            resultList.add(bag.getWPMValueType());
+        }
+        if (bag.getMetaheuristicName() != null){
+            resultList.add(bag.getMetaheuristicName());
+        }
+        if (bag.getEvaluatorName() != null){
+            resultList.add(bag.getEvaluatorName());
+        }
+        resultList.add(bag.getTopologyName() + "_" + bag.getApplicationName());
+
+        return buildPath(resultList);
+    }
+
+    public static void createGCLSynthesisAndNetworkCalculusDirectories(Bag bag){
+        Path gclSynthesisFilesPath = Paths.get(createGCLSynthesisPath(bag));
+
+        Path networkCalculusFilesPath = Paths.get(creatNCPath(bag));
+        Path networkCalculusInPath = Paths.get(networkCalculusFilesPath.toString(), "in");
+        Path networkCalculusOutPath = Paths.get(networkCalculusFilesPath.toString(), "out");
+
+        File gclSynthesisFilesFile = gclSynthesisFilesPath.toFile();
+
+        File networkCalculusInFile = networkCalculusInPath.toFile();
+        File networkCalculusOutFile = networkCalculusOutPath.toFile();
+
+        if(!networkCalculusInFile.exists()){
+            networkCalculusInFile.mkdirs();
+        }
+
+        if(!networkCalculusOutFile.exists()){
+            networkCalculusOutFile.mkdirs();
+        }
+
+        if(!gclSynthesisFilesFile.exists()){
+            gclSynthesisFilesFile.mkdirs();
+        }
     }
 }

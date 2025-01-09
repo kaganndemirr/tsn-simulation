@@ -3,29 +3,42 @@ package ktu.kaganndemirr.util;
 import ktu.kaganndemirr.application.SRTApplication;
 import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.message.Unicast;
-import ktu.kaganndemirr.solver.Solution;
 
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Constants {
-    public static final String AVB_LATENCY_MATH_VERSION_TSNCF = "avbLatencyMathCF";
+    public static final String AVB_LATENCY_MATH_VERSION_TSNCF = "avbLatencyMathTSNCF";
     public static final String AVB_LATENCY_MATH_VERSION_TSNRO = "avbLatencyMathTSNRO";
+    public static final String NETWORK_CALCULUS = "networkCalculus";
 
     public static final String DEBUG = "debug";
 
     public static final String TSNCF = "TSNCF";
-    public static final String TSNRO = "TSNRO";
+    public static final String TSNCF_V2 = "TSNCF_V2";
+    public static final String TSN_TSNSCHED = "TSN_TSNSCHED";
+    public static final String TSNNC = "TSNNC";
+
+    public static HashMap<Integer, String> applicationTypeMap;
+
+    static {
+        applicationTypeMap = new HashMap<>();
+        applicationTypeMap.put(1, "CLASS_F");
+        applicationTypeMap.put(2, "CLASS_E");
+        applicationTypeMap.put(3, "CLASS_D");
+        applicationTypeMap.put(4, "CLASS_C");
+        applicationTypeMap.put(5, "CLASS_B");
+        applicationTypeMap.put(6, "CLASS_A");
+        applicationTypeMap.put(7, "TT");
+    }
 
     public static final int CLASS_A_PCP = 6;
-    public static final String CLASS_A = "CLASS_A";
+    public static final int TT_PCP = 7;
 
     public static final int ONE_BYTE_TO_BIT = 8;
 
-    public static final int TT_PCP = 7;
-    public static final String TT = "TT";
+
 
     public static final int TSN_CONFIGURATION_FRAMEWORK_CMI = 500;
 
