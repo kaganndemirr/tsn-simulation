@@ -23,6 +23,7 @@ import org.jgrapht.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.Instant;
@@ -61,7 +62,7 @@ public class WSMv2LWR {
         bestSolution = new ArrayList<>();
     }
 
-    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, Bag bag, int threadNumber, Evaluator evaluator, Duration timeout){
+    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, Bag bag, int threadNumber, Evaluator evaluator, Duration timeout) throws IOException {
         Instant pathPenalizationMCDMKShortestPathsStartTime = Instant.now();
         PathPenalizationMCDMKShortestPaths pathPenalizationMCDMKShortestPaths = new PathPenalizationMCDMKShortestPaths(graph, applicationList, bag, k);
         Instant pathPenalizationMCDMKShortestPathsEndTime = Instant.now();

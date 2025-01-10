@@ -9,6 +9,7 @@ import ktu.kaganndemirr.evaluator.Evaluator;
 import ktu.kaganndemirr.message.Multicast;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
+import ktu.kaganndemirr.routing.phy.yen.YenMCDMKShortestPaths;
 import ktu.kaganndemirr.routing.phy.yen.YenRandomizedKShortestPaths;
 import ktu.kaganndemirr.solver.Solution;
 import ktu.kaganndemirr.util.Bag;
@@ -32,15 +33,15 @@ public class WPMLWRCWRDeadline {
 
     private final int k;
 
-    private List<Unicast> ttUnicastList;
-
-    private final Map<Double, Double> durationMap;
-
-    private Graph<Node, GCLEdge> graph;
-
-    private List<Application> applicationList;
-
+    private List<UnicastCandidate> ttUnicastCandidateList;
     private List<UnicastCandidate> srtUnicastCandidateList;
+
+    private List<Unicast> ttUnicastList;
+    private List<Unicast> srtUnicastList;
+
+    private final List<Unicast> unicastList;
+
+    private final Object writeLock;
 
     private final Object costLock;
 
@@ -50,16 +51,27 @@ public class WPMLWRCWRDeadline {
 
     private Evaluator evaluator;
 
+    private String scenarioOutputPath;
+
+    private final Map<Double, Double> durationMap;
+
     public WPMLWRCWRDeadline(int k){
         this.k = k;
+        unicastList = new ArrayList<>();
+        writeLock = new Object();
         costLock = new Object();
-        durationMap = new HashMap<>();
         globalBestCost = new AVBLatencyMathCost();
         bestSolution = new ArrayList<>();
+        durationMap = new HashMap<>();
     }
 
-    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, Bag bag, int threadNumber, Evaluator evaluator, Duration timeout){
-        ttUnicastList = YenRandomizedKShortestPaths.getTTUnicastList(applicationList);
+    public Solution solve(Bag bag){
+        YenMCDMKShortestPaths yenMCDMKShortestPaths = new YenMCDMKShortestPaths(bag);
+        ttUnicastList = yenMCDMKShortestPaths.getTTUnicastList();
+        srtUnicastList = yenMCDMKShortestPaths.getSRTUnicastList();
+
+        unicastList.addAll(ttUnicastList);
+        unicastList.addAll(srtUnicastList);
 
         this.graph = graph;
         this.applicationList = applicationList;

@@ -82,7 +82,6 @@ public class GCLEdge extends DefaultWeightedEdge {
 
     public double getMaxTTInterference(double duration) {
         double interference = duration;
-        //Use cached value if available
         if (!gclList.isEmpty()) {
             List<GCE> gateControlEventList = convertGCLToGateControlEventList(gclList);
             List<GCE> mergedGateControlEventList = mergeGateControlEventList(gateControlEventList);

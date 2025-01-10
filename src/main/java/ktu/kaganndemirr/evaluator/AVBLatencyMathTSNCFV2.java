@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class AVBLatencyMathTSNRO implements Evaluator{
-    private static final Logger logger = LoggerFactory.getLogger(AVBLatencyMathTSNRO.class.getSimpleName());
+public class AVBLatencyMathTSNCFV2 implements Evaluator{
+    private static final Logger logger = LoggerFactory.getLogger(AVBLatencyMathTSNCFV2.class.getSimpleName());
 
     @Override
     public Cost evaluate(List<Unicast> unicastList) {
@@ -131,13 +131,13 @@ public class AVBLatencyMathTSNRO implements Evaluator{
     private double calculateMaxLatency(GCLEdge edge, List<Allocation> totalAllocationList, SRTApplication app, double capacity) {
         double tDevice = (double) Constants.DEVICE_DELAY / edge.getRate();
 
-        double tMaxPacketSFDIPG = (double) ((Constants.MAX_BE_FRAME_BYTES + Constants.SFD + Constants.IPG) * 8) / edge.getRate();
+        double tMaxPacketSFDIPG = (double) ((Constants.MAX_BE_FRAME_BYTES + Constants.SFD + Constants.IPG) * Constants.ONE_BYTE_TO_BIT) / edge.getRate();
 
         double tAllStreams = getTAllStreams(edge, totalAllocationList, app);
 
-        double tStreamPacketSFDIPG = (double) ((app.getFrameSizeByte() + Constants.SFD + Constants.IPG) * 8) / edge.getRate();
+        double tStreamPacketSFDIPG = (double) ((app.getFrameSizeByte() + Constants.SFD + Constants.IPG) * Constants.ONE_BYTE_TO_BIT) / edge.getRate();
 
-        double tStreamPacketSFD = (double) ((app.getFrameSizeByte() + Constants.SFD) * 8) / edge.getRate();
+        double tStreamPacketSFD = (double) ((app.getFrameSizeByte() + Constants.SFD) * Constants.ONE_BYTE_TO_BIT) / edge.getRate();
 
         double evaluator = tDevice + tMaxPacketSFDIPG + (tAllStreams - tStreamPacketSFDIPG) * (edge.getRate() / (edge.getRate() * capacity)) + tStreamPacketSFD;
 

@@ -9,17 +9,22 @@ import ktu.kaganndemirr.message.UnicastCandidate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class LaursenMethods {
-    public static List<Unicast> constructInitialSolution(List<UnicastCandidate> srtUnicastCandidateList, List<Unicast> ttUnicastList, int k, Evaluator eval) {
+    public static List<Unicast> constructInitialSolution(List<UnicastCandidate> srtUnicastCandidateList, List<Unicast> unicastList, int k, Evaluator eval) {
 
-        List<Unicast> initialSolution = new ArrayList<>(ttUnicastList);
+        List<Unicast> initialSolution = new ArrayList<>(unicastList);
 
-        List<UnicastCandidate> shuffledAvbList = new ArrayList<>(srtUnicastCandidateList);
-        Collections.shuffle(shuffledAvbList);
+        List<UnicastCandidate> tempSRTUnicastCandidateList = new ArrayList<>(srtUnicastCandidateList);
+        List<UnicastCandidate> randomizedSRTUnicastCandidateList = new ArrayList<>(srtUnicastCandidateList.size());
+        while(!tempSRTUnicastCandidateList.isEmpty()){
+            int index = ThreadLocalRandom.current().nextInt(tempSRTUnicastCandidateList.size());
+            randomizedSRTUnicastCandidateList.add(tempSRTUnicastCandidateList.remove(index));
+        }
 
         //Then within an application, we select the
-        for (UnicastCandidate unicastCandidate : shuffledAvbList) {
+        for (UnicastCandidate unicastCandidate : randomizedSRTUnicastCandidateList) {
             Cost currentBestCost = new AVBLatencyMathCost();
             Unicast currentUnicast;
             Unicast currentBestUnicast = null;

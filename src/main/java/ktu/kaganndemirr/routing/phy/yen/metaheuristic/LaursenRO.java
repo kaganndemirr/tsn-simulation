@@ -40,11 +40,13 @@ public class LaursenRO {
 
     private long yenKShortestPathsDuration;
 
-    private List<Unicast> ttUnicastList;
-
-    private final Map<Double, Double> durationMap;
-
+    private List<UnicastCandidate> ttUnicastCandidateList;
     private List<UnicastCandidate> srtUnicastCandidateList;
+
+    private List<Unicast> ttUnicastList;
+    private List<Unicast> srtUnicastList;
+
+    private final List<Unicast> unicastList;
 
     private final Object writeLock;
 
@@ -58,14 +60,17 @@ public class LaursenRO {
 
     private String scenarioOutputPath;
 
+    private final Map<Double, Double> durationMap;
+
     public LaursenRO(int k){
         this.k = k;
         yenKShortestPathsDuration = 0;
+        unicastList = new ArrayList<>();
         writeLock = new Object();
         costLock = new Object();
-        durationMap = new HashMap<>();
         globalBestCost = new AVBLatencyMathCost();
         bestSolution = new ArrayList<>();
+        durationMap = new HashMap<>();
     }
 
     public Solution solve(Bag bag){
@@ -74,8 +79,14 @@ public class LaursenRO {
         Instant yenKShortestPathsEndTime = Instant.now();
         yenKShortestPathsDuration = Duration.between(yenKShortestPathsStartTime, yenKShortestPathsEndTime).toMillis();
 
+        ttUnicastCandidateList = yenKShortestPaths.getTTUnicastCandidateList();
         srtUnicastCandidateList = yenKShortestPaths.getSRTUnicastCandidateList();
+
         ttUnicastList = yenKShortestPaths.getTTUnicastList();
+        srtUnicastList = yenKShortestPaths.getSRTUnicastList();
+
+        unicastList.addAll(ttUnicastList);
+        unicastList.addAll(srtUnicastList);
 
         this.evaluator = bag.getEvaluator();
 
@@ -102,7 +113,7 @@ public class LaursenRO {
             timer.cancel();
 
         } catch (InterruptedException e) {
-            logger.info("Executor interrupted");
+            throw new RuntimeException(e);
         }
         return new Solution(globalBestCost, Multicast.generateMulticastList(bestSolution));
     }
@@ -148,26 +159,26 @@ public class LaursenRO {
                 List<Unicast> initialSolution = null;
 
                 if(Objects.equals(bag.getMetaheuristicName(), Constants.GRASP)){
-                    initialSolution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, ttUnicastList, k, evaluator);
+                    initialSolution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, unicastList, k, evaluator);
                     solution = MetaheuristicMethods.GRASP(initialSolution, evaluator, srtUnicastCandidateList, globalBestCost);
                 } else if (Objects.equals(bag.getMetaheuristicName(), Constants.ALO)) {
-                    initialSolution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, ttUnicastList, k, evaluator);
+                    initialSolution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, unicastList, k, evaluator);
                     solution = MetaheuristicMethods.ALO(initialSolution, initialSolution, srtUnicastCandidateList, k, evaluator);
                 } else if (Objects.equals(bag.getMetaheuristicName(), Constants.CONSTRUCT_INITIAL_SOLUTION)) {
-                    solution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, ttUnicastList, k, evaluator);
+                    solution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, unicastList, k, evaluator);
                 }
 
-//                if (logger.isDebugEnabled()) {
-//                    synchronized (writeLock) {
-//                        assert solution != null;
-//                        try {
-//                            assert initialSolution != null;
-//                            writeSolutionsToFile(initialSolution, solution, scenarioOutputPath, threadName, i);
-//                        } catch (IOException e) {
-//                            throw new RuntimeException(e);
-//                        }
-//                    }
-//                }
+                if (logger.isDebugEnabled()) {
+                    synchronized (writeLock) {
+                        assert solution != null;
+                        try {
+                            assert initialSolution != null;
+                            writeSolutionsToFile(initialSolution, solution, scenarioOutputPath, threadName, i);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
 
                 //Evaluate and see if better than anything we have seen before
                 Cost cost = evaluator.evaluate(solution);
@@ -193,8 +204,20 @@ public class LaursenRO {
         return bestSolution;
     }
 
+    public List<UnicastCandidate> getTTUnicastCandidateList() {
+        return ttUnicastCandidateList;
+    }
+
     public List<UnicastCandidate> getSRTUnicastCandidateList() {
         return srtUnicastCandidateList;
+    }
+
+    public List<Unicast> getTTUnicastList() {
+        return ttUnicastList;
+    }
+
+    public List<Unicast> getSRTUnicastList() {
+        return srtUnicastList;
     }
 
     public Map<Double, Double> getDurationMap() {

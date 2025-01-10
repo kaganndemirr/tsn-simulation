@@ -20,6 +20,7 @@ public class Bag {
     private String algorithm;
     private String lwr;
     private int k;
+    private String mcdmName;
     private String mcdmObjective;
     private String wsmNormalization;
     private String cwr;
@@ -34,7 +35,6 @@ public class Bag {
     private String metaheuristicName;
     private Evaluator evaluator;
     private String evaluatorName;
-    private String log;
 
     public Graph<Node, GCLEdge> getGraph() {
         return graph;
@@ -114,6 +114,14 @@ public class Bag {
 
     public void setK(int k) {
         this.k = k;
+    }
+
+    public String getMCDMName() {
+        return mcdmName;
+    }
+
+    public void setMCDMName(String mcdmName) {
+        this.mcdmName = mcdmName;
     }
 
     public String getMCDMObjective() {
@@ -226,14 +234,6 @@ public class Bag {
 
     public void setEvaluatorName(String evaluatorName) {
         this.evaluatorName = evaluatorName;
-    }
-
-    public String getLog() {
-        return log;
-    }
-
-    public void setLog(String log) {
-        this.log = log;
     }
 
 }

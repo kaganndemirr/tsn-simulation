@@ -1,5 +1,6 @@
 package ktu.kaganndemirr.util.mcdm;
 
+import ktu.kaganndemirr.application.TTApplication;
 import ktu.kaganndemirr.architecture.GCL;
 import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.architecture.Node;
@@ -12,19 +13,22 @@ import java.util.List;
 import java.util.Map;
 
 public class HelperMethods {
-    public static Map<GCLEdge, Double> getEdgeTTDurationMap(List<Unicast> ttUnicastList) {
+    public static Map<GCLEdge, Double> getEdgeTTDurationMap(List<Unicast> unicastList) {
         Map<GCLEdge, Double> edgeTTDurationMap = new HashMap<>();
-        for (Unicast unicast : ttUnicastList) {
-            for (GCLEdge edge : unicast.getPath().getEdgeList()) {
-                for (GCL gcl : edge.getGCL()) {
-                    if (!edgeTTDurationMap.containsKey(edge)) {
-                        edgeTTDurationMap.put(edge, (gcl.getDuration() / (unicast.getApplication().getCMI() / gcl.getFrequency())));
-                    } else {
-                        edgeTTDurationMap.put(edge, edgeTTDurationMap.get(edge) + (gcl.getDuration() / (unicast.getApplication().getCMI() / gcl.getFrequency())));
+        for (Unicast unicast : unicastList) {
+            if (unicast.getApplication() instanceof TTApplication){
+                for (GCLEdge edge : unicast.getPath().getEdgeList()) {
+                    for (GCL gcl : edge.getGCL()) {
+                        if (!edgeTTDurationMap.containsKey(edge)) {
+                            edgeTTDurationMap.put(edge, (gcl.getDuration() / (unicast.getApplication().getCMI() / gcl.getFrequency())));
+                        } else {
+                            edgeTTDurationMap.put(edge, edgeTTDurationMap.get(edge) + (gcl.getDuration() / (unicast.getApplication().getCMI() / gcl.getFrequency())));
+                        }
                     }
-                }
 
+                }
             }
+
         }
         return edgeTTDurationMap;
     }

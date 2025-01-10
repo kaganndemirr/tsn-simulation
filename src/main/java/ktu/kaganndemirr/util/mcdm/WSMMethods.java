@@ -12,7 +12,11 @@ import ktu.kaganndemirr.util.Bag;
 import ktu.kaganndemirr.util.Constants;
 import ktu.kaganndemirr.util.UnicastCandidateSortingMethods;
 import org.jgrapht.GraphPath;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -21,6 +25,8 @@ import java.util.Map;
 import static ktu.kaganndemirr.util.mcdm.HelperMethods.*;
 
 public class WSMMethods {
+    private static final Logger logger = LoggerFactory.getLogger(WSMMethods.class.getSimpleName());
+
     public static List<Double> normalizeGPCostMax(List<GraphPath<Node, GCLEdge>> graphPathList) {
         double max = findMaxCandidateLength(graphPathList);
 
@@ -69,8 +75,8 @@ public class WSMMethods {
 
             List<Double> normalizedCostGPList;
             switch (wsmNormalization) {
-                case Constants.MIN_MAX -> normalizedCostGPList = null;
-                case Constants.VECTOR -> normalizedCostGPList = null;
+                case MCDMConstants.MIN_MAX -> normalizedCostGPList = null;
+                case MCDMConstants.VECTOR -> normalizedCostGPList = null;
                 default -> normalizedCostGPList = normalizeGPCostMax(graphPathList);
             }
 
@@ -98,11 +104,11 @@ public class WSMMethods {
             List<Double> normalizedTTCostList;
 
             switch (wsmNormalization) {
-                case Constants.MIN_MAX -> {
+                case MCDMConstants.MIN_MAX -> {
                     normalizedSRTCostList = null;
                     normalizedTTCostList = null;
                 }
-                case Constants.VECTOR -> {
+                case MCDMConstants.VECTOR -> {
                     normalizedSRTCostList = null;
                     normalizedTTCostList = null;
                 }
@@ -134,11 +140,11 @@ public class WSMMethods {
         return solution;
     }
 
-    public static GraphPath<Node, GCLEdge> srtTTLengthGraphPathV1(Bag bag, Application application, EndSystem target, List<GraphPath<Node, GCLEdge>> kShortestPathsGraphPathList, List<Unicast> ttUnicastList, List<GraphPath<Node, GCLEdge>> mcdmGraphPathList, String scenarioOutputPath) {
+    public static GraphPath<Node, GCLEdge> srtTTLengthGraphPath(Bag bag, Application application, EndSystem target, List<GraphPath<Node, GCLEdge>> kShortestPathsGraphPathList, List<Unicast> unicastList, List<GraphPath<Node, GCLEdge>> mcdmGraphPathList, BufferedWriter costsWriter, int candidatePathIndex) throws IOException {
         List<Unicast> solution = new ArrayList<>();
 
-        if(!ttUnicastList.isEmpty()){
-            solution.addAll(ttUnicastList);
+        if(!unicastList.isEmpty()){
+            solution.addAll(unicastList);
         }
 
         if(!mcdmGraphPathList.isEmpty()){
@@ -147,16 +153,16 @@ public class WSMMethods {
             }
         }
 
-        Map<GCLEdge, Double> edgeDurationMap = getEdgeTTDurationMap(ttUnicastList);
+        Map<GCLEdge, Double> edgeDurationMap = getEdgeTTDurationMap(unicastList);
 
         List<Double> srtCostList = new ArrayList<>();
         List<Double> ttCostList = new ArrayList<>();
 
-        List<Double> normalizedCostGPList;
+        List<Double> normalizedLengthCostList;
         switch (bag.getWSMNormalization()) {
-            case Constants.MIN_MAX -> normalizedCostGPList = null;
-            case Constants.VECTOR -> normalizedCostGPList = null;
-            default -> normalizedCostGPList = normalizeGPCostMax(kShortestPathsGraphPathList);
+            case MCDMConstants.MIN_MAX -> normalizedLengthCostList = null;
+            case MCDMConstants.VECTOR -> normalizedLengthCostList = null;
+            default -> normalizedLengthCostList = normalizeGPCostMax(kShortestPathsGraphPathList);
         }
 
         for (GraphPath<Node, GCLEdge> graphPath : kShortestPathsGraphPathList) {
@@ -168,10 +174,10 @@ public class WSMMethods {
                     for (GCLEdge edge : sameElements) {
                         ttCost += edgeDurationMap.get(edge);
                     }
-                } else if (unicast.getApplication() instanceof SRTApplication srtApplication) {
+                } else if (unicast.getApplication() instanceof SRTApplication) {
                     int sameEdgeNumber = getSameEdgeList(graphPath.getEdgeList(), unicast.getPath().getEdgeList()).size();
                     double unicastCandidateTraffic = (application.getFrameSizeByte() * application.getNumber0fFrames()) / application.getCMI();
-                    double unicastTraffic = (srtApplication.getFrameSizeByte() * srtApplication.getNumber0fFrames()) / srtApplication.getCMI();
+                    double unicastTraffic = (unicast.getApplication() .getFrameSizeByte() * unicast.getApplication() .getNumber0fFrames()) / unicast.getApplication() .getCMI();
                     srtCost += sameEdgeNumber * (unicastTraffic * unicastCandidateTraffic);
                 }
             }
@@ -183,11 +189,11 @@ public class WSMMethods {
         List<Double> normalizedTTCostList;
 
         switch (bag.getWSMNormalization()) {
-            case Constants.MIN_MAX -> {
+            case MCDMConstants.MIN_MAX -> {
                 normalizedSRTCostList = null;
                 normalizedTTCostList = null;
             }
-            case Constants.VECTOR -> {
+            case MCDMConstants.VECTOR -> {
                 normalizedSRTCostList = null;
                 normalizedTTCostList = null;
             }
@@ -202,10 +208,14 @@ public class WSMMethods {
         double maxCost = Double.MAX_VALUE;
         GraphPath<Node, GCLEdge> selectedGraphPath = null;
 
+        List<Double> resultCostList = new ArrayList<>();
         for (int i = 0; i < kShortestPathsGraphPathList.size(); i++) {
             assert normalizedSRTCostList != null;
-            assert normalizedCostGPList != null;
-            double cost = bag.getWSRT() * normalizedSRTCostList.get(i) + bag.getWTT() * normalizedTTCostList.get(i) + bag.getWLength() * normalizedCostGPList.get(i);
+            assert normalizedLengthCostList != null;
+            double cost = bag.getWSRT() * normalizedSRTCostList.get(i) + bag.getWTT() * normalizedTTCostList.get(i) + bag.getWLength() * normalizedLengthCostList.get(i);
+            if(logger.isDebugEnabled()){
+                resultCostList.add(cost);
+            }
             if (cost < maxCost) {
                 maxCost = cost;
                 selectedGraphPath = kShortestPathsGraphPathList.get(i);
@@ -213,6 +223,15 @@ public class WSMMethods {
                     break;
                 }
             }
+        }
+
+        if(logger.isDebugEnabled()){
+            costsWriter.write(application.getName() + "_" + candidatePathIndex + "\n");
+            costsWriter.write(normalizedSRTCostList + "\n");
+            costsWriter.write(normalizedTTCostList + "\n");
+            costsWriter.write(normalizedLengthCostList + "\n");
+            costsWriter.write(resultCostList + "\n");
+            costsWriter.newLine();
         }
 
         return selectedGraphPath;

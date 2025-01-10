@@ -9,6 +9,7 @@ import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
 import ktu.kaganndemirr.util.Bag;
+import ktu.kaganndemirr.util.PathFindingMethods;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.YenKShortestPath;
@@ -22,37 +23,47 @@ import static ktu.kaganndemirr.util.GraphMethods.copyGraph;
 import static ktu.kaganndemirr.util.GraphMethods.discardUnnecessaryEndSystems;
 
 public class YenKShortestPaths {
-    private final List<Application> applicationList;
+    private final List<UnicastCandidate> ttUnicastCandidateList;
     private final List<UnicastCandidate> srtUnicastCandidateList;
 
+    private final List<Unicast> ttUnicastList;
+    private final List<Unicast> srtUnicastList;
+
     public YenKShortestPaths(Bag bag, int k) {
+        ttUnicastCandidateList = new ArrayList<>();
         srtUnicastCandidateList = new ArrayList<>();
-        this.applicationList = bag.getApplicationList();
 
-        for (Application app : applicationList) {
-            if (app instanceof SRTApplication) {
-                for(EndSystem target: app.getTargetList()){
-                    Graph<Node, GCLEdge> newGraph = copyGraph(bag.getGraph());
-                    Graph<Node, GCLEdge> graphWithoutUnnecessaryEndSystems = discardUnnecessaryEndSystems(newGraph, app.getSource(), target);
-
-                    YenKShortestPath<Node, GCLEdge> allYenKShortestPathList = new YenKShortestPath<>(graphWithoutUnnecessaryEndSystems);
-
-                    List<GraphPath<Node, GCLEdge>> yenKShortestPathGraphPathList = new ArrayList<>(k);
-
-                    List<GraphPath<Node, GCLEdge>> yenKShortestPathList = allYenKShortestPathList.getPaths(app.getSource(), target, k);
+        ttUnicastList = new ArrayList<>();
+        srtUnicastList = new ArrayList<>();
 
 
-                    if (yenKShortestPathList == null) {
-                        throw new InputMismatchException("Aborting, could not find a path from " + app.getSource() + " to " + target);
-                    } else {
-
-                        yenKShortestPathGraphPathList.addAll(fillYenKShortestPathGraphPathList(yenKShortestPathList, k));
-
-                        srtUnicastCandidateList.add(new UnicastCandidate(app, target, yenKShortestPathGraphPathList));
+        for (Application application : bag.getApplicationList()) {
+            if (application instanceof TTApplication){
+                for(int i = 0; i < application.getTargetList().size(); i++){
+                    if(application.getExplicitPathList().isEmpty()){
+                        List<GraphPath<Node, GCLEdge>> yenKShortestPathGraphPathList = PathFindingMethods.YenKShortestPaths(bag, application, application.getTargetList().get(i), k);
+                        ttUnicastCandidateList.add(new UnicastCandidate(application, application.getTargetList().get(i), yenKShortestPathGraphPathList));
+                    }
+                    else {
+                        ttUnicastList.add(new Unicast(application, application.getTargetList().get(i), application.getExplicitPathList().get(i)));
+                    }
+                }
+            } else if (application instanceof SRTApplication) {
+                for(int i = 0; i < application.getTargetList().size(); i++){
+                    if(application.getExplicitPathList().isEmpty()){
+                        List<GraphPath<Node, GCLEdge>> yenKShortestPathGraphPathList = PathFindingMethods.YenKShortestPaths(bag, application, application.getTargetList().get(i), k);
+                        srtUnicastCandidateList.add(new UnicastCandidate(application, application.getTargetList().get(i), yenKShortestPathGraphPathList));
+                    }
+                    else {
+                        srtUnicastList.add(new Unicast(application, application.getTargetList().get(i), application.getExplicitPathList().get(i)));
                     }
                 }
             }
         }
+    }
+
+    public List<UnicastCandidate> getTTUnicastCandidateList() {
+        return ttUnicastCandidateList;
     }
 
     public List<UnicastCandidate> getSRTUnicastCandidateList() {
@@ -60,14 +71,10 @@ public class YenKShortestPaths {
     }
 
     public List<Unicast> getTTUnicastList() {
-        List<Unicast> ttUnicastList = new ArrayList<>();
-        for (Application app : applicationList) {
-            if (app instanceof TTApplication) {
-                for(int i = 0; i < app.getTargetList().size(); i++){
-                    ttUnicastList.add(new Unicast(app, app.getTargetList().get(i), app.getExplicitPathList().get(i)));
-                }
-            }
-        }
         return ttUnicastList;
+    }
+
+    public List<Unicast> getSRTUnicastList() {
+        return srtUnicastList;
     }
 }

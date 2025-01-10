@@ -16,7 +16,6 @@ import org.jgrapht.Graph;
 import ktu.kaganndemirr.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.simple.SimpleLogger;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,11 +30,12 @@ import static ktu.kaganndemirr.util.HelperMethods.*;
 
 public class Main {
 
+    private static final Logger logger = LoggerFactory.getLogger(Main.class.getSimpleName());
+
     //region <Command line options>
     private static final String APP_ARG = "app";
     private static final String NET_ARG = "net";
     private static final String RATE_ARG = "rate";
-    private static final String EVALUATOR_ARG = "evaluator";
     private static final String K_ARG = "k";
     private static final String THREAD_NUMBER_ARG = "threadNumber";
     private static final String TIMEOUT_ARG = "timeout";
@@ -56,8 +56,6 @@ public class Main {
 
     private static final String IDLE_SLOPE_ARG = "idleSlope";
 
-    private static final String LOG_ARG = "log";
-
     private static final String TSN_SIMULATION_VERSION_ARG = "tsnSimulationVersion";
 
     private static final String METAHEURISTIC_NAME_ARG = "metaheuristicName";
@@ -65,6 +63,7 @@ public class Main {
     private static final String MTR_NAME_ARG = "mtrName";
 
     private static final String WSM_NORMALIZATION_ARG = "wsmNormalization";
+    private static final String MCDM_NAME_ARG = "mcdmName";
     //endregion
 
     public static void main(String[] args) {
@@ -111,9 +110,6 @@ public class Main {
         //Default IdleSlope
         double idleSlope = 0.75;
 
-        //Default Log
-        String log = null;
-
         //Default TSN Simulation Version
         String tsnSimulationVersion = "TSNCF";
 
@@ -123,8 +119,11 @@ public class Main {
         //Default MTR Name
         String mtrName = "v1";
 
-        //Default MTR Name
+        //Default WSM Normalization
         String wsmNormalization = "max";
+
+        //Default WSM Normalization
+        String mcdmName = "wsm";
 
         //endregion
 
@@ -136,7 +135,6 @@ public class Main {
         options.addOption(applicationFile);
         options.addOption(architectureFile);
         options.addOption(RATE_ARG, true, "The rate in mbps (Type: mbps) (Default: 1000)");
-        options.addOption(EVALUATOR_ARG, true, "WCD Analysis Method (Default: avbLatencyMathTSNCF) (Choices: avbLatencyMathTSNCF, avbLatencyMathTSNRO, networkCalculus)");
         options.addOption(K_ARG, true, "Value of K for search-space reduction (Default: 50)");
         options.addOption(THREAD_NUMBER_ARG, true, "Thread number (Default: Number of Processor Thread)");
         options.addOption(TIMEOUT_ARG, true, "Metaheuristic algorithm timeout (Type: Second) (Default: 60");
@@ -153,20 +151,20 @@ public class Main {
 
         options.addOption(LWR_ARG, true, "Link weight randomization method (Default: headsOrTails)");
         options.addOption(CWR_ARG, true, "Criteria weight randomization method (Default: secureRandom)");
-        options.addOption(WPM_VERSION_ARG, true, "Weighted Product Model Version (Default: v1)");
-        options.addOption(WPM_VALUE_TYPE_ARG, true, "Weighted Product Model Value Type for v2 (Default: actual)");
+        options.addOption(WPM_VERSION_ARG, true, "WPM Version (Default: v1) (Choices: v1, v2)");
+        options.addOption(WPM_VALUE_TYPE_ARG, true, "WPM Value Type for v2 (Default: actual) (Choices: actual, relative");
 
         options.addOption(IDLE_SLOPE_ARG, true, "Idle slope for CLASS_A (Default: 0.75)");
 
-        options.addOption(LOG_ARG, true, "Log Type (Default: info) (Choices: debug)");
-
-        options.addOption(TSN_SIMULATION_VERSION_ARG, true, "TSN Simulation Version (Default: TSNConfigurationFramework) (Choices: TSNConfigurationFramework, TSNRoutingOptimization)");
+        options.addOption(TSN_SIMULATION_VERSION_ARG, true, "TSN Simulation Version (Default: TSNCF) (Choices: TSNCF, TSNCFV2, TSNTSNSCHED, TSNNC)");
 
         options.addOption(METAHEURISTIC_NAME_ARG, true, "Which metaheuristic runs (Default: GRASP) (Choices: GRASP, ALO)");
 
         options.addOption(MTR_NAME_ARG, true, "MTR Versions (Default: v1) (Choices: v1, Average)");
 
         options.addOption(WSM_NORMALIZATION_ARG, true, "WSM Normalization Versions (Default: max) (Choices: max, minMax, vector)");
+
+        options.addOption(MCDM_NAME_ARG, true, "MCDM Versions (Default: wsm) (Choices: wsm, wpm, vector)");
 
 
         //endregion
@@ -185,17 +183,18 @@ public class Main {
                 rate = Integer.parseInt(line.getOptionValue(RATE_ARG));
             }
 
-            if (line.hasOption(EVALUATOR_ARG)) {
-                if (Objects.equals(line.getOptionValue(EVALUATOR_ARG), Constants.AVB_LATENCY_MATH_VERSION_TSNCF)) {
-                    evaluatorName = Constants.AVB_LATENCY_MATH_VERSION_TSNCF;
-                    evaluator = new AVBLatencyMathTSNCF();
-                } else if (Objects.equals(line.getOptionValue(EVALUATOR_ARG), Constants.AVB_LATENCY_MATH_VERSION_TSNRO)) {
-                    evaluatorName = Constants.AVB_LATENCY_MATH_VERSION_TSNRO;
-                    evaluator = new AVBLatencyMathTSNRO();
-                } else if (Objects.equals(line.getOptionValue(EVALUATOR_ARG), Constants.NETWORK_CALCULUS)) {
-                    evaluatorName = Constants.NETWORK_CALCULUS;
-                    evaluator = new NetworkCalculus();
-                }
+            if (Objects.equals(line.getOptionValue(TSN_SIMULATION_VERSION_ARG), Constants.TSNCF)) {
+                evaluatorName = Constants.AVB_LATENCY_MATH_TSNCF;
+                evaluator = new AVBLatencyMathTSNCF();
+            } else if (Objects.equals(line.getOptionValue(TSN_SIMULATION_VERSION_ARG), Constants.TSNCF_V2)) {
+                evaluatorName = Constants.AVB_LATENCY_MATH_TSNCF_V2;
+                evaluator = new AVBLatencyMathTSNCFV2();
+            } else if (Objects.equals(line.getOptionValue(TSN_SIMULATION_VERSION_ARG), Constants.TSN_TSNSCHED)) {
+                evaluatorName = Constants.AVB_LATENCY_MATH_TSNCF_V2;
+                evaluator = new AVBLatencyMathTSNCFV2();
+            } else if (Objects.equals(line.getOptionValue(TSN_SIMULATION_VERSION_ARG), Constants.TSN_NC)) {
+                evaluatorName = Constants.EVALUATOR_TSN_NC;
+                evaluator = new NetworkCalculus();
             }
 
             //Set K
@@ -265,13 +264,6 @@ public class Main {
                 idleSlope = Double.parseDouble(line.getOptionValue(IDLE_SLOPE_ARG));
             }
 
-            if (Objects.equals(line.getOptionValue(LOG_ARG), Constants.DEBUG)) {
-                log = "debug";
-                System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "DEBUG");
-            }
-
-            final Logger logger = LoggerFactory.getLogger(Main.class.getSimpleName());
-
             if (line.hasOption(TSN_SIMULATION_VERSION_ARG)) {
                 tsnSimulationVersion = line.getOptionValue(TSN_SIMULATION_VERSION_ARG);
             }
@@ -286,6 +278,10 @@ public class Main {
 
             if (line.hasOption(WSM_NORMALIZATION_ARG)) {
                 wsmNormalization = line.getOptionValue(WSM_NORMALIZATION_ARG);
+            }
+
+            if (line.hasOption(MCDM_NAME_ARG)) {
+                mcdmName = line.getOptionValue(MCDM_NAME_ARG);
             }
 
             //endregion
@@ -360,9 +356,8 @@ public class Main {
                                     bag.setMetaheuristicName(metaheuristicName);
                                     bag.setEvaluator(evaluator);
                                     bag.setEvaluatorName(evaluatorName);
-                                    bag.setLog(log);
 
-                                    if (evaluatorName.equals(Constants.NETWORK_CALCULUS)){
+                                    if (evaluatorName.equals(Constants.EVALUATOR_TSN_NC)){
                                         createGCLSynthesisAndNetworkCalculusDirectories(bag);
                                     }
 
@@ -401,6 +396,7 @@ public class Main {
                                     bag.setAlgorithm(algorithm);
                                     bag.setLWR(lwr);
                                     bag.setK(k);
+                                    bag.setMCDMName(mcdmName);
                                     bag.setMCDMObjective(mcdmObjective);
                                     bag.setWSMNormalization(wsmNormalization);
                                     bag.setWSRT(wSRT);
@@ -412,7 +408,6 @@ public class Main {
                                     bag.setMetaheuristicName(metaheuristicName);
                                     bag.setEvaluator(evaluator);
                                     bag.setEvaluatorName(evaluatorName);
-                                    bag.setLog(log);
 
                                     logger.info(createInfo(bag));
 

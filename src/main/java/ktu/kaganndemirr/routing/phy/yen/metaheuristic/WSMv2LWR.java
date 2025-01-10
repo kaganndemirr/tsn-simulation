@@ -32,7 +32,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static ktu.kaganndemirr.routing.phy.yen.YenMCDMKShortestPaths.getTTUnicastList;
 import static ktu.kaganndemirr.util.HelperMethods.*;
 
 public class WSMv2LWR {
@@ -40,9 +39,13 @@ public class WSMv2LWR {
 
     private final int k;
 
-    private final Map<Double, Double> durationMap;
-
+    private List<UnicastCandidate> ttUnicastCandidateList;
     private List<UnicastCandidate> srtUnicastCandidateList;
+
+    private List<Unicast> ttUnicastList;
+    private List<Unicast> srtUnicastList;
+
+    private final List<Unicast> unicastList;
 
     private final Object writeLock;
 
@@ -56,17 +59,25 @@ public class WSMv2LWR {
 
     private String scenarioOutputPath;
 
+    private final Map<Double, Double> durationMap;
+
     public WSMv2LWR(int k){
         this.k = k;
+        unicastList = new ArrayList<>();
         writeLock = new Object();
         costLock = new Object();
-        durationMap = new HashMap<>();
         globalBestCost = new AVBLatencyMathCost();
         bestSolution = new ArrayList<>();
+        durationMap = new HashMap<>();
     }
 
     public Solution solve(Bag bag){
-        List<Unicast> ttUnicastList = getTTUnicastList(bag.getApplicationList());
+        YenMCDMKShortestPaths yenMCDMKShortestPaths = new YenMCDMKShortestPaths(bag);
+        ttUnicastList = yenMCDMKShortestPaths.getTTUnicastList();
+        srtUnicastList = yenMCDMKShortestPaths.getSRTUnicastList();
+
+        unicastList.addAll(ttUnicastList);
+        unicastList.addAll(srtUnicastList);
 
         this.evaluator = bag.getEvaluator();
 
@@ -79,7 +90,7 @@ public class WSMv2LWR {
             Timer timer = getTimer(Duration.ofSeconds(bag.getTimeout()));
 
             for (int i = 0; i < bag.getThreadNumber(); i++) {
-                exec.execute(new WSMv2Runnable(bag, ttUnicastList));
+                exec.execute(new WSMv2Runnable(bag, unicastList));
             }
 
             exec.awaitTermination(Duration.ofSeconds(bag.getTimeout()).toSeconds(), TimeUnit.SECONDS);
@@ -123,27 +134,26 @@ public class WSMv2LWR {
         Instant solutionStartTime = Instant.now();
 
         Bag bag;
-        List<Unicast> ttUnicastList;
+        List<Unicast> unicastList;
 
-        public WSMv2Runnable(Bag bag, List<Unicast> ttUnicastList) {
+        public WSMv2Runnable(Bag bag, List<Unicast> unicastList) {
             this.bag = bag;
-            this.ttUnicastList = ttUnicastList;
+            this.unicastList = unicastList;
         }
 
         @Override
         public void run() {
-//            if(Objects.equals(bag.getLog(), Constants.DEBUG)){
-//                System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "DEBUG");
-//            }
-//
-//            final Logger logger = LoggerFactory.getLogger(WSMv2Runnable.class.getSimpleName());
-
             String threadName = Thread.currentThread().getName();
 
             while (!Thread.currentThread().isInterrupted()) {
                 i++;
 
-                YenMCDMKShortestPaths yenMCDMKShortestPaths = new YenMCDMKShortestPaths(bag, ttUnicastList, k, scenarioOutputPath);
+                YenMCDMKShortestPaths yenMCDMKShortestPaths;
+                try {
+                    yenMCDMKShortestPaths = new YenMCDMKShortestPaths(bag, unicastList, k, scenarioOutputPath, threadName, i);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
 
                 srtUnicastCandidateList = yenMCDMKShortestPaths.getSRTUnicastCandidateList();
 
@@ -151,13 +161,13 @@ public class WSMv2LWR {
                 List<Unicast> initialSolution = null;
 
                 if(Objects.equals(bag.getMetaheuristicName(), Constants.GRASP)){
-                    initialSolution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, ttUnicastList, k, evaluator);
+                    initialSolution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, unicastList, k, evaluator);
                     solution = MetaheuristicMethods.GRASP(initialSolution, evaluator, srtUnicastCandidateList, globalBestCost);
                 } else if (Objects.equals(bag.getMetaheuristicName(), Constants.ALO)) {
-                    initialSolution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, ttUnicastList, k, evaluator);
+                    initialSolution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, unicastList, k, evaluator);
                     solution = MetaheuristicMethods.ALO(initialSolution, initialSolution, srtUnicastCandidateList, k, evaluator);
                 } else if (Objects.equals(bag.getMetaheuristicName(), Constants.CONSTRUCT_INITIAL_SOLUTION)) {
-                    solution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, ttUnicastList, k, evaluator);
+                    solution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, unicastList, k, evaluator);
                     initialSolution = solution;
                 }
 
@@ -200,8 +210,20 @@ public class WSMv2LWR {
         return bestSolution;
     }
 
+    public List<UnicastCandidate> getTTUnicastCandidateList() {
+        return ttUnicastCandidateList;
+    }
+
     public List<UnicastCandidate> getSRTUnicastCandidateList() {
         return srtUnicastCandidateList;
+    }
+
+    public List<Unicast> getTTUnicastList() {
+        return ttUnicastList;
+    }
+
+    public List<Unicast> getSRTUnicastList() {
+        return srtUnicastList;
     }
 
     public Map<Double, Double> getDurationMap() {

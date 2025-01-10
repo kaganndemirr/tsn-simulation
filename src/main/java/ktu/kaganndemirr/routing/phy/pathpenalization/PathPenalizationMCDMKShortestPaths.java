@@ -14,13 +14,12 @@ import ktu.kaganndemirr.util.mcdm.WSMMethods;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
-import org.jgrapht.alg.shortestpath.YenKShortestPath;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 
-import static ktu.kaganndemirr.routing.phy.yen.HelperMethods.fillYenKShortestPathGraphPathList;
 import static ktu.kaganndemirr.util.GraphMethods.copyGraph;
 import static ktu.kaganndemirr.util.GraphMethods.discardUnnecessaryEndSystems;
 
@@ -29,7 +28,7 @@ public class PathPenalizationMCDMKShortestPaths {
     private final List<UnicastCandidate> srtUnicastCandidateList;
     private final List<Unicast> ttUnicastList;
 
-    public PathPenalizationMCDMKShortestPaths(Graph<Node, GCLEdge> graph, List<Application> applicationList, Bag bag, int k) {
+    public PathPenalizationMCDMKShortestPaths(Graph<Node, GCLEdge> graph, List<Application> applicationList, Bag bag, int k) throws IOException {
         this.applicationList = applicationList;
         srtUnicastCandidateList = new ArrayList<>();
         ttUnicastList = new ArrayList<>();
@@ -66,7 +65,7 @@ public class PathPenalizationMCDMKShortestPaths {
 
                         }
 
-                        GraphPath<Node, GCLEdge> selectedGraphPath = WSMMethods.srtTTLengthGraphPathV1(bag, application, target, shortestPathGraphPathList, ttUnicastList, mcdmGraphPathList, null);
+                        GraphPath<Node, GCLEdge> selectedGraphPath = WSMMethods.srtTTLengthGraphPath(bag, application, target, shortestPathGraphPathList, ttUnicastList, mcdmGraphPathList, null, null, i);
 
                         mcdmGraphPathList.add(selectedGraphPath);
                     }

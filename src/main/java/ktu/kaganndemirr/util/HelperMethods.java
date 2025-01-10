@@ -16,9 +16,43 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class HelperMethods {
+    public static double findAveragePathLengthIncludingES(List<Unicast> solution) {
+        double total = 0;
+        int size = 0;
+        for (Unicast unicast : solution) {
+            if (unicast.getApplication() instanceof SRTApplication) {
+                total += unicast.getPath().getEdgeList().size();
+                size++;
+            }
+        }
+
+        return total / size;
+    }
+
+    public static double findAveragePathLengthWithoutES(List<Unicast> solution) {
+        List<List<GCLEdge>> onlySwitchLinkList = solution.stream()
+                .map(item -> item.getPath().getEdgeList().subList(1, item.getPath().getEdgeList().size() - 1)).toList();
+
+        Map<Integer, Integer> lengthMap = new HashMap<>();
+
+        for (int i = 0; i < onlySwitchLinkList.size(); i++) {
+            List<GCLEdge> subList = onlySwitchLinkList.get(i);
+            lengthMap.put(i, subList.size());
+        }
+
+        double total = 0;
+        for (int i = 0; i < lengthMap.size(); i++) {
+            total += lengthMap.get(i);
+        }
+
+        return total / lengthMap.size();
+    }
+
     public static String createFoundNoSolutionString(Solution solution){
         return "Found No solution: " + solution.getCost().toDetailedString();
     }
@@ -316,15 +350,12 @@ public class HelperMethods {
         if (bag.getMetaheuristicName() != null){
             resultList.add(bag.getMetaheuristicName());
         }
-        if (bag.getEvaluatorName() != null){
-            resultList.add(bag.getEvaluatorName());
-        }
         resultList.add(bag.getTopologyName() + "_" + bag.getApplicationName());
 
         return buildPath(resultList);
     }
 
-    public static String creatNCPath(Bag bag){
+    public static String createNCPath(Bag bag){
         List<String> resultList = new ArrayList<>();
         resultList.add("networkCalculus");
         resultList.add(bag.getRouting());
@@ -369,9 +400,7 @@ public class HelperMethods {
         if (bag.getMetaheuristicName() != null){
             resultList.add(bag.getMetaheuristicName());
         }
-        if (bag.getEvaluatorName() != null){
-            resultList.add(bag.getEvaluatorName());
-        }
+
         resultList.add(bag.getTopologyName() + "_" + bag.getApplicationName());
 
         return buildPath(resultList);
@@ -380,7 +409,7 @@ public class HelperMethods {
     public static void createGCLSynthesisAndNetworkCalculusDirectories(Bag bag){
         Path gclSynthesisFilesPath = Paths.get(createGCLSynthesisPath(bag));
 
-        Path networkCalculusFilesPath = Paths.get(creatNCPath(bag));
+        Path networkCalculusFilesPath = Paths.get(createNCPath(bag));
         Path networkCalculusInPath = Paths.get(networkCalculusFilesPath.toString(), "in");
         Path networkCalculusOutPath = Paths.get(networkCalculusFilesPath.toString(), "out");
 

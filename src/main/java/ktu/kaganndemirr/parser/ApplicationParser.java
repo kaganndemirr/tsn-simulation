@@ -32,7 +32,7 @@ public class ApplicationParser {
 
         List<Application> applications = new ArrayList<>();
 
-        if(Objects.equals(TSNSimulationVersion, Constants.TSNCF) || Objects.equals(TSNSimulationVersion, Constants.TSNCF_V2)){
+        if(Objects.equals(TSNSimulationVersion, Constants.TSNCF) || Objects.equals(TSNSimulationVersion, Constants.TSNCF_V2) || Objects.equals(TSNSimulationVersion, Constants.TSN_TSNSCHED)){
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             Document dom;
 
@@ -72,7 +72,7 @@ public class ApplicationParser {
             }
 
             return applications;
-        } else if (Objects.equals(TSNSimulationVersion, Constants.TSNNC)) {
+        } else if (Objects.equals(TSNSimulationVersion, Constants.TSN_NC)) {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             Document dom;
 
@@ -119,7 +119,7 @@ public class ApplicationParser {
         double offset = 0.0;
 
         //TODO
-        List<GraphPath<Node, GCLEdge>> graphPathList = null;
+        List<GraphPath<Node, GCLEdge>> graphPathList = new ArrayList<>();
 
         return new SRTApplication(name, pcp, applicationType, frameSizeByte, numberOfFrames, messageSizeByte, messageSizeMbps, cmi, deadline, source, targetList, graphPathList, vlanId, offset);
     }
@@ -273,9 +273,12 @@ public class ApplicationParser {
 
     private static List<GraphPath<Node, GCLEdge>> createExplicitPathGraphPathList(EndSystem source, List<List<GCLEdge>> gclEdgeListList, List<EndSystem> targetList, Graph<Node, GCLEdge> graph) {
         List<GraphPath<Node, GCLEdge>> graphPathList = new ArrayList<>();
-        for (int i = 0; i < targetList.size(); i++){
-            GraphPath<Node, GCLEdge> graphPath = new GraphWalk<>(graph, source, targetList.get(i), gclEdgeListList.get(i), gclEdgeListList.size() * Constants.UNIT_WEIGHT);
-            graphPathList.add(graphPath);
+
+        if(!gclEdgeListList.isEmpty()){
+            for (int i = 0; i < targetList.size(); i++){
+                GraphPath<Node, GCLEdge> graphPath = new GraphWalk<>(graph, source, targetList.get(i), gclEdgeListList.get(i), gclEdgeListList.size() * Constants.UNIT_WEIGHT);
+                graphPathList.add(graphPath);
+            }
         }
 
         return graphPathList;
@@ -354,8 +357,8 @@ public class ApplicationParser {
                             path.get(i).add(new Switch(((Element) routeNL.item(u)).getAttribute("name")));
                         }
                     }
+                    path.get(i).add(target);
                 }
-                path.get(i).add(target);
             }
         }
         return path;
