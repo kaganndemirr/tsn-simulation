@@ -132,7 +132,7 @@ public class WPMLWRDeadline {
                 if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT)){
                     //TODO
                 } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH)) {
-                    initialSolution = WPMMethods.deadlineSRTTTLength(srtUnicastCandidateList, ttUnicastList, bag);
+                    initialSolution = WPMMethods.srtTTLength(srtUnicastCandidateList, ttUnicastList, bag);
                 } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH_UTIL)) {
                     //TODO
                 }

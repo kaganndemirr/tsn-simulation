@@ -9,10 +9,7 @@ import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
 import ktu.kaganndemirr.util.Bag;
-import ktu.kaganndemirr.util.GraphMethods;
 import ktu.kaganndemirr.util.PathFindingMethods;
-import ktu.kaganndemirr.util.mcdm.WSMMethods;
-import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +75,7 @@ public class YenMCDMKShortestPaths {
             if(application instanceof TTApplication){
                 for(EndSystem target: application.getTargetList()){
                     if(application.getExplicitPathList().isEmpty()){
-                        List<GraphPath<Node, GCLEdge>> mcdmGraphPathList = PathFindingMethods.YenMCDMKShortestPaths(bag, k, application, target, unicastList, costsWriter);
+                        List<GraphPath<Node, GCLEdge>> mcdmGraphPathList = PathFindingMethods.YenMCDMKShortestPathsV2(bag, k, application, target, unicastList, costsWriter);
                         ttUnicastCandidateList.add(new UnicastCandidate(application, target, mcdmGraphPathList));
                     }
 
@@ -86,7 +83,7 @@ public class YenMCDMKShortestPaths {
             } else if (application instanceof SRTApplication) {
                 for(EndSystem target: application.getTargetList()){
                     if(application.getExplicitPathList().isEmpty()){
-                        List<GraphPath<Node, GCLEdge>> mcdmGraphPathList = PathFindingMethods.YenMCDMKShortestPaths(bag, k, application, target, unicastList, costsWriter);
+                        List<GraphPath<Node, GCLEdge>> mcdmGraphPathList = PathFindingMethods.YenMCDMKShortestPathsV2(bag, k, application, target, unicastList, costsWriter);
                         srtUnicastCandidateList.add(new UnicastCandidate(application, target, mcdmGraphPathList));
                     }
 

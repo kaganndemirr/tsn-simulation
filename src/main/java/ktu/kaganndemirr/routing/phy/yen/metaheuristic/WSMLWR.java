@@ -9,16 +9,21 @@ import ktu.kaganndemirr.evaluator.Evaluator;
 import ktu.kaganndemirr.message.Multicast;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
+import ktu.kaganndemirr.routing.phy.yen.YenKShortestPaths;
+import ktu.kaganndemirr.routing.phy.yen.YenMCDMKShortestPaths;
 import ktu.kaganndemirr.routing.phy.yen.YenRandomizedKShortestPaths;
 import ktu.kaganndemirr.solver.Solution;
 import ktu.kaganndemirr.util.Bag;
 import ktu.kaganndemirr.util.Constants;
+import ktu.kaganndemirr.util.LaursenMethods;
 import ktu.kaganndemirr.util.MetaheuristicMethods;
 import ktu.kaganndemirr.util.mcdm.WPMMethods;
 import org.jgrapht.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.Instant;
@@ -27,20 +32,22 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class WPMLWRDeadline {
-    private static final Logger logger = LoggerFactory.getLogger(WPMLWRDeadline.class.getSimpleName());
+import static ktu.kaganndemirr.util.HelperMethods.*;
+
+public class WSMLWR {
+    private static final Logger logger = LoggerFactory.getLogger(WSMLWR.class.getSimpleName());
 
     private final int k;
 
-    private List<Unicast> ttUnicastList;
-
-    private final Map<Double, Double> durationMap;
-
-    private Graph<Node, GCLEdge> graph;
-
-    private List<Application> applicationList;
-
+    private List<UnicastCandidate> ttUnicastCandidateList;
     private List<UnicastCandidate> srtUnicastCandidateList;
+
+    private List<Unicast> ttUnicastList;
+    private List<Unicast> srtUnicastList;
+
+    private final List<Unicast> unicastList;
+
+    private final Object writeLock;
 
     private final Object costLock;
 
@@ -50,31 +57,43 @@ public class WPMLWRDeadline {
 
     private Evaluator evaluator;
 
-    public WPMLWRDeadline(int k){
+    private String scenarioOutputPath;
+
+    private final Map<Double, Double> durationMap;
+
+    public WSMLWR(int k){
         this.k = k;
+        unicastList = new ArrayList<>();
+        writeLock = new Object();
         costLock = new Object();
-        durationMap = new HashMap<>();
         globalBestCost = new AVBLatencyMathCost();
         bestSolution = new ArrayList<>();
+        durationMap = new HashMap<>();
     }
 
-    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, Bag bag, int threadNumber, Evaluator evaluator, Duration timeout){
-        ttUnicastList = YenRandomizedKShortestPaths.getTTUnicastList(applicationList);
+    public Solution solve(Bag bag){
+        YenMCDMKShortestPaths yenMCDMKShortestPaths = new YenMCDMKShortestPaths(bag);
+        ttUnicastList = yenMCDMKShortestPaths.getTTUnicastList();
+        srtUnicastList = yenMCDMKShortestPaths.getSRTUnicastList();
 
-        this.graph = graph;
-        this.applicationList = applicationList;
+        unicastList.addAll(ttUnicastList);
+        unicastList.addAll(srtUnicastList);
 
-        this.evaluator = evaluator;
+        this.evaluator = bag.getEvaluator();
 
-        try (ExecutorService exec = Executors.newFixedThreadPool(threadNumber)) {
+        scenarioOutputPath = createScenarioOutputPath(bag);
 
-            Timer timer = getTimer(timeout);
+        new File(scenarioOutputPath).mkdirs();
 
-            for (int i = 0; i < threadNumber; i++) {
-                exec.execute(new WPMLWRDeadlineRunnable(bag));
+        try (ExecutorService exec = Executors.newFixedThreadPool(bag.getThreadNumber())) {
+
+            Timer timer = getTimer(Duration.ofSeconds(bag.getTimeout()));
+
+            for (int i = 0; i < bag.getThreadNumber(); i++) {
+                exec.execute(new WSMv2Runnable(bag, unicastList));
             }
 
-            exec.awaitTermination(timeout.toSeconds(), TimeUnit.SECONDS);
+            exec.awaitTermination(Duration.ofSeconds(bag.getTimeout()).toSeconds(), TimeUnit.SECONDS);
             exec.shutdown();
 
             if (!exec.isTerminated()) {
@@ -110,39 +129,60 @@ public class WPMLWRDeadline {
         return timer;
     }
 
-    private class WPMLWRDeadlineRunnable implements Runnable {
+    private class WSMv2Runnable implements Runnable {
         private int i = 0;
         Instant solutionStartTime = Instant.now();
 
-        private final Bag bag;
+        Bag bag;
+        List<Unicast> unicastList;
 
-        public WPMLWRDeadlineRunnable(Bag bag) {
+        public WSMv2Runnable(Bag bag, List<Unicast> unicastList) {
             this.bag = bag;
+            this.unicastList = unicastList;
         }
 
         @Override
         public void run() {
+            String threadName = Thread.currentThread().getName();
+
             while (!Thread.currentThread().isInterrupted()) {
                 i++;
-                YenRandomizedKShortestPaths yenRandomizedGraphPaths = new YenRandomizedKShortestPaths(graph, applicationList, bag, k);
 
-                srtUnicastCandidateList = yenRandomizedGraphPaths.getSRTUnicastCandidateList();
-
-                List<Unicast> initialSolution = null;
-                if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT)){
-                    //TODO
-                } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH)) {
-                    initialSolution = WPMMethods.srtTTLength(srtUnicastCandidateList, ttUnicastList, bag);
-                } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH_UTIL)) {
-                    //TODO
+                YenMCDMKShortestPaths yenMCDMKShortestPaths;
+                try {
+                    yenMCDMKShortestPaths = new YenMCDMKShortestPaths(bag, unicastList, k, scenarioOutputPath, threadName, i);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
+
+                srtUnicastCandidateList = yenMCDMKShortestPaths.getSRTUnicastCandidateList();
 
                 List<Unicast> solution = null;
-                if (Objects.equals(bag.getMCDMObjective(), Constants.GRASP)){
+                List<Unicast> initialSolution = null;
+
+                if(Objects.equals(bag.getMetaheuristicName(), Constants.GRASP)){
+                    initialSolution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, unicastList, k, evaluator);
                     solution = MetaheuristicMethods.GRASP(initialSolution, evaluator, srtUnicastCandidateList, globalBestCost);
-                } else if (Objects.equals(bag.getMCDMObjective(), Constants.ALO)) {
+                } else if (Objects.equals(bag.getMetaheuristicName(), Constants.ALO)) {
+                    initialSolution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, unicastList, k, evaluator);
                     solution = MetaheuristicMethods.ALO(initialSolution, initialSolution, srtUnicastCandidateList, k, evaluator);
+                } else if (Objects.equals(bag.getMetaheuristicName(), Constants.CONSTRUCT_INITIAL_SOLUTION)) {
+                    solution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, unicastList, k, evaluator);
+                    initialSolution = solution;
                 }
+
+                if(logger.isDebugEnabled()){
+                    synchronized (writeLock) {
+                        assert solution != null;
+                        try {
+                            writeSolutionsToFile(initialSolution, solution, scenarioOutputPath, threadName, i);
+                            writeSRTCandidateRoutesToFile(srtUnicastCandidateList, scenarioOutputPath, threadName, i);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+
 
 
                 //Evaluate and see if better than anything we have seen before
@@ -162,7 +202,7 @@ public class WPMLWRDeadline {
                 }
             }
 
-            logger.info(" {} finished in {} iterations", Thread.currentThread().getName(), i);
+            logger.info(" {} finished in {} iterations", threadName, i);
         }
     }
 
@@ -170,11 +210,25 @@ public class WPMLWRDeadline {
         return bestSolution;
     }
 
+    public List<UnicastCandidate> getTTUnicastCandidateList() {
+        return ttUnicastCandidateList;
+    }
+
     public List<UnicastCandidate> getSRTUnicastCandidateList() {
         return srtUnicastCandidateList;
+    }
+
+    public List<Unicast> getTTUnicastList() {
+        return ttUnicastList;
+    }
+
+    public List<Unicast> getSRTUnicastList() {
+        return srtUnicastList;
     }
 
     public Map<Double, Double> getDurationMap() {
         return durationMap;
     }
 }
+
+

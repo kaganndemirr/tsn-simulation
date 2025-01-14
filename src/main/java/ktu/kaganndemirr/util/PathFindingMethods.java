@@ -43,7 +43,7 @@ public class PathFindingMethods {
         return yenKShortestPathGraphPathList;
     }
 
-    public static List<GraphPath<Node, GCLEdge>> YenMCDMKShortestPaths(Bag bag, int k, Application application, EndSystem target, List<Unicast> unicastList, BufferedWriter costsWriter) throws IOException {
+    public static List<GraphPath<Node, GCLEdge>> YenMCDMKShortestPathsV1(Bag bag, int k, Application application, EndSystem target, List<Unicast> unicastList, BufferedWriter costsWriter) throws IOException {
         List<GraphPath<Node, GCLEdge>> seletedGraphPathList = new ArrayList<>();
         for (int i = 0; i < k; i++){
             GraphMethods.randomizeGraph(bag.getGraph(), bag.getLWR());
@@ -64,13 +64,54 @@ public class PathFindingMethods {
 
                 GraphPath<Node, GCLEdge> seletedGraphPath = null;
                 if(Objects.equals(bag.getMCDMName(), MCDMConstants.WSM)){
-                    seletedGraphPath = WSMMethods.srtTTLengthGraphPath(bag, application, target, yenKShortestPathGraphPathList, unicastList, seletedGraphPathList, costsWriter, i);
+                    seletedGraphPath = WSMMethods.srtTTLengthGraphPathV2(bag, application, target, yenKShortestPathGraphPathList, unicastList, seletedGraphPathList, costsWriter, i);
                 } else if (Objects.equals(bag.getMCDMName(), MCDMConstants.WPM)) {
                     if(bag.getCWR() != null){
-                        seletedGraphPath = WPMMethods.srtTTLength(bag, application, target, yenKShortestPathGraphPathList, unicastList, seletedGraphPathList, costsWriter, i);
+                        seletedGraphPath = WPMMethods.srtTTLengthV2(bag, application, target, yenKShortestPathGraphPathList, unicastList, seletedGraphPathList, costsWriter, i);
                     }
                     else {
-                        seletedGraphPath = WPMMethods.srtTTLength(bag, application, target, yenKShortestPathGraphPathList, unicastList, seletedGraphPathList, costsWriter, i);
+                        seletedGraphPath = WPMMethods.srtTTLengthV2(bag, application, target, yenKShortestPathGraphPathList, unicastList, seletedGraphPathList, costsWriter, i);
+                    }
+
+                }
+
+
+                seletedGraphPathList.add(seletedGraphPath);
+
+            }
+        }
+
+        return seletedGraphPathList;
+    }
+
+    public static List<GraphPath<Node, GCLEdge>> YenMCDMKShortestPathsV2(Bag bag, int k, Application application, EndSystem target, List<Unicast> unicastList, BufferedWriter costsWriter) throws IOException {
+        List<GraphPath<Node, GCLEdge>> seletedGraphPathList = new ArrayList<>();
+        for (int i = 0; i < k; i++){
+            GraphMethods.randomizeGraph(bag.getGraph(), bag.getLWR());
+            Graph<Node, GCLEdge> newGraph = copyGraph(bag.getGraph());
+            Graph<Node, GCLEdge> graphWithoutUnnecessaryEndSystems = discardUnnecessaryEndSystems(newGraph, application.getSource(), target);
+
+            YenKShortestPath<Node, GCLEdge> allYenKShortestPathList = new YenKShortestPath<>(graphWithoutUnnecessaryEndSystems);
+
+            List<GraphPath<Node, GCLEdge>> yenKShortestPathGraphPathList = new ArrayList<>(k);
+
+            List<GraphPath<Node, GCLEdge>> yenKShortestPathList = allYenKShortestPathList.getPaths(application.getSource(), target, k);
+
+            if (yenKShortestPathList == null) {
+                throw new InputMismatchException("Aborting, could not find a path from " + application.getSource() + " to " + target);
+            } else {
+
+                yenKShortestPathGraphPathList.addAll(fillYenKShortestPathGraphPathList(yenKShortestPathList, k));
+
+                GraphPath<Node, GCLEdge> seletedGraphPath = null;
+                if(Objects.equals(bag.getMCDMName(), MCDMConstants.WSM)){
+                    seletedGraphPath = WSMMethods.srtTTLengthGraphPathV2(bag, application, target, yenKShortestPathGraphPathList, unicastList, seletedGraphPathList, costsWriter, i);
+                } else if (Objects.equals(bag.getMCDMName(), MCDMConstants.WPM)) {
+                    if(bag.getCWR() != null){
+                        seletedGraphPath = WPMMethods.srtTTLengthV2(bag, application, target, yenKShortestPathGraphPathList, unicastList, seletedGraphPathList, costsWriter, i);
+                    }
+                    else {
+                        seletedGraphPath = WPMMethods.srtTTLengthV2(bag, application, target, yenKShortestPathGraphPathList, unicastList, seletedGraphPathList, costsWriter, i);
                     }
 
                 }

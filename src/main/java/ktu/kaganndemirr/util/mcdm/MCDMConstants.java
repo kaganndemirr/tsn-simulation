@@ -17,4 +17,6 @@ public class MCDMConstants {
 
     public static final String WSM = "wsm";
     public static final String WPM = "wpm";
+
+    public static final String DEADLINE = "deadline";
 }

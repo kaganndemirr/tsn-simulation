@@ -65,7 +65,7 @@ public class PathPenalizationMCDMKShortestPaths {
 
                         }
 
-                        GraphPath<Node, GCLEdge> selectedGraphPath = WSMMethods.srtTTLengthGraphPath(bag, application, target, shortestPathGraphPathList, ttUnicastList, mcdmGraphPathList, null, null, i);
+                        GraphPath<Node, GCLEdge> selectedGraphPath = WSMMethods.srtTTLengthGraphPathV2(bag, application, target, shortestPathGraphPathList, ttUnicastList, mcdmGraphPathList, null, null, i);
 
                         mcdmGraphPathList.add(selectedGraphPath);
                     }

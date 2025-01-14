@@ -45,7 +45,7 @@ public class Constants {
     public static final double UNIT_WEIGHT = 1;
 
     public static final String SRT_TT = "srtTT";
-    public static final String SRT_TT_LENGTH = "srtTTLength";
+    public static final String SRT_TT_LENGTH = "srtTTLengthForCandidatePathComputing";
     public static final String SRT_TT_LENGTH_UTIL = "srtTTLengthUtil";
 
     public static final String NO_SOLUTION_COULD_BE_FOUND = "No solution could be found!";

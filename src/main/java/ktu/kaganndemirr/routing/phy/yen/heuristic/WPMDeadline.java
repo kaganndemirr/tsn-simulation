@@ -54,7 +54,7 @@ public class WPMDeadline {
         if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT)){
             solution = null;
         } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH)) {
-            solution = WPMMethods.deadlineSRTTTLength(srtUnicastCandidateList, ttUnicastList, bag);
+            solution = WPMMethods.srtTTLength(srtUnicastCandidateList, ttUnicastList, bag);
         } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH_UTIL)) {
             solution = null;
         }

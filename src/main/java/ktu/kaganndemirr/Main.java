@@ -89,7 +89,7 @@ public class Main {
         String algorithm = "LaursenRO";
 
         //Default weightedProductModelObjective
-        String mcdmObjective = "srtTTLength";
+        String mcdmObjective = "srtTTLengthForCandidatePathComputing";
         //Default wSoftRealTime
         double wSRT = 1;
         //Default wTimeTriggered
@@ -143,7 +143,7 @@ public class Main {
         options.addOption(PATH_FINDING_METHOD_ARG, true, "Choose path finding method (Default = yen) (Choices: shortestPath, yen, pathPenalization)");
         options.addOption(ALGORITHM_ARG, true, "Choose algorithm (Default = GRASP) (Choices: GRASP, ALO)");
 
-        options.addOption(WPM_OBJECTIVE_ARG, true, "Weighted Product Model Objective (Default: srtTTLength) (Choices: srtTT, srtTTLength, srtTTLengthUtil)");
+        options.addOption(WPM_OBJECTIVE_ARG, true, "Weighted Product Model Objective (Default: srtTTLengthForCandidatePathComputing) (Choices: srtTT, srtTTLengthForCandidatePathComputing, srtTTLengthUtil)");
         options.addOption(W_SRT_ARG, true, "SRT Weight (Default: 0");
         options.addOption(W_TT_ARG, true, "TT Weight (Default: 0");
         options.addOption(W_LENGTH_ARG, true, "Candidate Path Length Weight (Default: 0");
@@ -378,6 +378,53 @@ public class Main {
                                             logger.info(createFoundSolutionString(solution));
 
                                             new OutputMethods(bag, laursenRO.getSolution(), solution.getCost().getWCDMap(), graph, rate, laursenRO.getDurationMap(), laursenRO.getSRTUnicastCandidateList());
+                                        }
+                                    }
+                                }
+                                case "WSMLWR" -> {
+                                    WSMv2LWR wsmV2LWR = new WSMv2LWR(k);
+
+                                    Bag bag = new Bag();
+                                    bag.setGraph(graph);
+                                    bag.setApplicationList(applicationList);
+                                    bag.setTopologyName(topologyName);
+                                    bag.setApplicationName(applicationName);
+                                    bag.setTopologyName(topologyName);
+                                    bag.setApplicationName(applicationName);
+                                    bag.setRouting(routing);
+                                    bag.setPathFindingMethod(pathFindingMethod);
+                                    bag.setAlgorithm(algorithm);
+                                    bag.setLWR(lwr);
+                                    bag.setK(k);
+                                    bag.setMCDMName(mcdmName);
+                                    bag.setMCDMObjective(mcdmObjective);
+                                    bag.setWSMNormalization(wsmNormalization);
+                                    bag.setWSRT(wSRT);
+                                    bag.setWTT(wTT);
+                                    bag.setWLength(wLength);
+                                    bag.setWUtil(wUtil);
+                                    bag.setThreadNumber(threadNumber);
+                                    bag.setTimeout(timeout);
+                                    bag.setMetaheuristicName(metaheuristicName);
+                                    bag.setEvaluator(evaluator);
+                                    bag.setEvaluatorName(evaluatorName);
+
+                                    logger.info(createInfo(bag));
+
+                                    Solution solution = wsmV2LWR.solve(bag);
+
+                                    solution.getCost().writeResultToFile(bag);
+
+                                    if (solution.getMulticastList() == null || solution.getMulticastList().isEmpty()) {
+                                        logger.info(Constants.NO_SOLUTION_COULD_BE_FOUND);
+                                    } else {
+                                        if (solution.getCost().getTotalCost() == Double.MAX_VALUE) {
+                                            logger.info(createFoundNoSolutionString(solution));
+                                        } else {
+                                            logger.info(createFoundSolutionString(solution));
+
+                                            new OutputMethods(bag, wsmV2LWR.getSolution(), solution.getCost().getWCDMap(), graph, rate, wsmV2LWR.getDurationMap(), wsmV2LWR.getSRTUnicastCandidateList());
+
                                         }
                                     }
                                 }
