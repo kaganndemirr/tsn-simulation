@@ -45,7 +45,7 @@ public class Constants {
     public static final double UNIT_WEIGHT = 1;
 
     public static final String SRT_TT = "srtTT";
-    public static final String SRT_TT_LENGTH = "srtTTLengthForCandidatePathComputing";
+    public static final String SRT_TT_LENGTH = "srtTTLength";
     public static final String SRT_TT_LENGTH_UTIL = "srtTTLengthUtil";
 
     public static final String NO_SOLUTION_COULD_BE_FOUND = "No solution could be found!";
@@ -61,8 +61,6 @@ public class Constants {
     public static final String RANDOMIZE_WITH_HEADS_OR_TAILS_USING_THREAD_LOCAL_RANDOM = "headsOrTailsThreadLocalRandom";
 
     public static final int PROGRESS_PERIOD_SECOND = 10_000;
-
-    public static final String THREAD_LOCAL_RANDOM = "threadLocalRandom";
 
     public static final String GRASP = "GRASP";
     public static final String ALO = "ALO";

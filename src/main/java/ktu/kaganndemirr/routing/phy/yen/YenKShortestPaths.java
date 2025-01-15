@@ -3,24 +3,16 @@ package ktu.kaganndemirr.routing.phy.yen;
 import ktu.kaganndemirr.application.Application;
 import ktu.kaganndemirr.application.SRTApplication;
 import ktu.kaganndemirr.application.TTApplication;
-import ktu.kaganndemirr.architecture.EndSystem;
 import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
 import ktu.kaganndemirr.util.Bag;
 import ktu.kaganndemirr.util.PathFindingMethods;
-import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
-import org.jgrapht.alg.shortestpath.YenKShortestPath;
 
 import java.util.ArrayList;
-import java.util.InputMismatchException;
 import java.util.List;
-
-import static ktu.kaganndemirr.routing.phy.yen.HelperMethods.fillYenKShortestPathGraphPathList;
-import static ktu.kaganndemirr.util.GraphMethods.copyGraph;
-import static ktu.kaganndemirr.util.GraphMethods.discardUnnecessaryEndSystems;
 
 public class YenKShortestPaths {
     private final List<UnicastCandidate> ttUnicastCandidateList;
@@ -29,7 +21,7 @@ public class YenKShortestPaths {
     private final List<Unicast> ttUnicastList;
     private final List<Unicast> srtUnicastList;
 
-    public YenKShortestPaths(Bag bag, int k) {
+    public YenKShortestPaths(Bag bag) {
         ttUnicastCandidateList = new ArrayList<>();
         srtUnicastCandidateList = new ArrayList<>();
 
@@ -41,7 +33,7 @@ public class YenKShortestPaths {
             if (application instanceof TTApplication){
                 for(int i = 0; i < application.getTargetList().size(); i++){
                     if(application.getExplicitPathList().isEmpty()){
-                        List<GraphPath<Node, GCLEdge>> yenKShortestPathGraphPathList = PathFindingMethods.YenKShortestPaths(bag, application, application.getTargetList().get(i), k);
+                        List<GraphPath<Node, GCLEdge>> yenKShortestPathGraphPathList = PathFindingMethods.yenKShortestPaths(bag, application, application.getTargetList().get(i));
                         ttUnicastCandidateList.add(new UnicastCandidate(application, application.getTargetList().get(i), yenKShortestPathGraphPathList));
                     }
                     else {
@@ -51,7 +43,7 @@ public class YenKShortestPaths {
             } else if (application instanceof SRTApplication) {
                 for(int i = 0; i < application.getTargetList().size(); i++){
                     if(application.getExplicitPathList().isEmpty()){
-                        List<GraphPath<Node, GCLEdge>> yenKShortestPathGraphPathList = PathFindingMethods.YenKShortestPaths(bag, application, application.getTargetList().get(i), k);
+                        List<GraphPath<Node, GCLEdge>> yenKShortestPathGraphPathList = PathFindingMethods.yenKShortestPaths(bag, application, application.getTargetList().get(i));
                         srtUnicastCandidateList.add(new UnicastCandidate(application, application.getTargetList().get(i), yenKShortestPathGraphPathList));
                     }
                     else {

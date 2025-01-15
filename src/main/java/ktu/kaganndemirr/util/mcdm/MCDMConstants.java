@@ -19,4 +19,6 @@ public class MCDMConstants {
     public static final String WPM = "wpm";
 
     public static final String DEADLINE = "deadline";
+
+    public static final String THREAD_LOCAL_RANDOM = "threadLocalRandom";
 }

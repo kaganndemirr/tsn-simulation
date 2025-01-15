@@ -64,7 +64,7 @@ public class WSMv2LWR {
 
     public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, Bag bag, int threadNumber, Evaluator evaluator, Duration timeout) throws IOException {
         Instant pathPenalizationMCDMKShortestPathsStartTime = Instant.now();
-        PathPenalizationMCDMKShortestPaths pathPenalizationMCDMKShortestPaths = new PathPenalizationMCDMKShortestPaths(graph, applicationList, bag, k);
+        PathPenalizationMCDMKShortestPaths pathPenalizationMCDMKShortestPaths = new PathPenalizationMCDMKShortestPaths(bag);
         Instant pathPenalizationMCDMKShortestPathsEndTime = Instant.now();
         this.pathPenalizationMCDMKShortestPathsDuration = Duration.between(pathPenalizationMCDMKShortestPathsStartTime, pathPenalizationMCDMKShortestPathsEndTime).toMillis();
 

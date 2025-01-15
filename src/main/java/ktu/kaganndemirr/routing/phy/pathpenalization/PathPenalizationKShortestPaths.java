@@ -3,63 +3,59 @@ package ktu.kaganndemirr.routing.phy.pathpenalization;
 import ktu.kaganndemirr.application.Application;
 import ktu.kaganndemirr.application.SRTApplication;
 import ktu.kaganndemirr.application.TTApplication;
-import ktu.kaganndemirr.architecture.EndSystem;
 import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
-import ktu.kaganndemirr.util.GraphMethods;
-import org.jgrapht.Graph;
+import ktu.kaganndemirr.util.Bag;
+import ktu.kaganndemirr.util.PathFindingMethods;
 import org.jgrapht.GraphPath;
-import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
-import org.jgrapht.alg.shortestpath.YenKShortestPath;
 
 import java.util.ArrayList;
-import java.util.InputMismatchException;
 import java.util.List;
 
-import static ktu.kaganndemirr.routing.phy.yen.HelperMethods.fillYenKShortestPathGraphPathList;
-import static ktu.kaganndemirr.util.GraphMethods.copyGraph;
-import static ktu.kaganndemirr.util.GraphMethods.discardUnnecessaryEndSystems;
-
 public class PathPenalizationKShortestPaths {
-    private final List<Application> applicationList;
+    private final List<UnicastCandidate> ttUnicastCandidateList;
     private final List<UnicastCandidate> srtUnicastCandidateList;
 
-    public PathPenalizationKShortestPaths(final Graph<Node, GCLEdge> graph, final List<Application> applicationList, final int k) {
+    private final List<Unicast> ttUnicastList;
+    private final List<Unicast> srtUnicastList;
+
+    public PathPenalizationKShortestPaths(Bag bag) {
+        ttUnicastCandidateList = new ArrayList<>();
         srtUnicastCandidateList = new ArrayList<>();
-        this.applicationList = applicationList;
 
-        for (Application application : applicationList) {
-            if (application instanceof SRTApplication) {
-                for(EndSystem target: application.getTargetList()){
-                    Graph<Node, GCLEdge> newGraph = copyGraph(graph);
-                    Graph<Node, GCLEdge> graphWithoutUnnecessaryEndSystems = discardUnnecessaryEndSystems(newGraph, application.getSource(), target);
+        ttUnicastList = new ArrayList<>();
+        srtUnicastList = new ArrayList<>();
 
-                    List<GraphPath<Node, GCLEdge>> shortestPathGraphPathList = new ArrayList<>(k);
 
-                    for (int i = 0; i < k; i++){
-                        DijkstraShortestPath<Node, GCLEdge> allShortestPaths = new DijkstraShortestPath<>(graphWithoutUnnecessaryEndSystems);
-
-                        GraphPath<Node, GCLEdge> shortestGraphPath = allShortestPaths.getPath(application.getSource(), target);
-
-                        if (shortestGraphPath == null) {
-                            throw new InputMismatchException("Aborting, could not find a path from " + application.getSource() + " to " + target);
-                        }
-
-                        else{
-                            shortestPathGraphPathList.add(shortestGraphPath);
-
-                            GraphMethods.pathPenalization(graph, graphWithoutUnnecessaryEndSystems, shortestGraphPath);
-
-                        }
-
+        for (Application application : bag.getApplicationList()) {
+            if (application instanceof TTApplication){
+                for(int i = 0; i < application.getTargetList().size(); i++){
+                    if(application.getExplicitPathList().isEmpty()){
+                        List<GraphPath<Node, GCLEdge>> yenKShortestPathGraphPathList = PathFindingMethods.pathPenalizationKShortestPaths(bag, application, application.getTargetList().get(i));
+                        ttUnicastCandidateList.add(new UnicastCandidate(application, application.getTargetList().get(i), yenKShortestPathGraphPathList));
                     }
-
-                    srtUnicastCandidateList.add(new UnicastCandidate(application, target, shortestPathGraphPathList));
+                    else {
+                        ttUnicastList.add(new Unicast(application, application.getTargetList().get(i), application.getExplicitPathList().get(i)));
+                    }
+                }
+            } else if (application instanceof SRTApplication) {
+                for(int i = 0; i < application.getTargetList().size(); i++){
+                    if(application.getExplicitPathList().isEmpty()){
+                        List<GraphPath<Node, GCLEdge>> yenKShortestPathGraphPathList = PathFindingMethods.pathPenalizationKShortestPaths(bag, application, application.getTargetList().get(i));
+                        srtUnicastCandidateList.add(new UnicastCandidate(application, application.getTargetList().get(i), yenKShortestPathGraphPathList));
+                    }
+                    else {
+                        srtUnicastList.add(new Unicast(application, application.getTargetList().get(i), application.getExplicitPathList().get(i)));
+                    }
                 }
             }
         }
+    }
+
+    public List<UnicastCandidate> getTTUnicastCandidateList() {
+        return ttUnicastCandidateList;
     }
 
     public List<UnicastCandidate> getSRTUnicastCandidateList() {
@@ -67,15 +63,10 @@ public class PathPenalizationKShortestPaths {
     }
 
     public List<Unicast> getTTUnicastList() {
-        List<Unicast> ttUnicastList = new ArrayList<>();
-        for (Application app : applicationList) {
-            if (app instanceof TTApplication) {
-                for(int i = 0; i < app.getTargetList().size(); i++){
-                    ttUnicastList.add(new Unicast(app, app.getTargetList().get(i), app.getExplicitPathList().get(i)));
-                }
-            }
-        }
         return ttUnicastList;
     }
-}
 
+    public List<Unicast> getSRTUnicastList() {
+        return srtUnicastList;
+    }
+}

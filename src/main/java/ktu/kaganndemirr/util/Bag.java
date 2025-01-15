@@ -18,6 +18,7 @@ public class Bag {
     private String mtrName;
     private String pathFindingMethod;
     private String algorithm;
+    private String unicastCandidateSortingMethod;
     private String lwr;
     private int k;
     private String mcdmName;
@@ -98,6 +99,14 @@ public class Bag {
 
     public void setAlgorithm(String algorithm) {
         this.algorithm = algorithm;
+    }
+
+    public String getUnicastCandidateSortingMethod() {
+        return unicastCandidateSortingMethod;
+    }
+
+    public void setUnicastCandidateSortingMethod(String unicastCandidateSortingMethod) {
+        this.unicastCandidateSortingMethod = unicastCandidateSortingMethod;
     }
 
     public String getLWR(){

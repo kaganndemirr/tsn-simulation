@@ -58,24 +58,18 @@ public class YenMCDMKShortestPaths {
 
     }
 
-    public YenMCDMKShortestPaths(Bag bag, List<Unicast> unicastList, int k, String scenarioOutputPath, String threadName, int i) throws IOException {
+    public YenMCDMKShortestPaths(Bag bag, String scenarioOutputPath, String threadName, int i) throws IOException {
         ttUnicastCandidateList = new ArrayList<>();
         srtUnicastCandidateList = new ArrayList<>();
 
         ttUnicastList = null;
         srtUnicastList = null;
 
-        BufferedWriter costsWriter = null;
-        if(logger.isDebugEnabled()){
-            costsWriter = new BufferedWriter(new FileWriter(Paths.get(scenarioOutputPath, "Costs.txt").toString(), true));
-            costsWriter.write("############## ThreadName:" + threadName + " Iteration:" + i + " ##############\n");
-        }
-
         for (Application application : bag.getApplicationList()) {
             if(application instanceof TTApplication){
                 for(EndSystem target: application.getTargetList()){
                     if(application.getExplicitPathList().isEmpty()){
-                        List<GraphPath<Node, GCLEdge>> mcdmGraphPathList = PathFindingMethods.YenMCDMKShortestPathsV2(bag, k, application, target, unicastList, costsWriter);
+                        List<GraphPath<Node, GCLEdge>> mcdmGraphPathList = PathFindingMethods.yenKShortestPathsLWR(bag, application, target);;
                         ttUnicastCandidateList.add(new UnicastCandidate(application, target, mcdmGraphPathList));
                     }
 
@@ -83,18 +77,13 @@ public class YenMCDMKShortestPaths {
             } else if (application instanceof SRTApplication) {
                 for(EndSystem target: application.getTargetList()){
                     if(application.getExplicitPathList().isEmpty()){
-                        List<GraphPath<Node, GCLEdge>> mcdmGraphPathList = PathFindingMethods.YenMCDMKShortestPathsV2(bag, k, application, target, unicastList, costsWriter);
+                        List<GraphPath<Node, GCLEdge>> mcdmGraphPathList = PathFindingMethods.yenKShortestPathsLWR(bag, application, target);
                         srtUnicastCandidateList.add(new UnicastCandidate(application, target, mcdmGraphPathList));
                     }
 
                 }
 
             }
-        }
-
-        if(logger.isDebugEnabled()){
-            assert costsWriter != null;
-            costsWriter.close();
         }
     }
 

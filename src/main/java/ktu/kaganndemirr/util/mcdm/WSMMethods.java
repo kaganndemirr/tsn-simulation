@@ -13,7 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static ktu.kaganndemirr.util.mcdm.HelperMethods.*;
@@ -39,9 +41,9 @@ public class WSMMethods {
         return normalizedSRTTTCostlist;
     }
 
-    public static List<Unicast> srtTTLength(Bag bag, String unicastCandidateSortingMethod, List<UnicastCandidate> srtUnicastCandidateList, List<Unicast> unicastList) {
+    public static List<Unicast> srtTTLength(Bag bag, List<UnicastCandidate> srtUnicastCandidateList, List<Unicast> unicastList, BufferedWriter costsWriter) throws IOException {
         List<UnicastCandidate> sortedSRTUnicastCandidateList = null;
-        if(Objects.equals(unicastCandidateSortingMethod, MCDMConstants.DEADLINE)){
+        if(Objects.equals(bag.getUnicastCandidateSortingMethod(), MCDMConstants.DEADLINE)){
             sortedSRTUnicastCandidateList = UnicastCandidateSortingMethods.sortUnicastCandidateListForDeadlineAscending(srtUnicastCandidateList);
         }
 
@@ -54,51 +56,7 @@ public class WSMMethods {
         Map<GCLEdge, Double> edgeDurationMap = getEdgeTTDurationMap(unicastList);
 
         assert sortedSRTUnicastCandidateList != null;
-        Map<UnicastCandidate, List<List<Double>>> unicastCandidateCostsMap = getSRTTTLengthCostList(bag, sortedSRTUnicastCandidateList, solution, edgeDurationMap);
-
-        for(Map.Entry<UnicastCandidate, List<List<Double>>> entry: unicastCandidateCostsMap.entrySet()){
-            List<Double> normalizedSRTCostList;
-            List<Double> normalizedTTCostList;
-            List<Double> normalizedLengthList;
-            switch (bag.getWSMNormalization()) {
-                case MCDMConstants.MIN_MAX -> {
-                    normalizedSRTCostList = null;
-                    normalizedTTCostList = null;
-                    normalizedLengthList = null;
-                }
-                case MCDMConstants.VECTOR -> {
-                    normalizedSRTCostList = null;
-                    normalizedTTCostList = null;
-                    normalizedLengthList = null;
-                }
-                default -> {
-                    {
-                        normalizedSRTCostList = normalizeSRTTTLengthCostListMax(entry.getValue().getFirst());
-                        normalizedTTCostList = normalizeSRTTTLengthCostListMax(entry.getValue().get(1));
-                        normalizedLengthList = normalizeSRTTTLengthCostListMax(entry.getValue().getLast());
-                    }
-                }
-            }
-
-            double maxCost = Double.MAX_VALUE;
-            GraphPath<Node, GCLEdge> selectedGraphPath = null;
-
-            for (int i = 0; i < entry.getKey().getCandidatePathList().size(); i++) {
-                assert normalizedSRTCostList != null;
-                double cost = bag.getWSRT() * normalizedSRTCostList.get(i) + bag.getWTT() * normalizedTTCostList.get(i) + bag.getWLength() * normalizedLengthList.get(i);
-                if (cost < maxCost) {
-                    maxCost = cost;
-                    selectedGraphPath = entry.getKey().getCandidatePathList().get(i);
-                    if (maxCost == 0) {
-                        break;
-                    }
-                }
-            }
-
-            solution.add(new Unicast(entry.getKey().getApplication(), entry.getKey().getTarget(), selectedGraphPath));
-        }
-
-        return solution;
+        return getSRTTTLengthCostList(bag, sortedSRTUnicastCandidateList, solution, edgeDurationMap, costsWriter);
     }
 
     public static GraphPath<Node, GCLEdge> srtTTLengthForCandidatePathComputing(Bag bag, Application application, EndSystem target, List<GraphPath<Node, GCLEdge>> kShortestPathsGraphPathList, List<Unicast> unicastList, List<GraphPath<Node, GCLEdge>> mcdmGraphPathList, BufferedWriter costsWriter, int candidatePathIndex) throws IOException {

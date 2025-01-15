@@ -102,6 +102,9 @@ public class HelperMethods {
         }
         resultList.add(bag.getPathFindingMethod());
         resultList.add(bag.getAlgorithm());
+        if (bag.getUnicastCandidateSortingMethod() != null){
+            resultList.add(bag.getUnicastCandidateSortingMethod());
+        }
         if (bag.getLWR() != null){
             resultList.add(bag.getLWR());
         }
@@ -155,6 +158,9 @@ public class HelperMethods {
         }
         resultList.add(bag.getPathFindingMethod());
         resultList.add(bag.getAlgorithm());
+        if (bag.getUnicastCandidateSortingMethod() != null){
+            resultList.add(bag.getUnicastCandidateSortingMethod());
+        }
         if (bag.getLWR() != null){
             resultList.add(bag.getLWR());
         }
@@ -235,15 +241,6 @@ public class HelperMethods {
         writer.close();
     }
 
-    public static void writeNormalizedCostsToFile(Application application, List<Double> normalizedSRTCostList, List<Double> normalizedTTCostList, List<Double> normalizedLengthCostList,  String scenarioOutputPath, String threadName, int i) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter(Paths.get(scenarioOutputPath, "NormalizedCosts.txt").toString(), true));
-        writer.write("############## ThreadName:" + threadName + " Iteration:" + i + " ##############\n");
-        for(int j = 0; j < normalizedSRTCostList.size(); j++){
-
-        }
-        writer.close();
-    }
-
     public static String buildPath(List<String> pathSegments) {
         String separator = File.separator;
 
@@ -257,11 +254,17 @@ public class HelperMethods {
         }
         result += ", PathFindingMethod: " + bag.getPathFindingMethod();
         result += ", Algorithm: " + bag.getAlgorithm();
+        if (bag.getUnicastCandidateSortingMethod() != null){
+            result += ", Unicast Candidate Sorting Method: " + bag.getUnicastCandidateSortingMethod();
+        }
         if (bag.getLWR() != null){
             result += ", LWR: " + bag.getLWR();
         }
         if (bag.getK() != 0){
             result += ", K: " + bag.getK();
+        }
+        if (bag.getMCDMName() != null){
+            result += ", MCDM Name: " + bag.getMCDMName();
         }
         if (bag.getMCDMObjective() != null){
             result += ", MCDM Objective: " + bag.getMCDMObjective();
@@ -429,5 +432,15 @@ public class HelperMethods {
         if(!gclSynthesisFilesFile.exists()){
             gclSynthesisFilesFile.mkdirs();
         }
+    }
+
+    public static List<GraphPath<Node, GCLEdge>> fillKShortestPathGraphPathList(List<GraphPath<Node, GCLEdge>> kShortestPathList, int k){
+        if (kShortestPathList.size() != k) {
+            int appPathsSize = kShortestPathList.size();
+            for (int j = 0; j < k - appPathsSize; j++) {
+                kShortestPathList.add(kShortestPathList.getLast());
+            }
+        }
+        return kShortestPathList;
     }
 }

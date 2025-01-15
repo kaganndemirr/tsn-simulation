@@ -9,81 +9,86 @@ import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
 import ktu.kaganndemirr.util.Bag;
-import ktu.kaganndemirr.util.GraphMethods;
-import ktu.kaganndemirr.util.mcdm.WSMMethods;
-import org.jgrapht.Graph;
+import ktu.kaganndemirr.util.PathFindingMethods;
 import org.jgrapht.GraphPath;
-import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.InputMismatchException;
 import java.util.List;
 
-import static ktu.kaganndemirr.util.GraphMethods.copyGraph;
-import static ktu.kaganndemirr.util.GraphMethods.discardUnnecessaryEndSystems;
 
 public class PathPenalizationMCDMKShortestPaths {
-    private final List<Application> applicationList;
+    private static final Logger logger = LoggerFactory.getLogger(PathPenalizationMCDMKShortestPaths.class.getSimpleName());
+
+    private final List<UnicastCandidate> ttUnicastCandidateList;
     private final List<UnicastCandidate> srtUnicastCandidateList;
+
     private final List<Unicast> ttUnicastList;
+    private final List<Unicast> srtUnicastList;
 
-    public PathPenalizationMCDMKShortestPaths(Graph<Node, GCLEdge> graph, List<Application> applicationList, Bag bag, int k) throws IOException {
-        this.applicationList = applicationList;
-        srtUnicastCandidateList = new ArrayList<>();
+    public PathPenalizationMCDMKShortestPaths(Bag bag){
+        ttUnicastCandidateList = null;
+        srtUnicastCandidateList = null;
+
         ttUnicastList = new ArrayList<>();
+        srtUnicastList = new ArrayList<>();
 
-        createTTUnicast();
-
-        for (Application application : applicationList) {
-            if (application instanceof SRTApplication) {
-                List<GraphPath<Node, GCLEdge>> mcdmGraphPathList = new ArrayList<>();
-                for(EndSystem target: application.getTargetList()){
-                    for (int i = 0; i < k; i++){
-                        GraphMethods.randomizeGraph(graph, bag.getLWR());
-
-                        Graph<Node, GCLEdge> newGraph = copyGraph(graph);
-                        Graph<Node, GCLEdge> graphWithoutUnnecessaryEndSystems = discardUnnecessaryEndSystems(newGraph, application.getSource(), target);
-
-                        List<GraphPath<Node, GCLEdge>> shortestPathGraphPathList = new ArrayList<>(k);
-
-                        for (int j = 0; j < k; j++){
-                            DijkstraShortestPath<Node, GCLEdge> allShortestPaths = new DijkstraShortestPath<>(graphWithoutUnnecessaryEndSystems);
-
-                            GraphPath<Node, GCLEdge> shortestGraphPath = allShortestPaths.getPath(application.getSource(), target);
-
-                            if (shortestGraphPath == null) {
-                                throw new InputMismatchException("Aborting, could not find a path from " + application.getSource() + " to " + target);
-                            }
-
-                            else{
-                                shortestPathGraphPathList.add(shortestGraphPath);
-
-                                GraphMethods.pathPenalization(graph, graphWithoutUnnecessaryEndSystems, shortestGraphPath);
-
-                            }
-
-                        }
-
-                        GraphPath<Node, GCLEdge> selectedGraphPath = WSMMethods.srtTTLengthGraphPathV2(bag, application, target, shortestPathGraphPathList, ttUnicastList, mcdmGraphPathList, null, null, i);
-
-                        mcdmGraphPathList.add(selectedGraphPath);
+        for (Application application : bag.getApplicationList()) {
+            if(application instanceof TTApplication){
+                for(int j = 0; j < application.getTargetList().size(); j++){
+                    if(!application.getExplicitPathList().isEmpty()){
+                        ttUnicastList.add(new Unicast(application, application.getTargetList().get(j), application.getExplicitPathList().get(j)));
+                    }
+                }
+            } else if (application instanceof SRTApplication) {
+                for(int j = 0; j < application.getTargetList().size(); j++){
+                    if(!application.getExplicitPathList().isEmpty()){
+                        srtUnicastList.add(new Unicast(application, application.getTargetList().get(j), application.getExplicitPathList().get(j)));
                     }
 
-                    srtUnicastCandidateList.add(new UnicastCandidate(application, target, mcdmGraphPathList));
                 }
+
+            }
+        }
+
+    }
+
+    public PathPenalizationMCDMKShortestPaths(Bag bag, String scenarioOutputPath, String threadName, int i) throws IOException {
+        ttUnicastCandidateList = new ArrayList<>();
+        srtUnicastCandidateList = new ArrayList<>();
+
+        ttUnicastList = null;
+        srtUnicastList = null;
+
+        for (Application application : bag.getApplicationList()) {
+            if(application instanceof TTApplication){
+                for(EndSystem target: application.getTargetList()){
+                    if(application.getExplicitPathList().isEmpty()){
+                        List<GraphPath<Node, GCLEdge>> mcdmGraphPathList = PathFindingMethods.pathPenalizationKShortestPathsLWR(bag, application, target);;
+                        ttUnicastCandidateList.add(new UnicastCandidate(application, target, mcdmGraphPathList));
+                    }
+
+                }
+            } else if (application instanceof SRTApplication) {
+                for(EndSystem target: application.getTargetList()){
+                    if(application.getExplicitPathList().isEmpty()){
+                        List<GraphPath<Node, GCLEdge>> mcdmGraphPathList = PathFindingMethods.pathPenalizationKShortestPathsLWR(bag, application, target);
+                        srtUnicastCandidateList.add(new UnicastCandidate(application, target, mcdmGraphPathList));
+                    }
+
+                }
+
             }
         }
     }
 
-    private void createTTUnicast() {
-        for (Application application : applicationList) {
-            if (application instanceof TTApplication) {
-                for(int i = 0; i < application.getTargetList().size(); i++){
-                    ttUnicastList.add(new Unicast(application, application.getTargetList().get(i), application.getExplicitPathList().get(i)));
-                }
-            }
-        }
+    public List<UnicastCandidate> getTTUnicastCandidateList() {
+        return ttUnicastCandidateList;
     }
 
     public List<UnicastCandidate> getSRTUnicastCandidateList() {
@@ -93,6 +98,9 @@ public class PathPenalizationMCDMKShortestPaths {
     public List<Unicast> getTTUnicastList() {
         return ttUnicastList;
     }
-}
 
+    public List<Unicast> getSRTUnicastList() {
+        return srtUnicastList;
+    }
+}
 

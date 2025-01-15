@@ -43,7 +43,7 @@ public class WPMDeadline {
 
     public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, Bag bag, Evaluator evaluator){
         Instant graphPathsStartTime = Instant.now();
-        YenKShortestPaths yenKShortestPaths = new YenKShortestPaths(bag, k);
+        YenKShortestPaths yenKShortestPaths = new YenKShortestPaths(bag);
         Instant graphPathsEndTime = Instant.now();
         long graphPathsDuration = Duration.between(graphPathsStartTime, graphPathsEndTime).toMillis();
 
@@ -54,7 +54,7 @@ public class WPMDeadline {
         if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT)){
             solution = null;
         } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH)) {
-            solution = WPMMethods.srtTTLength(srtUnicastCandidateList, ttUnicastList, bag);
+            solution = WPMMethods.srtTTLength(bag, srtUnicastCandidateList, ttUnicastList);
         } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH_UTIL)) {
             solution = null;
         }

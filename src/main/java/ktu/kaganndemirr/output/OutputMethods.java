@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.*;
@@ -38,6 +39,8 @@ public class OutputMethods {
     public OutputMethods(Bag bag, List<Unicast> bestSolution, Map<Multicast, Double> wcdMap, Graph<Node, GCLEdge> graph, int rate, Map<Double, Double> durationMap, List<UnicastCandidate> srtUnicastCandidateList) {
         scenarioOutputPath = createScenarioOutputPath(bag);
 
+        new File(scenarioOutputPath).mkdirs();
+
         resultOutputPath = createResultOutputPath(bag);
 
         utilizationMap = new HashMap<>();
@@ -54,7 +57,7 @@ public class OutputMethods {
         writeLinkUtilizationsToFile();
         writeDurationMap();
 
-        if (bag.getLWR() == null && bag.getCWR() == null){
+        if (bag.getLWR() == null){
             writeSRTCandidateRoutesToFile();
         }
 

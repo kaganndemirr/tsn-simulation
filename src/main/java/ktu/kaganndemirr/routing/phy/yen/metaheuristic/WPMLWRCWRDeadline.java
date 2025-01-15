@@ -15,6 +15,7 @@ import ktu.kaganndemirr.solver.Solution;
 import ktu.kaganndemirr.util.Bag;
 import ktu.kaganndemirr.util.Constants;
 import ktu.kaganndemirr.util.MetaheuristicMethods;
+import ktu.kaganndemirr.util.mcdm.MCDMConstants;
 import ktu.kaganndemirr.util.mcdm.WPMMethods;
 import org.jgrapht.Graph;
 import org.slf4j.Logger;
@@ -73,20 +74,16 @@ public class WPMLWRCWRDeadline {
         unicastList.addAll(ttUnicastList);
         unicastList.addAll(srtUnicastList);
 
-        this.graph = graph;
-        this.applicationList = applicationList;
 
-        this.evaluator = evaluator;
+        try (ExecutorService exec = Executors.newFixedThreadPool(bag.getThreadNumber())) {
 
-        try (ExecutorService exec = Executors.newFixedThreadPool(threadNumber)) {
+            Timer timer = getTimer(Duration.ofSeconds(bag.getTimeout()));
 
-            Timer timer = getTimer(timeout);
-
-            for (int i = 0; i < threadNumber; i++) {
+            for (int i = 0; i < bag.getThreadNumber(); i++) {
                 exec.execute(new WPMLWRCWRDeadlineRunnable(bag));
             }
 
-            exec.awaitTermination(timeout.toSeconds(), TimeUnit.SECONDS);
+            exec.awaitTermination(Duration.ofSeconds(bag.getTimeout()).toSeconds(), TimeUnit.SECONDS);
             exec.shutdown();
 
             if (!exec.isTerminated()) {
@@ -136,7 +133,7 @@ public class WPMLWRCWRDeadline {
         public void run() {
             while (!Thread.currentThread().isInterrupted()) {
                 i++;
-                YenRandomizedKShortestPaths yenRandomizedGraphPaths = new YenRandomizedKShortestPaths(graph, applicationList, bag, k);
+                YenRandomizedKShortestPaths yenRandomizedGraphPaths = new YenRandomizedKShortestPaths(bag);
 
                 srtUnicastCandidateList = yenRandomizedGraphPaths.getSRTUnicastCandidateList();
 
@@ -144,8 +141,8 @@ public class WPMLWRCWRDeadline {
                 if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT)){
                     //TODO
                 } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH)) {
-                    if(Objects.equals(bag.getCWR(), Constants.THREAD_LOCAL_RANDOM)){
-                        initialSolution = WPMMethods.deadlineCWRSRTTTLength(bag, srtUnicastCandidateList, ttUnicastList);
+                    if(Objects.equals(bag.getCWR(), MCDMConstants.THREAD_LOCAL_RANDOM)){
+                        initialSolution = null;
                     }
                 } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH_UTIL)) {
                     //TODO

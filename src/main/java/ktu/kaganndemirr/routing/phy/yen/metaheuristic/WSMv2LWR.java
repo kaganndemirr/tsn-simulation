@@ -81,9 +81,13 @@ public class WSMv2LWR {
 
         this.evaluator = bag.getEvaluator();
 
-        scenarioOutputPath = createScenarioOutputPath(bag);
+        scenarioOutputPath = null;
+        if (logger.isDebugEnabled()){
+            scenarioOutputPath = createScenarioOutputPath(bag);
 
-        new File(scenarioOutputPath).mkdirs();
+            new File(scenarioOutputPath).mkdirs();
+        }
+
 
         try (ExecutorService exec = Executors.newFixedThreadPool(bag.getThreadNumber())) {
 
@@ -150,7 +154,7 @@ public class WSMv2LWR {
 
                 YenMCDMKShortestPaths yenMCDMKShortestPaths;
                 try {
-                    yenMCDMKShortestPaths = new YenMCDMKShortestPaths(bag, unicastList, k, scenarioOutputPath, threadName, i);
+                    yenMCDMKShortestPaths = new YenMCDMKShortestPaths(bag,scenarioOutputPath, threadName, i);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

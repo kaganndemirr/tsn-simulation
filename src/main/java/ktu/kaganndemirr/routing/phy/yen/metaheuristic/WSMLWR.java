@@ -18,12 +18,16 @@ import ktu.kaganndemirr.util.Constants;
 import ktu.kaganndemirr.util.LaursenMethods;
 import ktu.kaganndemirr.util.MetaheuristicMethods;
 import ktu.kaganndemirr.util.mcdm.WPMMethods;
+import ktu.kaganndemirr.util.mcdm.WSMMethods;
 import org.jgrapht.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.Instant;
@@ -36,8 +40,6 @@ import static ktu.kaganndemirr.util.HelperMethods.*;
 
 public class WSMLWR {
     private static final Logger logger = LoggerFactory.getLogger(WSMLWR.class.getSimpleName());
-
-    private final int k;
 
     private List<UnicastCandidate> ttUnicastCandidateList;
     private List<UnicastCandidate> srtUnicastCandidateList;
@@ -61,8 +63,7 @@ public class WSMLWR {
 
     private final Map<Double, Double> durationMap;
 
-    public WSMLWR(int k){
-        this.k = k;
+    public WSMLWR(){
         unicastList = new ArrayList<>();
         writeLock = new Object();
         costLock = new Object();
@@ -81,9 +82,12 @@ public class WSMLWR {
 
         this.evaluator = bag.getEvaluator();
 
-        scenarioOutputPath = createScenarioOutputPath(bag);
+        if(logger.isDebugEnabled()){
+            scenarioOutputPath = createScenarioOutputPath(bag);
 
-        new File(scenarioOutputPath).mkdirs();
+            new File(scenarioOutputPath).mkdirs();
+        }
+
 
         try (ExecutorService exec = Executors.newFixedThreadPool(bag.getThreadNumber())) {
 
@@ -150,31 +154,53 @@ public class WSMLWR {
 
                 YenMCDMKShortestPaths yenMCDMKShortestPaths;
                 try {
-                    yenMCDMKShortestPaths = new YenMCDMKShortestPaths(bag, unicastList, k, scenarioOutputPath, threadName, i);
+                    yenMCDMKShortestPaths = new YenMCDMKShortestPaths(bag, scenarioOutputPath, threadName, i);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
 
                 srtUnicastCandidateList = yenMCDMKShortestPaths.getSRTUnicastCandidateList();
+                ttUnicastCandidateList = yenMCDMKShortestPaths.getTTUnicastCandidateList();
+
+                BufferedWriter costsWriter = null;
+                if(logger.isDebugEnabled()){
+                    try {
+                        costsWriter = new BufferedWriter(new FileWriter(Paths.get(scenarioOutputPath, "Costs.txt").toString(), true));
+                        costsWriter.write("############## ThreadName:" + threadName + " Iteration:" + i + " ##############\n");
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                List<Unicast> initialSolution = null;
+                try{
+                    if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT)){
+                        //TODO
+                    } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH)) {
+                        initialSolution = WSMMethods.srtTTLength(bag, srtUnicastCandidateList, ttUnicastList, costsWriter);
+                    } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH_UTIL)) {
+                        //TODO
+                    }
+                }catch (IOException e){
+                    throw new RuntimeException(e);
+                }
+
 
                 List<Unicast> solution = null;
-                List<Unicast> initialSolution = null;
 
                 if(Objects.equals(bag.getMetaheuristicName(), Constants.GRASP)){
-                    initialSolution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, unicastList, k, evaluator);
                     solution = MetaheuristicMethods.GRASP(initialSolution, evaluator, srtUnicastCandidateList, globalBestCost);
                 } else if (Objects.equals(bag.getMetaheuristicName(), Constants.ALO)) {
-                    initialSolution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, unicastList, k, evaluator);
-                    solution = MetaheuristicMethods.ALO(initialSolution, initialSolution, srtUnicastCandidateList, k, evaluator);
-                } else if (Objects.equals(bag.getMetaheuristicName(), Constants.CONSTRUCT_INITIAL_SOLUTION)) {
-                    solution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, unicastList, k, evaluator);
-                    initialSolution = solution;
+                    solution = MetaheuristicMethods.ALO(initialSolution, initialSolution, srtUnicastCandidateList, bag.getK(), evaluator);
                 }
 
                 if(logger.isDebugEnabled()){
                     synchronized (writeLock) {
                         assert solution != null;
                         try {
+                            assert costsWriter != null;
+                            costsWriter.close();
+                            assert initialSolution != null;
                             writeSolutionsToFile(initialSolution, solution, scenarioOutputPath, threadName, i);
                             writeSRTCandidateRoutesToFile(srtUnicastCandidateList, scenarioOutputPath, threadName, i);
                         } catch (IOException e) {

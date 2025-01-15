@@ -15,6 +15,7 @@ import ktu.kaganndemirr.solver.Solution;
 import ktu.kaganndemirr.util.Bag;
 import ktu.kaganndemirr.util.Constants;
 import ktu.kaganndemirr.util.MetaheuristicMethods;
+import ktu.kaganndemirr.util.mcdm.MCDMConstants;
 import ktu.kaganndemirr.util.mcdm.WPMMethods;
 import org.jgrapht.Graph;
 import org.slf4j.Logger;
@@ -63,7 +64,7 @@ public class WPMCWRDeadline {
         ttUnicastList = YenRandomizedKShortestPaths.getTTUnicastList(applicationList);
 
         Instant pathPenalizationShortestPathsStartTime = Instant.now();
-        PathPenalizationKShortestPaths pathPenalizationKShortestPaths = new PathPenalizationKShortestPaths(graph, applicationList, k);
+        PathPenalizationKShortestPaths pathPenalizationKShortestPaths = new PathPenalizationKShortestPaths(bag);
         Instant pathPenalizationShortestPathsEndTime = Instant.now();
         long pathPenalizationKShortestPathsDuration = Duration.between(pathPenalizationShortestPathsStartTime, pathPenalizationShortestPathsEndTime).toMillis();
 
@@ -133,8 +134,8 @@ public class WPMCWRDeadline {
                 if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT)){
                     //TODO
                 } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH)) {
-                    if(Objects.equals(bag.getCWR(), Constants.THREAD_LOCAL_RANDOM)){
-                        initialSolution = WPMMethods.deadlineCWRSRTTTLength(bag, srtUnicastCandidateList, ttUnicastList);
+                    if(Objects.equals(bag.getCWR(), MCDMConstants.THREAD_LOCAL_RANDOM)){
+                        initialSolution = null;
                     }
                 } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH_UTIL)) {
                     //TODO

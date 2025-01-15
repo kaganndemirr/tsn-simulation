@@ -89,9 +89,9 @@ public class AVBLatencyMathCost implements Cost, Comparator<AVBLatencyMathCost> 
 
     @Override
     public void writeResultToFile(Bag bag) throws IOException {
-        String scenarioOutputPath = createScenarioOutputPath(bag);
-
         String resultOutputPath = createResultOutputPath(bag);
+
+        new File(resultOutputPath).mkdirs();
 
         BufferedWriter writer = new BufferedWriter(new FileWriter(Paths.get(resultOutputPath, "Results.txt").toString(), true));
         writer.write(bag.getTopologyName() + "_" + bag.getApplicationName() + "\n");

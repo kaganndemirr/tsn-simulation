@@ -117,9 +117,9 @@ public class WPMMethods {
         return selectedGraphPath;
     }
 
-    public static List<Unicast> srtTTLength(Bag bag, String unicastCandidateSortingMethod, List<UnicastCandidate> srtUnicastCandidateList, List<Unicast> ttUnicastList) {
+    public static List<Unicast> srtTTLength(Bag bag, List<UnicastCandidate> srtUnicastCandidateList, List<Unicast> ttUnicastList) {
         List<UnicastCandidate> sortedSRTUnicastCandidateList = null;
-        if(Objects.equals(unicastCandidateSortingMethod, MCDMConstants.DEADLINE)){
+        if(Objects.equals(bag.getUnicastCandidateSortingMethod(), MCDMConstants.DEADLINE)){
             sortedSRTUnicastCandidateList = UnicastCandidateSortingMethods.sortUnicastCandidateListForDeadlineAscending(srtUnicastCandidateList);
         }
 
@@ -131,26 +131,26 @@ public class WPMMethods {
 
         Map<GCLEdge, Double> edgeDurationMap = getEdgeTTDurationMap(ttUnicastList);
 
-        assert sortedSRTUnicastCandidateList != null;
-        Map<UnicastCandidate, List<List<Double>>> unicastCandidateCostsMap = getSRTTTLengthCostList(bag, sortedSRTUnicastCandidateList, solution, edgeDurationMap);
-
-        if(Objects.equals(bag.getWPMVersion(), MCDMConstants.WPM_VERSION_V1)){
-            for(Map.Entry<UnicastCandidate, List<List<Double>>> entry: unicastCandidateCostsMap.entrySet()){
-                Unicast unicast = getWPMVersionV1Unicast(bag, entry);
-                solution.add(unicast);
-            }
-
-        }
-        else {
-            for(Map.Entry<UnicastCandidate, List<List<Double>>> entry: unicastCandidateCostsMap.entrySet()){
-
-                GraphPath<Node, GCLEdge> selectedGraphPath = srtTTLengthV2GraphPath(bag, entry.getValue(), entry.getKey().getCandidatePathList());
-
-                Unicast unicast = new Unicast(entry.getKey().getApplication(), entry.getKey().getTarget(), selectedGraphPath);
-                solution.add(unicast);
-            }
-
-        }
+//        assert sortedSRTUnicastCandidateList != null;
+//        Map<UnicastCandidate, List<List<Double>>> unicastCandidateCostsMap = getSRTTTLengthCostList(bag, sortedSRTUnicastCandidateList, solution, edgeDurationMap);
+//
+//        if(Objects.equals(bag.getWPMVersion(), MCDMConstants.WPM_VERSION_V1)){
+//            for(Map.Entry<UnicastCandidate, List<List<Double>>> entry: unicastCandidateCostsMap.entrySet()){
+//                Unicast unicast = getWPMVersionV1Unicast(bag, entry);
+//                solution.add(unicast);
+//            }
+//
+//        }
+//        else {
+//            for(Map.Entry<UnicastCandidate, List<List<Double>>> entry: unicastCandidateCostsMap.entrySet()){
+//
+//                GraphPath<Node, GCLEdge> selectedGraphPath = srtTTLengthV2GraphPath(bag, entry.getValue(), entry.getKey().getCandidatePathList());
+//
+//                Unicast unicast = new Unicast(entry.getKey().getApplication(), entry.getKey().getTarget(), selectedGraphPath);
+//                solution.add(unicast);
+//            }
+//
+//        }
 
         return solution;
     }
@@ -204,30 +204,30 @@ public class WPMMethods {
         Map<GCLEdge, Double> edgeDurationMap = getEdgeTTDurationMap(ttUnicastList);
 
         assert sortedSRTUnicastCandidateList != null;
-        Map<UnicastCandidate, List<List<Double>>> unicastCandidateCostsMap = getSRTTTLengthCostList(bag, sortedSRTUnicastCandidateList, solution, edgeDurationMap);
-
-        List<Double> weightList = RandomNumberGenerator.generateRandomWeightsAVBTTLengthThreadLocalRandom();
-        bag.setWSRT(weightList.getFirst());
-        bag.setWTT(weightList.get(1));
-        bag.setWLength(weightList.getLast());
-
-        if(Objects.equals(bag.getWPMVersion(), MCDMConstants.WPM_VERSION_V1)){
-            for(Map.Entry<UnicastCandidate, List<List<Double>>> entry: unicastCandidateCostsMap.entrySet()){
-                Unicast unicast = getWPMVersionV1Unicast(bag, entry);
-                solution.add(unicast);
-            }
-
-        }
-        else {
-            for(Map.Entry<UnicastCandidate, List<List<Double>>> entry: unicastCandidateCostsMap.entrySet()){
-
-                GraphPath<Node, GCLEdge> selectedGraphPath = srtTTLengthV2GraphPath(bag, entry.getValue(), entry.getKey().getCandidatePathList());
-
-                Unicast unicast = new Unicast(entry.getKey().getApplication(), entry.getKey().getTarget(), selectedGraphPath);
-                solution.add(unicast);
-            }
-
-        }
+//        Map<UnicastCandidate, List<List<Double>>> unicastCandidateCostsMap = getSRTTTLengthCostList(bag, sortedSRTUnicastCandidateList, solution, edgeDurationMap);
+//
+//        List<Double> weightList = RandomNumberGenerator.generateRandomWeightsAVBTTLengthThreadLocalRandom();
+//        bag.setWSRT(weightList.getFirst());
+//        bag.setWTT(weightList.get(1));
+//        bag.setWLength(weightList.getLast());
+//
+//        if(Objects.equals(bag.getWPMVersion(), MCDMConstants.WPM_VERSION_V1)){
+//            for(Map.Entry<UnicastCandidate, List<List<Double>>> entry: unicastCandidateCostsMap.entrySet()){
+//                Unicast unicast = getWPMVersionV1Unicast(bag, entry);
+//                solution.add(unicast);
+//            }
+//
+//        }
+//        else {
+//            for(Map.Entry<UnicastCandidate, List<List<Double>>> entry: unicastCandidateCostsMap.entrySet()){
+//
+//                GraphPath<Node, GCLEdge> selectedGraphPath = srtTTLengthV2GraphPath(bag, entry.getValue(), entry.getKey().getCandidatePathList());
+//
+//                Unicast unicast = new Unicast(entry.getKey().getApplication(), entry.getKey().getTarget(), selectedGraphPath);
+//                solution.add(unicast);
+//            }
+//
+//        }
 
         return solution;
     }
