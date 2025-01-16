@@ -19,6 +19,7 @@ import org.jgrapht.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.Instant;
@@ -132,7 +133,11 @@ public class WPMLWRDeadline {
                 if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT)){
                     //TODO
                 } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH)) {
-                    initialSolution = WPMMethods.srtTTLength(bag, srtUnicastCandidateList, ttUnicastList);
+                    try {
+                        initialSolution = WPMMethods.srtTTLength(bag, srtUnicastCandidateList, ttUnicastList, null);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH_UTIL)) {
                     //TODO
                 }

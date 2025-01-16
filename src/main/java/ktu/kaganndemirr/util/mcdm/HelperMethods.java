@@ -19,7 +19,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.*;
 
-import static ktu.kaganndemirr.util.mcdm.WSMMethods.normalizeSRTTTLengthCostListMax;
+import static ktu.kaganndemirr.util.mcdm.WSMMethods.*;
 
 public class HelperMethods {
     private static final Logger logger = LoggerFactory.getLogger(HelperMethods.class.getSimpleName());
@@ -105,113 +105,5 @@ public class HelperMethods {
         srtTTLengthCostList.add(lengthList);
 
         return srtTTLengthCostList;
-    }
-
-    public static List<Unicast> getSRTTTLengthCostList(Bag bag, List<UnicastCandidate> sortedSRTUnicastCandidateList, List<Unicast> solution, Map<GCLEdge, Double> edgeDurationMap, BufferedWriter costsWriter) throws IOException {
-
-        for (UnicastCandidate unicastCandidate : sortedSRTUnicastCandidateList) {
-            List<Double> srtCostList = new ArrayList<>();
-            List<Double> ttCostList = new ArrayList<>();
-            List<Double> lengthList = new ArrayList<>();
-
-            for (GraphPath<Node, GCLEdge> graphPath : unicastCandidate.getCandidatePathList()) {
-                double srtCost = 0;
-
-                for (Unicast unicast : solution) {
-                    if (unicast.getApplication() instanceof SRTApplication) {
-                        int sameEdgeNumber = getSameEdgeList(graphPath.getEdgeList(), unicast.getPath().getEdgeList()).size();
-                        double sSSf = (unicastCandidate.getApplication().getFrameSizeByte() * unicastCandidate.getApplication().getNumber0fFrames()) * (unicast.getApplication().getFrameSizeByte() * unicast.getApplication().getNumber0fFrames());
-                        double tSTf = unicastCandidate.getApplication().getCMI() * unicast.getApplication().getCMI();
-                        double dSDf = (double) 1 / (unicastCandidate.getApplication().getDeadline() * unicast.getApplication().getDeadline());
-                        srtCost += sameEdgeNumber * tSTf * sSSf * dSDf;
-                    }
-                }
-
-                srtCostList.add(srtCost);
-
-                double ttCost = 0;
-                for (Unicast unicast : solution) {
-                    if (unicast.getApplication() instanceof TTApplication) {
-                        List<GCLEdge> sameElements = getSameEdgeList(graphPath.getEdgeList(), unicast.getPath().getEdgeList());
-                        for (GCLEdge edge : sameElements) {
-                            ttCost += edgeDurationMap.get(edge);
-                        }
-                    }
-                }
-
-                ttCostList.add(ttCost);
-                lengthList.add((double) graphPath.getEdgeList().size());
-            }
-
-            List<Double> normalizedSRTCostList = null;
-            List<Double> normalizedTTCostList = null;
-            List<Double> normalizedLengthList = null;
-            switch (bag.getWSMNormalization()) {
-                case MCDMConstants.MIN_MAX -> {
-                    normalizedSRTCostList = null;
-                    normalizedTTCostList = null;
-                    normalizedLengthList = null;
-                }
-                case MCDMConstants.VECTOR -> {
-                    normalizedSRTCostList = null;
-                    normalizedTTCostList = null;
-                    normalizedLengthList = null;
-                }
-                case MCDMConstants.MAX -> {
-                    {
-                        normalizedSRTCostList = normalizeSRTTTLengthCostListMax(srtCostList);
-                        normalizedTTCostList = normalizeSRTTTLengthCostListMax(ttCostList);
-                        normalizedLengthList = normalizeSRTTTLengthCostListMax(lengthList);
-                    }
-                }
-            }
-
-            double maxCost = Double.MAX_VALUE;
-            GraphPath<Node, GCLEdge> selectedGraphPath = null;
-
-            double wSRT = bag.getWSRT();
-            double wTT = bag.getWTT();
-            double wLength = bag.getWLength();
-            if (Objects.equals(bag.getCWR(), MCDMConstants.THREAD_LOCAL_RANDOM)){
-                List<Double> weightList = RandomNumberGenerator.generateRandomWeightsAVBTTLengthThreadLocalRandom();
-                wSRT = weightList.getFirst();
-                wTT = weightList.get(1);
-                wLength = weightList.getLast();
-            }
-
-            List<Double> resultList = null;
-            if(logger.isDebugEnabled()){
-                resultList = new ArrayList<>();
-            }
-            for (int i = 0; i < unicastCandidate.getCandidatePathList().size(); i++) {
-                assert normalizedSRTCostList != null;
-                double cost = wSRT * normalizedSRTCostList.get(i) + wTT * normalizedTTCostList.get(i) + wLength * normalizedLengthList.get(i);
-                if(logger.isDebugEnabled()){
-                    assert resultList != null;
-                    resultList.add(cost);
-                }
-                if (cost < maxCost) {
-                    maxCost = cost;
-                    selectedGraphPath = unicastCandidate.getCandidatePathList().get(i);
-                    if (maxCost == 0) {
-                        break;
-                    }
-                }
-            }
-
-            if(logger.isDebugEnabled()){
-                costsWriter.write(unicastCandidate.getApplication().getName() + "\n");
-                costsWriter.write(normalizedSRTCostList + "\n");
-                costsWriter.write(normalizedTTCostList + "\n");
-                costsWriter.write(normalizedLengthList + "\n");
-                costsWriter.write(resultList + "\n");
-                costsWriter.newLine();
-            }
-
-            solution.add(new Unicast(unicastCandidate.getApplication(), unicastCandidate.getTarget(), selectedGraphPath));
-
-        }
-
-        return solution;
     }
 }

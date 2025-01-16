@@ -10,15 +10,11 @@ import ktu.kaganndemirr.message.Multicast;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
 import ktu.kaganndemirr.routing.phy.pathpenalization.PathPenalizationMCDMKShortestPaths;
-import ktu.kaganndemirr.routing.phy.yen.YenKShortestPaths;
-import ktu.kaganndemirr.routing.phy.yen.YenMCDMKShortestPaths;
-import ktu.kaganndemirr.routing.phy.yen.YenRandomizedKShortestPaths;
 import ktu.kaganndemirr.solver.Solution;
 import ktu.kaganndemirr.util.Bag;
 import ktu.kaganndemirr.util.Constants;
 import ktu.kaganndemirr.util.LaursenMethods;
 import ktu.kaganndemirr.util.MetaheuristicMethods;
-import ktu.kaganndemirr.util.mcdm.WPMMethods;
 import org.jgrapht.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +29,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class WSMv2LWR {
-    private static final Logger logger = LoggerFactory.getLogger(WPMLWRDeadline.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(WPMLWR.class.getSimpleName());
 
     private final int k;
 

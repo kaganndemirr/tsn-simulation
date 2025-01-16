@@ -17,6 +17,7 @@ import org.jgrapht.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
@@ -41,7 +42,7 @@ public class WPMDeadline {
         this.durationMap = new HashMap<>();
     }
 
-    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, Bag bag, Evaluator evaluator){
+    public Solution solve(Graph<Node, GCLEdge> graph, List<Application> applicationList, Bag bag, Evaluator evaluator) throws IOException {
         Instant graphPathsStartTime = Instant.now();
         YenKShortestPaths yenKShortestPaths = new YenKShortestPaths(bag);
         Instant graphPathsEndTime = Instant.now();
@@ -54,7 +55,7 @@ public class WPMDeadline {
         if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT)){
             solution = null;
         } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH)) {
-            solution = WPMMethods.srtTTLength(bag, srtUnicastCandidateList, ttUnicastList);
+            solution = WPMMethods.srtTTLength(bag, srtUnicastCandidateList, ttUnicastList, null);
         } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH_UTIL)) {
             solution = null;
         }

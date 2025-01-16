@@ -15,7 +15,6 @@ import ktu.kaganndemirr.util.Bag;
 import ktu.kaganndemirr.util.Constants;
 import ktu.kaganndemirr.util.MetaheuristicMethods;
 import ktu.kaganndemirr.util.mcdm.MCDMConstants;
-import ktu.kaganndemirr.util.mcdm.WPMMethods;
 import org.jgrapht.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +28,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class WPMLWRCWRDeadline {
-    private static final Logger logger = LoggerFactory.getLogger(WPMLWRDeadline.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(WPMLWR.class.getSimpleName());
 
     private final int k;
 

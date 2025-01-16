@@ -17,12 +17,19 @@ import org.jgrapht.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import static ktu.kaganndemirr.util.HelperMethods.createScenarioOutputPath;
 
 public class WPM {
     private static final Logger logger = LoggerFactory.getLogger(ktu.kaganndemirr.routing.phy.yen.heuristic.WPMDeadline.class.getSimpleName());
@@ -37,7 +44,7 @@ public class WPM {
         this.durationMap = new HashMap<>();
     }
 
-    public Solution solve(Bag bag){
+    public Solution solve(Bag bag) throws IOException {
         Instant pathPenalizationKShortestPathsStartTime = Instant.now();
         PathPenalizationKShortestPaths pathPenalizationKShortestPaths = new PathPenalizationKShortestPaths(bag);
         Instant pathPenalizationKShortestPathsEndTime = Instant.now();
@@ -46,16 +53,33 @@ public class WPM {
         srtUnicastCandidateList = pathPenalizationKShortestPaths.getSRTUnicastCandidateList();
         List<Unicast> ttUnicastList = pathPenalizationKShortestPaths.getTTUnicastList();
 
+        String scenarioOutputPath = null;
+        if(logger.isDebugEnabled()){
+            scenarioOutputPath = createScenarioOutputPath(bag);
+
+            new File(scenarioOutputPath).mkdirs();
+        }
+
+        BufferedWriter costsWriter = null;
+        if(logger.isDebugEnabled()){
+            assert scenarioOutputPath != null;
+            costsWriter = new BufferedWriter(new FileWriter(Paths.get(scenarioOutputPath, "Costs.txt").toString(), true));
+        }
+
         Instant solutionStartTime = Instant.now();
         if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT)){
             solution = null;
         } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH)) {
-            solution = WPMMethods.srtTTLength(bag, srtUnicastCandidateList, ttUnicastList);
+            solution = WPMMethods.srtTTLength(bag, srtUnicastCandidateList, ttUnicastList, costsWriter);
         } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH_UTIL)) {
             solution = null;
         }
 
         Instant solutionEndTime = Instant.now();
+        if(logger.isDebugEnabled()){
+            assert costsWriter != null;
+            costsWriter.close();
+        }
         long solutionDuration = Duration.between(solutionStartTime, solutionEndTime).toMillis();
         Cost cost = bag.getEvaluator().evaluate(solution);
 

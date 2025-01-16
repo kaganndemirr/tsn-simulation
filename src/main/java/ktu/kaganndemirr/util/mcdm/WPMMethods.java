@@ -1,6 +1,8 @@
 package ktu.kaganndemirr.util.mcdm;
 
 import ktu.kaganndemirr.application.Application;
+import ktu.kaganndemirr.application.SRTApplication;
+import ktu.kaganndemirr.application.TTApplication;
 import ktu.kaganndemirr.architecture.EndSystem;
 import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.architecture.Node;
@@ -16,108 +18,188 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static ktu.kaganndemirr.util.mcdm.HelperMethods.*;
 
 public class WPMMethods {
     private static final Logger logger = LoggerFactory.getLogger(WPMMethods.class.getSimpleName());
 
-    private static GraphPath<Node, GCLEdge> srtTTLengthV2GraphPath(Bag bag, List<List<Double>> srtTTLengthCostList, List<GraphPath<Node, GCLEdge>> graphPathList) {
-        Map<GraphPath<Node, GCLEdge>, Integer> graphPathPathScoreMap = new HashMap<>();
-        GraphPath<Node, GCLEdge> selectedGraphPath;
+    public static List<Unicast> getSRTTTLengthCostList(Bag bag, List<UnicastCandidate> sortedSRTUnicastCandidateList, List<Unicast> solution, Map<GCLEdge, Double> edgeDurationMap, BufferedWriter costsWriter) throws IOException {
 
-        if(Objects.equals(bag.getWPMValueType(), MCDMConstants.ACTUAL)){
-            for(int i = 0; i < graphPathList.size(); i++){
-                for(int j = i + 1; j < graphPathList.size(); j++){
-                    if(!graphPathList.get(i).equals(graphPathList.get(j))) {
-                        if (!graphPathPathScoreMap.containsKey(graphPathList.get(i))){
-                            graphPathPathScoreMap.put(graphPathList.get(i), 0);
-                        }
-                        if (!graphPathPathScoreMap.containsKey(graphPathList.get(j))){
-                            graphPathPathScoreMap.put(graphPathList.get(j), 0);
-                        }
+        for (UnicastCandidate unicastCandidate : sortedSRTUnicastCandidateList) {
 
-                        double cost;
-                        if(srtTTLengthCostList.getFirst().get(j) == 0 || srtTTLengthCostList.get(1).get(j) == 0){
-                            cost = MCDMConstants.NEW_COST;
-                        }
-                        else {
-                            cost = Math.pow((srtTTLengthCostList.getFirst().get(i) / srtTTLengthCostList.getFirst().get(j)), bag.getWSRT()) * Math.pow((srtTTLengthCostList.get(1).get(i) / srtTTLengthCostList.get(1).get(j)), bag.getWTT()) * Math.pow(( srtTTLengthCostList.getLast().get(i) / srtTTLengthCostList.getLast().get(j)), bag.getWLength());
-                        }
+            List<CandidatePathHolder> candidatePathHolderList = new ArrayList<>();
+            for (GraphPath<Node, GCLEdge> candidatePath : unicastCandidate.getCandidatePathList()) {
+                CandidatePathHolder candidatePathHolder = new CandidatePathHolder();
+                candidatePathHolder.setCandidatePath(candidatePath);
+                double srtCost = 0;
 
-                        if (cost < MCDMConstants.WPM_THRESHOLD) {
-                            graphPathPathScoreMap.put(graphPathList.get(i), graphPathPathScoreMap.get(graphPathList.get(i)) + 1);
+                for (Unicast unicast : solution) {
+                    if (unicast.getApplication() instanceof SRTApplication) {
+                        if(unicast.getPath() == null){
+                            System.out.println(1);
+                        }
+                        int sameEdgeNumber = getSameEdgeList(candidatePath.getEdgeList(), unicast.getPath().getEdgeList()).size();
+                        double sSSf = (unicastCandidate.getApplication().getFrameSizeByte() * unicastCandidate.getApplication().getNumber0fFrames()) * (unicast.getApplication().getFrameSizeByte() * unicast.getApplication().getNumber0fFrames());
+                        double tSTf = unicastCandidate.getApplication().getCMI() * unicast.getApplication().getCMI();
+                        double dSDf = (double) 1 / (unicastCandidate.getApplication().getDeadline() * unicast.getApplication().getDeadline());
+                        srtCost += sameEdgeNumber * (sSSf / tSTf) * dSDf;
+                    }
+                }
 
-                        } else {
-                            graphPathPathScoreMap.put(graphPathList.get(j), graphPathPathScoreMap.get(graphPathList.get(j)) + 1);
+                candidatePathHolder.setSRTCost(srtCost);
+
+                double ttCost = 0;
+                for (Unicast unicast : solution) {
+                    if (unicast.getApplication() instanceof TTApplication) {
+                        List<GCLEdge> sameElements = getSameEdgeList(candidatePath.getEdgeList(), unicast.getPath().getEdgeList());
+                        for (GCLEdge edge : sameElements) {
+                            ttCost += edgeDurationMap.get(edge);
                         }
                     }
                 }
+
+                candidatePathHolder.setTTCost(ttCost);
+                candidatePathHolder.setLength((double) candidatePath.getEdgeList().size());
+
+                candidatePathHolderList.add(candidatePathHolder);
             }
 
-        }
-        else if(Objects.equals(bag.getWPMValueType(), MCDMConstants.RELATIVE)){
-            for(int i = 0; i < graphPathList.size(); i++){
-                for(int j = i + 1; j < graphPathList.size(); j++){
-                    if(!graphPathList.get(i).equals(graphPathList.get(j))){
-                        if (!graphPathPathScoreMap.containsKey(graphPathList.get(i))){
-                            graphPathPathScoreMap.put(graphPathList.get(i), 0);
-                        }
+            double maxCost = Double.MAX_VALUE;
+            int minWinnerNumber = Integer.MIN_VALUE;
+            GraphPath<Node, GCLEdge> selectedGraphPath = null;
 
-                        double relativeSRTCostI = srtTTLengthCostList.getFirst().get(i) / (srtTTLengthCostList.getFirst().get(i) + srtTTLengthCostList.get(1).get(i) + srtTTLengthCostList.getLast().get(i));
-                        double relativeTTCostI =  srtTTLengthCostList.get(1).get(i) / (srtTTLengthCostList.getFirst().get(i) + srtTTLengthCostList.get(1).get(i) + srtTTLengthCostList.getLast().get(i));
-                        double relativeLengthCostI =  srtTTLengthCostList.getLast().get(i) / (srtTTLengthCostList.getFirst().get(i) + srtTTLengthCostList.get(1).get(i) + srtTTLengthCostList.getLast().get(i));
+            double wSRT = bag.getWSRT();
+            double wTT = bag.getWTT();
+            double wLength = bag.getWLength();
+            if (Objects.equals(bag.getCWR(), MCDMConstants.THREAD_LOCAL_RANDOM)){
+                List<Double> weightList = RandomNumberGenerator.generateRandomWeightsAVBTTLengthThreadLocalRandom();
+                wSRT = weightList.getFirst();
+                wTT = weightList.get(1);
+                wLength = weightList.getLast();
+            }
 
-                        if (!graphPathPathScoreMap.containsKey(graphPathList.get(j))){
-                            graphPathPathScoreMap.put(graphPathList.get(j), 0);
-                        }
-
-                        double cost;
-                        if(srtTTLengthCostList.getFirst().get(j) == 0 || srtTTLengthCostList.get(1).get(j) == 0){
-                            cost = MCDMConstants.NEW_COST;
-                        }
-
-                        else {
-                            double relativeSRTCostJ = srtTTLengthCostList.getFirst().get(j) / (srtTTLengthCostList.getFirst().get(j) + srtTTLengthCostList.get(1).get(j) + srtTTLengthCostList.getLast().get(j));
-                            double relativeTTCostJ =  srtTTLengthCostList.get(1).get(j) / (srtTTLengthCostList.getFirst().get(j) + srtTTLengthCostList.get(1).get(j) + srtTTLengthCostList.getLast().get(j));
-                            double relativeLengthCostJ =  srtTTLengthCostList.getLast().get(j) / (srtTTLengthCostList.getFirst().get(j) + srtTTLengthCostList.get(1).get(j) + srtTTLengthCostList.getLast().get(j));
-
-                            cost = Math.pow((relativeSRTCostI / relativeSRTCostJ), bag.getWSRT()) * Math.pow((relativeTTCostI / relativeTTCostJ), bag.getWTT()) * Math.pow((relativeLengthCostI / relativeLengthCostJ), bag.getWLength());
-                        }
-
-                        if(cost < MCDMConstants.WPM_THRESHOLD){
-                            graphPathPathScoreMap.put(graphPathList.get(i), graphPathPathScoreMap.get(graphPathList.get(i)) + 1);
-                        }
-                        else{
-                            graphPathPathScoreMap.put(graphPathList.get(j), graphPathPathScoreMap.get(graphPathList.get(j)) + 1);
+            if(Objects.equals(bag.getWPMVersion(), MCDMConstants.WPM_VERSION_V1)) {
+                List<Double> srtCostList = null;
+                List<Double> ttCostList = null;
+                List<Double> lengthList = null;
+                List<Double> costList = null;
+                if(logger.isDebugEnabled()){
+                    srtCostList = new ArrayList<>();
+                    ttCostList = new ArrayList<>();
+                    lengthList = new ArrayList<>();
+                    costList = new ArrayList<>();
+                    costsWriter.write(unicastCandidate.getApplication().getName() + "\n");
+                }
+                for (CandidatePathHolder candidatePathHolder : candidatePathHolderList) {
+                    double cost = Math.pow(candidatePathHolder.getSRTCost(), wSRT) * Math.pow(candidatePathHolder.getTTCost(), wTT) * Math.pow(candidatePathHolder.getLength(), wLength);
+                    if(logger.isDebugEnabled()){
+                        assert srtCostList != null;
+                        srtCostList.add(candidatePathHolder.getSRTCost());
+                        ttCostList.add(candidatePathHolder.getTTCost());
+                        lengthList.add(candidatePathHolder.getLength());
+                        costList.add(cost);
+                    }
+                    if (cost < maxCost) {
+                        maxCost = cost;
+                        selectedGraphPath = candidatePathHolder.getCandidatePath();
+                        if (maxCost == 0) {
+                            break;
                         }
                     }
                 }
+
+                if(logger.isDebugEnabled()){
+                    costsWriter.write(srtCostList + "\n");
+                    costsWriter.write(ttCostList + "\n");
+                    costsWriter.write(lengthList + "\n");
+                    costsWriter.write(costList + "\n");
+                    costsWriter.newLine();
+                }
             }
+
+            else if (Objects.equals(bag.getWPMVersion(), MCDMConstants.WPM_VERSION_V2)) {
+                List<Double> srtCostList = null;
+                List<Double> ttCostList = null;
+                List<Double> lengthList = null;
+                List<Double> costList = null;
+                if(logger.isDebugEnabled()){
+                    srtCostList = new ArrayList<>();
+                    ttCostList = new ArrayList<>();
+                    lengthList = new ArrayList<>();
+                    costList = new ArrayList<>();
+                    costsWriter.write(unicastCandidate.getApplication().getName() + "\n");
+                }
+
+                for (CandidatePathHolder candidatePathHolder : candidatePathHolderList) {
+                    int winNumber = srtTTLengthV2Cost(bag, candidatePathHolder, candidatePathHolderList);
+                    if(logger.isDebugEnabled()){
+                        assert srtCostList != null;
+                        srtCostList.add(candidatePathHolder.getSRTCost());
+                        ttCostList.add(candidatePathHolder.getTTCost());
+                        lengthList.add(candidatePathHolder.getLength());
+                        costList.add((double) winNumber);
+                    }
+                    if (winNumber > minWinnerNumber) {
+                        minWinnerNumber = winNumber;
+                        selectedGraphPath = candidatePathHolder.getCandidatePath();
+                    }
+                }
+
+                if(logger.isDebugEnabled()){
+                    costsWriter.write(srtCostList + "\n");
+                    costsWriter.write(ttCostList + "\n");
+                    costsWriter.write(lengthList + "\n");
+                    costsWriter.write(costList + "\n");
+                    costsWriter.newLine();
+                }
+            }
+
+            solution.add(new Unicast(unicastCandidate.getApplication(), unicastCandidate.getTarget(), selectedGraphPath));
         }
 
-        //All graphPaths same so pick first one
-        if(graphPathPathScoreMap.isEmpty()){
-            graphPathPathScoreMap.put(graphPathList.getFirst(), 1);
-        }
-
-        Map<GraphPath<Node, GCLEdge>, Integer> sortedGraphPathPathScoreMap = graphPathPathScoreMap.entrySet()
-                .stream()
-                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (e1, e2) -> e1,
-                        LinkedHashMap::new
-                ));
-
-        selectedGraphPath = sortedGraphPathPathScoreMap.entrySet().stream().findFirst().get().getKey();
-
-        return selectedGraphPath;
+        return solution;
     }
 
-    public static List<Unicast> srtTTLength(Bag bag, List<UnicastCandidate> srtUnicastCandidateList, List<Unicast> ttUnicastList) {
+    private static int srtTTLengthV2Cost(Bag bag, CandidatePathHolder candidatePathHolder, List<CandidatePathHolder> candidatePathHolderList) throws IOException {
+        int winnerNumber = 0;
+        for(CandidatePathHolder candidatePathHolderForLoop: candidatePathHolderList){
+            if(!candidatePathHolder.equals(candidatePathHolderForLoop)) {
+                double cost = getCost(bag, candidatePathHolder, candidatePathHolderForLoop);
+                if (cost < MCDMConstants.WPM_THRESHOLD) {
+                    winnerNumber++;
+                }
+            }
+        }
+
+        return winnerNumber;
+    }
+
+    private static double getCost(Bag bag, CandidatePathHolder candidatePathHolder, CandidatePathHolder candidatePathHolderForLoop) {
+        double cost = 0;
+        if(candidatePathHolderForLoop.getSRTCost() == 0 || candidatePathHolderForLoop.getTTCost() == 0){
+            cost = MCDMConstants.NEW_COST;
+        }
+        else {
+            if(Objects.equals(bag.getWPMValueType(), MCDMConstants.ACTUAL)){
+                cost = Math.pow((candidatePathHolder.getSRTCost() / candidatePathHolderForLoop.getSRTCost()), bag.getWSRT()) * Math.pow((candidatePathHolder.getTTCost() / candidatePathHolderForLoop.getTTCost()), bag.getWTT()) * Math.pow((candidatePathHolder.getLength() / candidatePathHolderForLoop.getLength()), bag.getWLength());
+            }else if (Objects.equals(bag.getWPMValueType(), MCDMConstants.RELATIVE)){
+                double relativeSRTCostCandidatePathHolder = candidatePathHolder.getSRTCost() / (candidatePathHolder.getSRTCost() + candidatePathHolder.getTTCost() + candidatePathHolder.getLength());
+                double relativeTTCostCandidatePathHolder =  candidatePathHolder.getTTCost() / (candidatePathHolder.getSRTCost() + candidatePathHolder.getTTCost() + candidatePathHolder.getLength());
+                double relativeLengthCostCandidatePathHolder =  candidatePathHolder.getLength() / (candidatePathHolder.getSRTCost() + candidatePathHolder.getTTCost() + candidatePathHolder.getLength());
+
+                double relativeSRTCostCandidatePathHolderForLoop = candidatePathHolderForLoop.getSRTCost() / (candidatePathHolderForLoop.getSRTCost() + candidatePathHolderForLoop.getTTCost() + candidatePathHolderForLoop.getLength());
+                double relativeTTCostCandidatePathHolderForLoop =  candidatePathHolderForLoop.getTTCost() / (candidatePathHolderForLoop.getSRTCost() + candidatePathHolderForLoop.getTTCost() + candidatePathHolderForLoop.getLength());
+                double relativeLengthCCandidatePathHolderForLoop =  candidatePathHolderForLoop.getLength() / (candidatePathHolderForLoop.getSRTCost() + candidatePathHolderForLoop.getTTCost() + candidatePathHolderForLoop.getLength());
+
+                cost = Math.pow((relativeSRTCostCandidatePathHolder / relativeSRTCostCandidatePathHolderForLoop), bag.getWSRT()) * Math.pow((relativeTTCostCandidatePathHolder / relativeTTCostCandidatePathHolderForLoop), bag.getWTT()) * Math.pow((relativeLengthCostCandidatePathHolder / relativeLengthCCandidatePathHolderForLoop), bag.getWLength());
+            }
+
+        }
+        return cost;
+    }
+
+    public static List<Unicast> srtTTLength(Bag bag, List<UnicastCandidate> srtUnicastCandidateList, List<Unicast> unicastList, BufferedWriter costsWriter) throws IOException {
         List<UnicastCandidate> sortedSRTUnicastCandidateList = null;
         if(Objects.equals(bag.getUnicastCandidateSortingMethod(), MCDMConstants.DEADLINE)){
             sortedSRTUnicastCandidateList = UnicastCandidateSortingMethods.sortUnicastCandidateListForDeadlineAscending(srtUnicastCandidateList);
@@ -125,34 +207,13 @@ public class WPMMethods {
 
         List<Unicast> solution = new ArrayList<>();
 
-        if(!ttUnicastList.isEmpty()){
-            solution.addAll(ttUnicastList);
+        if(!unicastList.isEmpty()){
+            solution.addAll(unicastList);
         }
 
-        Map<GCLEdge, Double> edgeDurationMap = getEdgeTTDurationMap(ttUnicastList);
-
-//        assert sortedSRTUnicastCandidateList != null;
-//        Map<UnicastCandidate, List<List<Double>>> unicastCandidateCostsMap = getSRTTTLengthCostList(bag, sortedSRTUnicastCandidateList, solution, edgeDurationMap);
-//
-//        if(Objects.equals(bag.getWPMVersion(), MCDMConstants.WPM_VERSION_V1)){
-//            for(Map.Entry<UnicastCandidate, List<List<Double>>> entry: unicastCandidateCostsMap.entrySet()){
-//                Unicast unicast = getWPMVersionV1Unicast(bag, entry);
-//                solution.add(unicast);
-//            }
-//
-//        }
-//        else {
-//            for(Map.Entry<UnicastCandidate, List<List<Double>>> entry: unicastCandidateCostsMap.entrySet()){
-//
-//                GraphPath<Node, GCLEdge> selectedGraphPath = srtTTLengthV2GraphPath(bag, entry.getValue(), entry.getKey().getCandidatePathList());
-//
-//                Unicast unicast = new Unicast(entry.getKey().getApplication(), entry.getKey().getTarget(), selectedGraphPath);
-//                solution.add(unicast);
-//            }
-//
-//        }
-
-        return solution;
+        Map<GCLEdge, Double> edgeDurationMap = getEdgeTTDurationMap(unicastList);
+        assert sortedSRTUnicastCandidateList != null;
+        return getSRTTTLengthCostList(bag, sortedSRTUnicastCandidateList, solution, edgeDurationMap, costsWriter);
     }
 
     public static GraphPath<Node, GCLEdge> srtTTLengthForCandidatePathComputing(Bag bag, Application application, EndSystem target, List<GraphPath<Node, GCLEdge>> kShortestPathsGraphPathList, List<Unicast> unicastList, List<GraphPath<Node, GCLEdge>> mcdmGraphPathList, BufferedWriter costsWriter, int candidatePathIndex) throws IOException {
@@ -170,13 +231,13 @@ public class WPMMethods {
 
         Map<GCLEdge, Double> edgeDurationMap = getEdgeTTDurationMap(unicastList);
 
-        List<List<Double>> srtTTLengthCostList = getSRTTTLengthCostListForCandidatePathComputation(kShortestPathsGraphPathList, solution, application, edgeDurationMap);
+        List<List<Double>> srtCostList = getSRTTTLengthCostListForCandidatePathComputation(kShortestPathsGraphPathList, solution, application, edgeDurationMap);
 
         double maxCost = Double.MAX_VALUE;
         GraphPath<Node, GCLEdge> selectedGraphPath = null;
 
         for (int i = 0; i < kShortestPathsGraphPathList.size(); i++) {
-            double cost = Math.pow(srtTTLengthCostList.getFirst().get(i), bag.getWSRT()) * Math.pow(srtTTLengthCostList.get(1).get(i), bag.getWTT()) * Math.pow(srtTTLengthCostList.getLast().get(i), bag.getWLength());
+            double cost = Math.pow(srtCostList.getFirst().get(i), bag.getWSRT()) * Math.pow(srtCostList.get(1).get(i), bag.getWTT()) * Math.pow(srtCostList.getLast().get(i), bag.getWLength());
             if (cost < maxCost) {
                 maxCost = cost;
                 selectedGraphPath = kShortestPathsGraphPathList.get(i);
@@ -187,67 +248,6 @@ public class WPMMethods {
         }
 
         return selectedGraphPath;
-    }
-
-    public static List<Unicast> srtTTLengthCWR(Bag bag, String unicastCandidateSortingMethod, List<UnicastCandidate> srtUnicastCandidateList, List<Unicast> ttUnicastList) {
-        List<UnicastCandidate> sortedSRTUnicastCandidateList = null;
-        if(Objects.equals(unicastCandidateSortingMethod, MCDMConstants.DEADLINE)){
-            sortedSRTUnicastCandidateList = UnicastCandidateSortingMethods.sortUnicastCandidateListForDeadlineAscending(srtUnicastCandidateList);
-        }
-
-        List<Unicast> solution = new ArrayList<>();
-
-        if(!ttUnicastList.isEmpty()){
-            solution.addAll(ttUnicastList);
-        }
-
-        Map<GCLEdge, Double> edgeDurationMap = getEdgeTTDurationMap(ttUnicastList);
-
-        assert sortedSRTUnicastCandidateList != null;
-//        Map<UnicastCandidate, List<List<Double>>> unicastCandidateCostsMap = getSRTTTLengthCostList(bag, sortedSRTUnicastCandidateList, solution, edgeDurationMap);
-//
-//        List<Double> weightList = RandomNumberGenerator.generateRandomWeightsAVBTTLengthThreadLocalRandom();
-//        bag.setWSRT(weightList.getFirst());
-//        bag.setWTT(weightList.get(1));
-//        bag.setWLength(weightList.getLast());
-//
-//        if(Objects.equals(bag.getWPMVersion(), MCDMConstants.WPM_VERSION_V1)){
-//            for(Map.Entry<UnicastCandidate, List<List<Double>>> entry: unicastCandidateCostsMap.entrySet()){
-//                Unicast unicast = getWPMVersionV1Unicast(bag, entry);
-//                solution.add(unicast);
-//            }
-//
-//        }
-//        else {
-//            for(Map.Entry<UnicastCandidate, List<List<Double>>> entry: unicastCandidateCostsMap.entrySet()){
-//
-//                GraphPath<Node, GCLEdge> selectedGraphPath = srtTTLengthV2GraphPath(bag, entry.getValue(), entry.getKey().getCandidatePathList());
-//
-//                Unicast unicast = new Unicast(entry.getKey().getApplication(), entry.getKey().getTarget(), selectedGraphPath);
-//                solution.add(unicast);
-//            }
-//
-//        }
-
-        return solution;
-    }
-
-    private static Unicast getWPMVersionV1Unicast(Bag bag, Map.Entry<UnicastCandidate, List<List<Double>>> entry) {
-        double maxCost = Double.MAX_VALUE;
-        GraphPath<Node, GCLEdge> selectedGraphPath = null;
-
-        for(int i = 0; i < entry.getKey().getCandidatePathList().size(); i++){
-            double cost = Math.pow(entry.getValue().getFirst().get(i), bag.getWSRT()) * Math.pow(entry.getValue().get(1).get(i), bag.getWTT()) * Math.pow(entry.getValue().getLast().get(i), bag.getWLength());
-            if (cost < maxCost) {
-                maxCost = cost;
-                selectedGraphPath = entry.getKey().getCandidatePathList().get(i);
-                if (maxCost == 0) {
-                    break;
-                }
-            }
-        }
-
-        return new Unicast(entry.getKey().getApplication(), entry.getKey().getTarget(), selectedGraphPath);
     }
 
 }

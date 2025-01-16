@@ -12,6 +12,7 @@ import ktu.kaganndemirr.routing.phy.yen.heuristic.WSM;
 import ktu.kaganndemirr.routing.phy.yen.metaheuristic.*;
 import ktu.kaganndemirr.solver.Solution;
 import ktu.kaganndemirr.util.Bag;
+import ktu.kaganndemirr.util.mcdm.MCDMConstants;
 import org.apache.commons.cli.*;
 import org.jgrapht.Graph;
 import ktu.kaganndemirr.util.Constants;
@@ -693,6 +694,103 @@ public class Main {
                                             logger.info(createFoundSolutionString(solution));
 
                                             new OutputMethods(bag, wsmCWR.getSolution(), solution.getCost().getWCDMap(), graph, rate, wsmCWR.getDurationMap(), wsmCWR.getSRTUnicastCandidateList());
+
+                                        }
+                                    }
+                                }
+                                case "WPM" -> {
+                                    ktu.kaganndemirr.routing.phy.pathpenalization.heuristic.WPM wpm = new ktu.kaganndemirr.routing.phy.pathpenalization.heuristic.WPM();
+
+                                    Bag bag = new Bag();
+                                    bag.setGraph(graph);
+                                    bag.setApplicationList(applicationList);
+                                    bag.setTopologyName(topologyName);
+                                    bag.setApplicationName(applicationName);
+                                    bag.setRouting(routing);
+                                    bag.setPathFindingMethod(pathFindingMethod);
+                                    bag.setAlgorithm(algorithm);
+                                    bag.setUnicastCandidateSortingMethod(unicastCandidateSortingMethod);
+                                    bag.setK(k);
+                                    bag.setMCDMName(mcdmName);
+                                    bag.setMCDMObjective(mcdmObjective);
+                                    bag.setWSRT(wSRT);
+                                    bag.setWTT(wTT);
+                                    bag.setWLength(wLength);
+                                    bag.setWUtil(wUtil);
+                                    bag.setWPMVersion(wpmVersion);
+                                    bag.setEvaluator(evaluator);
+                                    bag.setEvaluatorName(evaluatorName);
+
+                                    if(Objects.equals(bag.getWPMVersion(), MCDMConstants.WPM_VERSION_V2)){
+                                        bag.setWPMValueType(wpmValueType);
+                                    }
+
+                                    logger.info(createInfo(bag));
+
+                                    Solution solution = wpm.solve(bag);
+
+                                    solution.getCost().writeResultToFile(bag);
+
+                                    if (solution.getMulticastList() == null || solution.getMulticastList().isEmpty()) {
+                                        logger.info(Constants.NO_SOLUTION_COULD_BE_FOUND);
+                                    } else {
+                                        if (solution.getCost().getTotalCost() == Double.MAX_VALUE) {
+                                            logger.info(createFoundNoSolutionString(solution));
+                                        } else {
+                                            logger.info(createFoundSolutionString(solution));
+
+                                            new OutputMethods(bag, wpm.getSolution(), solution.getCost().getWCDMap(), graph, rate, wpm.getDurationMap(), wpm.getSRTUnicastCandidateList());
+
+
+                                        }
+                                    }
+                                }
+                                case "WPMLWR" -> {
+                                    ktu.kaganndemirr.routing.phy.pathpenalization.metaheuristic.WPMLWR wpmLWR = new ktu.kaganndemirr.routing.phy.pathpenalization.metaheuristic.WPMLWR();
+
+                                    Bag bag = new Bag();
+                                    bag.setGraph(graph);
+                                    bag.setApplicationList(applicationList);
+                                    bag.setTopologyName(topologyName);
+                                    bag.setApplicationName(applicationName);
+                                    bag.setRouting(routing);
+                                    bag.setPathFindingMethod(pathFindingMethod);
+                                    bag.setAlgorithm(algorithm);
+                                    bag.setUnicastCandidateSortingMethod(unicastCandidateSortingMethod);
+                                    bag.setLWR(lwr);
+                                    bag.setK(k);
+                                    bag.setMCDMName(mcdmName);
+                                    bag.setMCDMObjective(mcdmObjective);
+                                    bag.setWSRT(wSRT);
+                                    bag.setWTT(wTT);
+                                    bag.setWLength(wLength);
+                                    bag.setWUtil(wUtil);
+                                    bag.setThreadNumber(threadNumber);
+                                    bag.setTimeout(timeout);
+                                    bag.setMetaheuristicName(metaheuristicName);
+                                    bag.setEvaluator(evaluator);
+                                    bag.setEvaluatorName(evaluatorName);
+                                    bag.setEvaluatorName(evaluatorName);
+
+                                    if(Objects.equals(bag.getWPMVersion(), MCDMConstants.WPM_VERSION_V2)){
+                                        bag.setWPMValueType(wpmValueType);
+                                    }
+
+                                    logger.info(createInfo(bag));
+
+                                    Solution solution = wpmLWR.solve(bag);
+
+                                    solution.getCost().writeResultToFile(bag);
+
+                                    if (solution.getMulticastList() == null || solution.getMulticastList().isEmpty()) {
+                                        logger.info(Constants.NO_SOLUTION_COULD_BE_FOUND);
+                                    } else {
+                                        if (solution.getCost().getTotalCost() == Double.MAX_VALUE) {
+                                            logger.info(createFoundNoSolutionString(solution));
+                                        } else {
+                                            logger.info(createFoundSolutionString(solution));
+
+                                            new OutputMethods(bag, wpmLWR.getSolution(), solution.getCost().getWCDMap(), graph, rate, wpmLWR.getDurationMap(), wpmLWR.getSRTUnicastCandidateList());
 
                                         }
                                     }
