@@ -770,7 +770,7 @@ public class Main {
                                     bag.setMetaheuristicName(metaheuristicName);
                                     bag.setEvaluator(evaluator);
                                     bag.setEvaluatorName(evaluatorName);
-                                    bag.setEvaluatorName(evaluatorName);
+                                    bag.setWPMVersion(wpmVersion);
 
                                     if(Objects.equals(bag.getWPMVersion(), MCDMConstants.WPM_VERSION_V2)){
                                         bag.setWPMValueType(wpmValueType);

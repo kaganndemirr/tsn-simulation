@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static ktu.kaganndemirr.util.mcdm.HelperMethods.*;
 
@@ -36,9 +37,6 @@ public class WPMMethods {
 
                 for (Unicast unicast : solution) {
                     if (unicast.getApplication() instanceof SRTApplication) {
-                        if(unicast.getPath() == null){
-                            System.out.println(1);
-                        }
                         int sameEdgeNumber = getSameEdgeList(candidatePath.getEdgeList(), unicast.getPath().getEdgeList()).size();
                         double sSSf = (unicastCandidate.getApplication().getFrameSizeByte() * unicastCandidate.getApplication().getNumber0fFrames()) * (unicast.getApplication().getFrameSizeByte() * unicast.getApplication().getNumber0fFrames());
                         double tSTf = unicastCandidate.getApplication().getCMI() * unicast.getApplication().getCMI();
@@ -66,7 +64,6 @@ public class WPMMethods {
             }
 
             double maxCost = Double.MAX_VALUE;
-            int minWinnerNumber = Integer.MIN_VALUE;
             GraphPath<Node, GCLEdge> selectedGraphPath = null;
 
             double wSRT = bag.getWSRT();
@@ -122,37 +119,55 @@ public class WPMMethods {
                 List<Double> srtCostList = null;
                 List<Double> ttCostList = null;
                 List<Double> lengthList = null;
-                List<Double> costList = null;
+                List<Integer> winnerNumberList = null;
                 if(logger.isDebugEnabled()){
                     srtCostList = new ArrayList<>();
                     ttCostList = new ArrayList<>();
                     lengthList = new ArrayList<>();
-                    costList = new ArrayList<>();
+                    winnerNumberList = new ArrayList<>();
                     costsWriter.write(unicastCandidate.getApplication().getName() + "\n");
                 }
 
-                for (CandidatePathHolder candidatePathHolder : candidatePathHolderList) {
-                    int winNumber = srtTTLengthV2Cost(bag, candidatePathHolder, candidatePathHolderList);
-                    if(logger.isDebugEnabled()){
-                        assert srtCostList != null;
-                        srtCostList.add(candidatePathHolder.getSRTCost());
-                        ttCostList.add(candidatePathHolder.getTTCost());
-                        lengthList.add(candidatePathHolder.getLength());
-                        costList.add((double) winNumber);
-                    }
-                    if (winNumber > minWinnerNumber) {
-                        minWinnerNumber = winNumber;
-                        selectedGraphPath = candidatePathHolder.getCandidatePath();
-                    }
+                Map<CandidatePathHolder, Integer> candidatePathScoreMap = new HashMap<>();
+
+                for(CandidatePathHolder candidatePathHolder: candidatePathHolderList){
+                    candidatePathScoreMap.put(candidatePathHolder, 0);
+                }
+
+                for(CandidatePathHolder candidatePathHolder: candidatePathHolderList){
+                    int winnerNumber = srtTTLengthV2Cost(bag, candidatePathHolder, candidatePathHolderList);
+                    candidatePathScoreMap.put(candidatePathHolder, candidatePathScoreMap.get(candidatePathHolder) + winnerNumber);
                 }
 
                 if(logger.isDebugEnabled()){
-                    costsWriter.write(srtCostList + "\n");
-                    costsWriter.write(ttCostList + "\n");
-                    costsWriter.write(lengthList + "\n");
-                    costsWriter.write(costList + "\n");
-                    costsWriter.newLine();
+                    for(Map.Entry<CandidatePathHolder, Integer> entry: candidatePathScoreMap.entrySet()){
+                        assert srtCostList != null;
+                        srtCostList.add(entry.getKey().getSRTCost());
+                        ttCostList.add(entry.getKey().getTTCost());
+                        lengthList.add(entry.getKey().getLength());
+                        winnerNumberList.add(entry.getValue());
+                    }
+
+                    if(logger.isDebugEnabled()){
+                        costsWriter.write(srtCostList + "\n");
+                        costsWriter.write(ttCostList + "\n");
+                        costsWriter.write(lengthList + "\n");
+                        costsWriter.write(winnerNumberList + "\n");
+                        costsWriter.newLine();
+                    }
                 }
+
+                Map<CandidatePathHolder, Integer> sortedcandidatePathScoreMap = candidatePathScoreMap.entrySet()
+                        .stream()
+                        .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                Map.Entry::getValue,
+                                (e1, e2) -> e1,
+                                LinkedHashMap::new
+                        ));
+
+                selectedGraphPath = sortedcandidatePathScoreMap.entrySet().stream().findFirst().get().getKey().getCandidatePath();
             }
 
             solution.add(new Unicast(unicastCandidate.getApplication(), unicastCandidate.getTarget(), selectedGraphPath));
@@ -163,40 +178,38 @@ public class WPMMethods {
 
     private static int srtTTLengthV2Cost(Bag bag, CandidatePathHolder candidatePathHolder, List<CandidatePathHolder> candidatePathHolderList) throws IOException {
         int winnerNumber = 0;
-        for(CandidatePathHolder candidatePathHolderForLoop: candidatePathHolderList){
-            if(!candidatePathHolder.equals(candidatePathHolderForLoop)) {
-                double cost = getCost(bag, candidatePathHolder, candidatePathHolderForLoop);
-                if (cost < MCDMConstants.WPM_THRESHOLD) {
-                    winnerNumber++;
+        if(candidatePathHolder.getSRTCost() == 0 || candidatePathHolder.getTTCost() == 0){
+            return candidatePathHolderList.size() - 1;
+        }
+        else {
+            double cost = 0;
+            for(CandidatePathHolder candidatePathHolderForLoop: candidatePathHolderList){
+                if(candidatePathHolder != candidatePathHolderForLoop){
+                    if(candidatePathHolderForLoop.getSRTCost() == 0 || candidatePathHolderForLoop.getTTCost() == 0) {
+                        cost = MCDMConstants.LOST_COST;
+                    }
+                    else {
+                        if(Objects.equals(bag.getWPMValueType(), MCDMConstants.ACTUAL)){
+                            cost = Math.pow((candidatePathHolder.getSRTCost() / candidatePathHolderForLoop.getSRTCost()), bag.getWSRT()) * Math.pow((candidatePathHolder.getTTCost() / candidatePathHolderForLoop.getTTCost()), bag.getWTT()) * Math.pow((candidatePathHolder.getLength() / candidatePathHolderForLoop.getLength()), bag.getWLength());
+                        }else if (Objects.equals(bag.getWPMValueType(), MCDMConstants.RELATIVE)){
+                            double relativeSRTCostCandidatePathHolder = candidatePathHolder.getSRTCost() / (candidatePathHolder.getSRTCost() + candidatePathHolder.getTTCost() + candidatePathHolder.getLength());
+                            double relativeTTCostCandidatePathHolder =  candidatePathHolder.getTTCost() / (candidatePathHolder.getSRTCost() + candidatePathHolder.getTTCost() + candidatePathHolder.getLength());
+                            double relativeLengthCostCandidatePathHolder =  candidatePathHolder.getLength() / (candidatePathHolder.getSRTCost() + candidatePathHolder.getTTCost() + candidatePathHolder.getLength());
+
+                            double relativeSRTCostCandidatePathHolderForLoop = candidatePathHolderForLoop.getSRTCost() / (candidatePathHolderForLoop.getSRTCost() + candidatePathHolderForLoop.getTTCost() + candidatePathHolderForLoop.getLength());
+                            double relativeTTCostCandidatePathHolderForLoop =  candidatePathHolderForLoop.getTTCost() / (candidatePathHolderForLoop.getSRTCost() + candidatePathHolderForLoop.getTTCost() + candidatePathHolderForLoop.getLength());
+                            double relativeLengthCCandidatePathHolderForLoop =  candidatePathHolderForLoop.getLength() / (candidatePathHolderForLoop.getSRTCost() + candidatePathHolderForLoop.getTTCost() + candidatePathHolderForLoop.getLength());
+
+                            cost = Math.pow((relativeSRTCostCandidatePathHolder / relativeSRTCostCandidatePathHolderForLoop), bag.getWSRT()) * Math.pow((relativeTTCostCandidatePathHolder / relativeTTCostCandidatePathHolderForLoop), bag.getWTT()) * Math.pow((relativeLengthCostCandidatePathHolder / relativeLengthCCandidatePathHolderForLoop), bag.getWLength());
+                        }
+                    }
+                    if(cost < MCDMConstants.WPM_THRESHOLD){
+                        winnerNumber++;
+                    }
                 }
             }
         }
-
         return winnerNumber;
-    }
-
-    private static double getCost(Bag bag, CandidatePathHolder candidatePathHolder, CandidatePathHolder candidatePathHolderForLoop) {
-        double cost = 0;
-        if(candidatePathHolderForLoop.getSRTCost() == 0 || candidatePathHolderForLoop.getTTCost() == 0){
-            cost = MCDMConstants.NEW_COST;
-        }
-        else {
-            if(Objects.equals(bag.getWPMValueType(), MCDMConstants.ACTUAL)){
-                cost = Math.pow((candidatePathHolder.getSRTCost() / candidatePathHolderForLoop.getSRTCost()), bag.getWSRT()) * Math.pow((candidatePathHolder.getTTCost() / candidatePathHolderForLoop.getTTCost()), bag.getWTT()) * Math.pow((candidatePathHolder.getLength() / candidatePathHolderForLoop.getLength()), bag.getWLength());
-            }else if (Objects.equals(bag.getWPMValueType(), MCDMConstants.RELATIVE)){
-                double relativeSRTCostCandidatePathHolder = candidatePathHolder.getSRTCost() / (candidatePathHolder.getSRTCost() + candidatePathHolder.getTTCost() + candidatePathHolder.getLength());
-                double relativeTTCostCandidatePathHolder =  candidatePathHolder.getTTCost() / (candidatePathHolder.getSRTCost() + candidatePathHolder.getTTCost() + candidatePathHolder.getLength());
-                double relativeLengthCostCandidatePathHolder =  candidatePathHolder.getLength() / (candidatePathHolder.getSRTCost() + candidatePathHolder.getTTCost() + candidatePathHolder.getLength());
-
-                double relativeSRTCostCandidatePathHolderForLoop = candidatePathHolderForLoop.getSRTCost() / (candidatePathHolderForLoop.getSRTCost() + candidatePathHolderForLoop.getTTCost() + candidatePathHolderForLoop.getLength());
-                double relativeTTCostCandidatePathHolderForLoop =  candidatePathHolderForLoop.getTTCost() / (candidatePathHolderForLoop.getSRTCost() + candidatePathHolderForLoop.getTTCost() + candidatePathHolderForLoop.getLength());
-                double relativeLengthCCandidatePathHolderForLoop =  candidatePathHolderForLoop.getLength() / (candidatePathHolderForLoop.getSRTCost() + candidatePathHolderForLoop.getTTCost() + candidatePathHolderForLoop.getLength());
-
-                cost = Math.pow((relativeSRTCostCandidatePathHolder / relativeSRTCostCandidatePathHolderForLoop), bag.getWSRT()) * Math.pow((relativeTTCostCandidatePathHolder / relativeTTCostCandidatePathHolderForLoop), bag.getWTT()) * Math.pow((relativeLengthCostCandidatePathHolder / relativeLengthCCandidatePathHolderForLoop), bag.getWLength());
-            }
-
-        }
-        return cost;
     }
 
     public static List<Unicast> srtTTLength(Bag bag, List<UnicastCandidate> srtUnicastCandidateList, List<Unicast> unicastList, BufferedWriter costsWriter) throws IOException {

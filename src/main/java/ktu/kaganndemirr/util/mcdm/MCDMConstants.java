@@ -11,7 +11,8 @@ public class MCDMConstants {
     public static final String ACTUAL = "actual";
     public static final String RELATIVE = "relative";
 
-    public static final double NEW_COST = 2;
+    public static final double LOST_COST = 2;
+    public static final double WIN_COST = 0;
 
     public static final int WPM_THRESHOLD = 1;
 
