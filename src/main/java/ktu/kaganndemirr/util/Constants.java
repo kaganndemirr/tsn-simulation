@@ -16,7 +16,6 @@ public class Constants {
 
     public static final String AVB_LATENCY_MATH_TSNCF = "avbLatencyMathTSNCF";
     public static final String AVB_LATENCY_MATH_TSNCF_V2 = "avbLatencyMathTSNCFV2";
-    public static final String EVALUATOR_TSN_NC = "networkCalculus";
 
     public static HashMap<Integer, String> applicationTypeMap;
 
@@ -30,6 +29,13 @@ public class Constants {
         applicationTypeMap.put(6, "CLASS_A");
         applicationTypeMap.put(7, "TT");
     }
+
+    public static final String PHY = "phy";
+    public static final String MTR = "mtr";
+    public static final String YEN = "yen";
+    public static final String PATH_PENALIZATION = "pathPenalization";
+    public static final String WSM = "wsm";
+    public static final String WPM = "wpm";
 
     public static final int CLASS_A_PCP = 6;
     public static final int TT_PCP = 7;

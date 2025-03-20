@@ -3,25 +3,26 @@ package ktu.kaganndemirr;
 import ktu.kaganndemirr.application.Application;
 import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.architecture.Node;
-import ktu.kaganndemirr.evaluator.*;
+import ktu.kaganndemirr.evaluator.AVBLatencyMathTSNCF;
+import ktu.kaganndemirr.evaluator.AVBLatencyMathTSNCFV2;
+import ktu.kaganndemirr.evaluator.Evaluator;
 import ktu.kaganndemirr.output.OutputMethods;
 import ktu.kaganndemirr.parser.ApplicationParser;
 import ktu.kaganndemirr.parser.TopologyParser;
-import ktu.kaganndemirr.routing.phy.yen.heuristic.WPMDeadline;
-import ktu.kaganndemirr.routing.phy.yen.heuristic.WSM;
-import ktu.kaganndemirr.routing.phy.yen.metaheuristic.*;
+import ktu.kaganndemirr.routing.heuristic.MCDM;
+import ktu.kaganndemirr.routing.metaheuristic.CWR;
+import ktu.kaganndemirr.routing.metaheuristic.LWR;
+import ktu.kaganndemirr.routing.metaheuristic.LaursenRO;
 import ktu.kaganndemirr.solver.Solution;
 import ktu.kaganndemirr.util.Bag;
-import ktu.kaganndemirr.util.mcdm.MCDMConstants;
+import ktu.kaganndemirr.util.Constants;
 import org.apache.commons.cli.*;
 import org.jgrapht.Graph;
-import ktu.kaganndemirr.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.Duration;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Objects;
@@ -73,62 +74,62 @@ public class Main {
         //region <Default Values>
 
         //Default value of rate (mbps)
-        int rate = 1000;
+        int rate = 0;
         //Default Evaluator Name and Evaluator
-        String evaluatorName = "avbLatencyMathTSNCF";
+        String evaluatorName = null;
         Evaluator evaluator = new AVBLatencyMathTSNCF();
         //Default value of K
-        int k = 50;
+        int k = 0;
         //Default thread number
         int threadNumber = Runtime.getRuntime().availableProcessors();
         //Metaheuristic Algorithm Timeout
-        int timeout = 60;
+        int timeout = 0;
 
         //Default Routing
-        String routing = "phy";
+        String routing = null;
         //Default Method
-        String pathFindingMethod = "yen";
+        String pathFindingMethod = null;
         //Default Algorithm
-        String algorithm = "LaursenRO";
+        String algorithm = null;
 
-        String unicastCandidateSortingMethod = "deadline";
+        String unicastCandidateSortingMethod = null;
 
         //Default MCDM Objective
-        String mcdmObjective = "srtTTLength";
+        String mcdmObjective = null;
         //Default wSoftRealTime
-        double wSRT = 1;
+        double wSRT = 0;
         //Default wTimeTriggered
-        double wTT = 1;
+        double wTT = 0;
         //Default wLength
-        double wLength = 1;
+        double wLength = 0;
         //Default wUtil
         double wUtil = 0;
         //Default linkWeightRandomization
-        String lwr = "headsOrTailsThreadLocalRandom";
+        String lwrName = null;
         //Default criteriaWeightRandomization
-        String cwr = "threadLocalRandom";
+        String cwrName = null;
         //Default weightedProductModelVersion
-        String wpmVersion = "v1";
+        String wpmVersion = null;
         //Default weightedProductModelValueType
-        String wpmValueType = "actual";
+        String wpmValueType = null;
 
         //Default IdleSlope
-        double idleSlope = 0.75;
+        double idleSlope = 0;
 
         //Default TSN Simulation Version
-        String tsnSimulationVersion = "TSNCF";
+        String tsnSimulationVersion = null;
 
         //Default Metaheuristic Name
-        String metaheuristicName = "GRASP";
+        String metaheuristicName = null;
 
         //Default MTR Name
-        String mtrName = "v1";
+        String mtrName = null;
 
         //Default WSM Normalization
-        String wsmNormalization = "max";
+        String wsmNormalization = null;
 
         //Default WSM Normalization
-        String mcdmName = "wsm";
+        String mcdmName = null;
 
         //endregion
 
@@ -139,38 +140,38 @@ public class Main {
         Options options = new Options();
         options.addOption(applicationFile);
         options.addOption(architectureFile);
-        options.addOption(RATE_ARG, true, "The rate in mbps (Type: mbps) (Default: 1000)");
-        options.addOption(K_ARG, true, "Value of K for search-space reduction (Default: 50)");
-        options.addOption(THREAD_NUMBER_ARG, true, "Thread number (Default: Number of Processor Thread)");
-        options.addOption(TIMEOUT_ARG, true, "Metaheuristic algorithm timeout (Type: Second) (Default: 60");
+        options.addOption(RATE_ARG, true, "The rate in mbps (Type: mbps)");
+        options.addOption(K_ARG, true, "Value of K for search-space reduction");
+        options.addOption(THREAD_NUMBER_ARG, true, "Thread number");
+        options.addOption(TIMEOUT_ARG, true, "Metaheuristic algorithm timeout (Type: Second)");
 
-        options.addOption(ROUTING_ARG, true, "Choose routing (Default: phy) (Choices: phy, mtr)");
-        options.addOption(PATH_FINDING_METHOD_ARG, true, "Choose path finding method (Default = yen) (Choices: shortestPath, yen, pathPenalization)");
-        options.addOption(ALGORITHM_ARG, true, "Choose algorithm (Default = GRASP) (Choices: GRASP, ALO)");
-        options.addOption(UNICAST_CANDIDATE_SORTING_METHOD_ARG, true, "Unicast Candidate Sorting Method (Default = deadline) (Choices: deadline, deadline/size/period)");
+        options.addOption(ROUTING_ARG, true, "Choose routing (Choices: phy, mtr)");
+        options.addOption(PATH_FINDING_METHOD_ARG, true, "Choose path finding method (Choices: shortestPath, yen, pathPenalization)");
+        options.addOption(ALGORITHM_ARG, true, "Choose algorithm (Choices: GRASP, ALO)");
+        options.addOption(UNICAST_CANDIDATE_SORTING_METHOD_ARG, true, "Unicast Candidate Sorting Method (Choices: deadline, deadline/size/period)");
 
-        options.addOption(WPM_OBJECTIVE_ARG, true, "Weighted Product Model Objective (Default: srtTTLengthForCandidatePathComputing) (Choices: srtTT, srtTTLengthForCandidatePathComputing, srtTTLengthUtil)");
-        options.addOption(W_SRT_ARG, true, "SRT Weight (Default: 0");
-        options.addOption(W_TT_ARG, true, "TT Weight (Default: 0");
-        options.addOption(W_LENGTH_ARG, true, "Candidate Path Length Weight (Default: 0");
-        options.addOption(W_UTIL_ARG, true, "Utilization Weight (Default: 0");
+        options.addOption(WPM_OBJECTIVE_ARG, true, "Weighted Product Model Objective (Choices: srtTT, srtTTLengthForCandidatePathComputing, srtTTLengthUtil)");
+        options.addOption(W_SRT_ARG, true, "SRT Weight");
+        options.addOption(W_TT_ARG, true, "TT Weight");
+        options.addOption(W_LENGTH_ARG, true, "Candidate Path Length Weight");
+        options.addOption(W_UTIL_ARG, true, "Utilization Weight");
 
-        options.addOption(LWR_ARG, true, "Link weight randomization method (Default: headsOrTails)");
-        options.addOption(CWR_ARG, true, "Criteria weight randomization method (Default: secureRandom)");
-        options.addOption(WPM_VERSION_ARG, true, "WPM Version (Default: v1) (Choices: v1, v2)");
-        options.addOption(WPM_VALUE_TYPE_ARG, true, "WPM Value Type for v2 (Default: actual) (Choices: actual, relative");
+        options.addOption(LWR_ARG, true, "Link weight randomization method");
+        options.addOption(CWR_ARG, true, "Criteria weight randomization method");
+        options.addOption(WPM_VERSION_ARG, true, "WPM Version (Choices: v1, v2)");
+        options.addOption(WPM_VALUE_TYPE_ARG, true, "WPM Value Type for v2 (Choices: actual, relative");
 
-        options.addOption(IDLE_SLOPE_ARG, true, "Idle slope for CLASS_A (Default: 0.75)");
+        options.addOption(IDLE_SLOPE_ARG, true, "Idle slope for CLASS_A");
 
-        options.addOption(TSN_SIMULATION_VERSION_ARG, true, "TSN Simulation Version (Default: TSNCF) (Choices: TSNCF, TSNCFV2, TSNTSNSCHED, TSNNC)");
+        options.addOption(TSN_SIMULATION_VERSION_ARG, true, "TSN Simulation Version (Choices: TSNCF, TSNCFV2, TSNTSNSCHED, TSNNC)");
 
-        options.addOption(METAHEURISTIC_NAME_ARG, true, "Which metaheuristic runs (Default: GRASP) (Choices: GRASP, ALO)");
+        options.addOption(METAHEURISTIC_NAME_ARG, true, "Which metaheuristic runs (Choices: GRASP, ALO)");
 
-        options.addOption(MTR_NAME_ARG, true, "MTR Versions (Default: v1) (Choices: v1, Average)");
+        options.addOption(MTR_NAME_ARG, true, "MTR Versions (Choices: v1, Average)");
 
-        options.addOption(WSM_NORMALIZATION_ARG, true, "WSM Normalization Versions (Default: max) (Choices: max, minMax, vector)");
+        options.addOption(WSM_NORMALIZATION_ARG, true, "WSM Normalization Versions (Choices: max, minMax, vector)");
 
-        options.addOption(MCDM_NAME_ARG, true, "MCDM Versions (Default: wsm) (Choices: wsm, wpm, vector)");
+        options.addOption(MCDM_NAME_ARG, true, "MCDM Versions (Choices: wsm, wpm, vector)");
 
 
         //endregion
@@ -198,9 +199,6 @@ public class Main {
             } else if (Objects.equals(line.getOptionValue(TSN_SIMULATION_VERSION_ARG), Constants.TSN_TSNSCHED)) {
                 evaluatorName = Constants.AVB_LATENCY_MATH_TSNCF_V2;
                 evaluator = new AVBLatencyMathTSNCFV2();
-            } else if (Objects.equals(line.getOptionValue(TSN_SIMULATION_VERSION_ARG), Constants.TSN_NC)) {
-                evaluatorName = Constants.EVALUATOR_TSN_NC;
-                evaluator = new NetworkCalculus();
             }
 
             //Set K
@@ -255,11 +253,11 @@ public class Main {
             }
 
             if (line.hasOption(LWR_ARG)) {
-                lwr = line.getOptionValue(LWR_ARG);
+                lwrName = line.getOptionValue(LWR_ARG);
             }
 
             if (line.hasOption(CWR_ARG)) {
-                cwr = line.getOptionValue(CWR_ARG);
+                cwrName = line.getOptionValue(CWR_ARG);
             }
 
             if (line.hasOption(WPM_VERSION_ARG)) {
@@ -344,469 +342,181 @@ public class Main {
                 }
             }
             //endregion
+            switch (algorithm) {
+                case "LaursenRO" -> {
+                    Bag bag = new Bag();
+                    bag.setGraph(graph);
+                    bag.setApplicationList(applicationList);
+                    bag.setTopologyName(topologyName);
+                    bag.setApplicationName(applicationName);
+                    bag.setRouting(routing);
+                    bag.setPathFindingMethod(pathFindingMethod);
+                    bag.setAlgorithm(algorithm);
+                    bag.setK(k);
+                    bag.setThreadNumber(threadNumber);
+                    bag.setTimeout(timeout);
+                    bag.setMetaheuristicName(metaheuristicName);
+                    bag.setEvaluator(evaluator);
+                    bag.setEvaluatorName(evaluatorName);
 
-            //region <Set Routing>
-            switch (routing) {
-                case "phy" -> {
-                    switch (pathFindingMethod) {
-                        case "yen" -> {
-                            switch (algorithm) {
-                                case "LaursenRO" -> {
-                                    Bag bag = new Bag();
-                                    bag.setGraph(graph);
-                                    bag.setApplicationList(applicationList);
-                                    bag.setTopologyName(topologyName);
-                                    bag.setApplicationName(applicationName);
-                                    bag.setRouting(routing);
-                                    bag.setPathFindingMethod(pathFindingMethod);
-                                    bag.setAlgorithm(algorithm);
-                                    bag.setK(k);
-                                    bag.setThreadNumber(threadNumber);
-                                    bag.setTimeout(timeout);
-                                    bag.setMetaheuristicName(metaheuristicName);
-                                    bag.setEvaluator(evaluator);
-                                    bag.setEvaluatorName(evaluatorName);
+                    LaursenRO laursenRO = new LaursenRO(k);
 
-                                    if (evaluatorName.equals(Constants.EVALUATOR_TSN_NC)){
-                                        createGCLSynthesisAndNetworkCalculusDirectories(bag);
-                                    }
+                    logger.info(createInfo(bag));
 
-                                    LaursenRO laursenRO = new LaursenRO(k);
+                    Solution solution = laursenRO.solve(bag);
 
-                                    logger.info(createInfo(bag));
+                    solution.getCost().writeResultToFile(bag);
 
-                                    Solution solution = laursenRO.solve(bag);
+                    if (solution.getMulticastList() == null || solution.getMulticastList().isEmpty()) {
+                        logger.info(Constants.NO_SOLUTION_COULD_BE_FOUND);
+                    } else {
+                        if (solution.getCost().getTotalCost() == Double.MAX_VALUE) {
+                            logger.info(createFoundNoSolutionString(solution));
+                        } else {
+                            logger.info(createFoundSolutionString(solution));
 
-                                    solution.getCost().writeResultToFile(bag);
-
-                                    if (solution.getMulticastList() == null || solution.getMulticastList().isEmpty()) {
-                                        logger.info(Constants.NO_SOLUTION_COULD_BE_FOUND);
-                                    } else {
-                                        if (solution.getCost().getTotalCost() == Double.MAX_VALUE) {
-                                            logger.info(createFoundNoSolutionString(solution));
-                                        } else {
-                                            logger.info(createFoundSolutionString(solution));
-
-                                            new OutputMethods(bag, laursenRO.getSolution(), solution.getCost().getWCDMap(), graph, rate, laursenRO.getDurationMap(), laursenRO.getSRTUnicastCandidateList());
-                                        }
-                                    }
-                                }
-                                case "WSM" -> {
-                                    WSM wsm = new WSM();
-
-                                    Bag bag = new Bag();
-                                    bag.setGraph(graph);
-                                    bag.setApplicationList(applicationList);
-                                    bag.setTopologyName(topologyName);
-                                    bag.setApplicationName(applicationName);
-                                    bag.setRouting(routing);
-                                    bag.setPathFindingMethod(pathFindingMethod);
-                                    bag.setAlgorithm(algorithm);
-                                    bag.setUnicastCandidateSortingMethod(unicastCandidateSortingMethod);
-                                    bag.setK(k);
-                                    bag.setMCDMName(mcdmName);
-                                    bag.setMCDMObjective(mcdmObjective);
-                                    bag.setWSMNormalization(wsmNormalization);
-                                    bag.setWSRT(wSRT);
-                                    bag.setWTT(wTT);
-                                    bag.setWLength(wLength);
-                                    bag.setWUtil(wUtil);
-                                    bag.setEvaluator(evaluator);
-                                    bag.setEvaluatorName(evaluatorName);
-
-                                    logger.info(createInfo(bag));
-
-                                    Solution solution = wsm.solve(bag);
-
-                                    solution.getCost().writeResultToFile(bag);
-
-                                    if (solution.getMulticastList() == null || solution.getMulticastList().isEmpty()) {
-                                        logger.info(Constants.NO_SOLUTION_COULD_BE_FOUND);
-                                    } else {
-                                        if (solution.getCost().getTotalCost() == Double.MAX_VALUE) {
-                                            logger.info(createFoundNoSolutionString(solution));
-                                        } else {
-                                            logger.info(createFoundSolutionString(solution));
-
-                                            new OutputMethods(bag, wsm.getSolution(), solution.getCost().getWCDMap(), graph, rate, wsm.getDurationMap(), wsm.getSRTUnicastCandidateList());
-
-
-                                        }
-                                    }
-                                }
-                                case "WSMLWR" -> {
-                                    WSMLWR wsmLWR = new WSMLWR();
-
-                                    Bag bag = new Bag();
-                                    bag.setGraph(graph);
-                                    bag.setApplicationList(applicationList);
-                                    bag.setTopologyName(topologyName);
-                                    bag.setApplicationName(applicationName);
-                                    bag.setRouting(routing);
-                                    bag.setPathFindingMethod(pathFindingMethod);
-                                    bag.setAlgorithm(algorithm);
-                                    bag.setUnicastCandidateSortingMethod(unicastCandidateSortingMethod);
-                                    bag.setLWR(lwr);
-                                    bag.setK(k);
-                                    bag.setMCDMName(mcdmName);
-                                    bag.setMCDMObjective(mcdmObjective);
-                                    bag.setWSMNormalization(wsmNormalization);
-                                    bag.setWSRT(wSRT);
-                                    bag.setWTT(wTT);
-                                    bag.setWLength(wLength);
-                                    bag.setWUtil(wUtil);
-                                    bag.setThreadNumber(threadNumber);
-                                    bag.setTimeout(timeout);
-                                    bag.setMetaheuristicName(metaheuristicName);
-                                    bag.setEvaluator(evaluator);
-                                    bag.setEvaluatorName(evaluatorName);
-
-                                    logger.info(createInfo(bag));
-
-                                    Solution solution = wsmLWR.solve(bag);
-
-                                    solution.getCost().writeResultToFile(bag);
-
-                                    if (solution.getMulticastList() == null || solution.getMulticastList().isEmpty()) {
-                                        logger.info(Constants.NO_SOLUTION_COULD_BE_FOUND);
-                                    } else {
-                                        if (solution.getCost().getTotalCost() == Double.MAX_VALUE) {
-                                            logger.info(createFoundNoSolutionString(solution));
-                                        } else {
-                                            logger.info(createFoundSolutionString(solution));
-
-                                            new OutputMethods(bag, wsmLWR.getSolution(), solution.getCost().getWCDMap(), graph, rate, wsmLWR.getDurationMap(), wsmLWR.getSRTUnicastCandidateList());
-
-                                        }
-                                    }
-                                }
-                                case "WSMCWR" -> {
-                                    WSMCWR wsmCWR = new WSMCWR();
-
-                                    Bag bag = new Bag();
-                                    bag.setGraph(graph);
-                                    bag.setApplicationList(applicationList);
-                                    bag.setTopologyName(topologyName);
-                                    bag.setApplicationName(applicationName);
-                                    bag.setRouting(routing);
-                                    bag.setPathFindingMethod(pathFindingMethod);
-                                    bag.setAlgorithm(algorithm);
-                                    bag.setUnicastCandidateSortingMethod(unicastCandidateSortingMethod);
-                                    bag.setK(k);
-                                    bag.setMCDMName(mcdmName);
-                                    bag.setMCDMObjective(mcdmObjective);
-                                    bag.setWSMNormalization(wsmNormalization);
-                                    bag.setCWR(cwr);
-                                    bag.setThreadNumber(threadNumber);
-                                    bag.setTimeout(timeout);
-                                    bag.setMetaheuristicName(metaheuristicName);
-                                    bag.setEvaluator(evaluator);
-                                    bag.setEvaluatorName(evaluatorName);
-
-                                    logger.info(createInfo(bag));
-
-                                    Solution solution = wsmCWR.solve(bag);
-
-                                    solution.getCost().writeResultToFile(bag);
-
-                                    if (solution.getMulticastList() == null || solution.getMulticastList().isEmpty()) {
-                                        logger.info(Constants.NO_SOLUTION_COULD_BE_FOUND);
-                                    } else {
-                                        if (solution.getCost().getTotalCost() == Double.MAX_VALUE) {
-                                            logger.info(createFoundNoSolutionString(solution));
-                                        } else {
-                                            logger.info(createFoundSolutionString(solution));
-
-                                            new OutputMethods(bag, wsmCWR.getSolution(), solution.getCost().getWCDMap(), graph, rate, wsmCWR.getDurationMap(), wsmCWR.getSRTUnicastCandidateList());
-
-                                        }
-                                    }
-                                }
-                                default -> throw new InputMismatchException("Aborting: " + routing + ", " + pathFindingMethod + ", " + algorithm + " unrecognized!");
-                            }
+                            new OutputMethods(bag, laursenRO.getSolution(), solution.getCost().getWCDMap(), graph, rate, laursenRO.getDurationMap(), laursenRO.getSRTUnicastCandidateList());
                         }
-                        case "pathPenalization" -> {
-                            switch (algorithm) {
-                                case "LaursenRO" -> {
-                                    Bag bag = new Bag();
-                                    bag.setGraph(graph);
-                                    bag.setApplicationList(applicationList);
-                                    bag.setTopologyName(topologyName);
-                                    bag.setApplicationName(applicationName);
-                                    bag.setRouting(routing);
-                                    bag.setPathFindingMethod(pathFindingMethod);
-                                    bag.setAlgorithm(algorithm);
-                                    bag.setK(k);
-                                    bag.setThreadNumber(threadNumber);
-                                    bag.setTimeout(timeout);
-                                    bag.setMetaheuristicName(metaheuristicName);
-                                    bag.setEvaluator(evaluator);
-                                    bag.setEvaluatorName(evaluatorName);
-
-                                    if (evaluatorName.equals(Constants.EVALUATOR_TSN_NC)){
-                                        createGCLSynthesisAndNetworkCalculusDirectories(bag);
-                                    }
-
-                                    LaursenRO laursenRO = new LaursenRO(k);
-
-                                    logger.info(createInfo(bag));
-
-                                    Solution solution = laursenRO.solve(bag);
-
-                                    solution.getCost().writeResultToFile(bag);
-
-                                    if (solution.getMulticastList() == null || solution.getMulticastList().isEmpty()) {
-                                        logger.info(Constants.NO_SOLUTION_COULD_BE_FOUND);
-                                    } else {
-                                        if (solution.getCost().getTotalCost() == Double.MAX_VALUE) {
-                                            logger.info(createFoundNoSolutionString(solution));
-                                        } else {
-                                            logger.info(createFoundSolutionString(solution));
-
-                                            new OutputMethods(bag, laursenRO.getSolution(), solution.getCost().getWCDMap(), graph, rate, laursenRO.getDurationMap(), laursenRO.getSRTUnicastCandidateList());
-                                        }
-                                    }
-                                }
-                                case "WSM" -> {
-                                    ktu.kaganndemirr.routing.phy.pathpenalization.heuristic.WSM wsm = new ktu.kaganndemirr.routing.phy.pathpenalization.heuristic.WSM();
-
-                                    Bag bag = new Bag();
-                                    bag.setGraph(graph);
-                                    bag.setApplicationList(applicationList);
-                                    bag.setTopologyName(topologyName);
-                                    bag.setApplicationName(applicationName);
-                                    bag.setRouting(routing);
-                                    bag.setPathFindingMethod(pathFindingMethod);
-                                    bag.setAlgorithm(algorithm);
-                                    bag.setUnicastCandidateSortingMethod(unicastCandidateSortingMethod);
-                                    bag.setK(k);
-                                    bag.setMCDMName(mcdmName);
-                                    bag.setMCDMObjective(mcdmObjective);
-                                    bag.setWSMNormalization(wsmNormalization);
-                                    bag.setWSRT(wSRT);
-                                    bag.setWTT(wTT);
-                                    bag.setWLength(wLength);
-                                    bag.setWUtil(wUtil);
-                                    bag.setEvaluator(evaluator);
-                                    bag.setEvaluatorName(evaluatorName);
-
-                                    logger.info(createInfo(bag));
-
-                                    Solution solution = wsm.solve(bag);
-
-                                    solution.getCost().writeResultToFile(bag);
-
-                                    if (solution.getMulticastList() == null || solution.getMulticastList().isEmpty()) {
-                                        logger.info(Constants.NO_SOLUTION_COULD_BE_FOUND);
-                                    } else {
-                                        if (solution.getCost().getTotalCost() == Double.MAX_VALUE) {
-                                            logger.info(createFoundNoSolutionString(solution));
-                                        } else {
-                                            logger.info(createFoundSolutionString(solution));
-
-                                            new OutputMethods(bag, wsm.getSolution(), solution.getCost().getWCDMap(), graph, rate, wsm.getDurationMap(), wsm.getSRTUnicastCandidateList());
-
-
-                                        }
-                                    }
-                                }
-                                case "WSMLWR" -> {
-                                    ktu.kaganndemirr.routing.phy.pathpenalization.metaheuristic.WSMLWR wsmLWR = new ktu.kaganndemirr.routing.phy.pathpenalization.metaheuristic.WSMLWR();
-
-                                    Bag bag = new Bag();
-                                    bag.setGraph(graph);
-                                    bag.setApplicationList(applicationList);
-                                    bag.setTopologyName(topologyName);
-                                    bag.setApplicationName(applicationName);
-                                    bag.setRouting(routing);
-                                    bag.setPathFindingMethod(pathFindingMethod);
-                                    bag.setAlgorithm(algorithm);
-                                    bag.setUnicastCandidateSortingMethod(unicastCandidateSortingMethod);
-                                    bag.setLWR(lwr);
-                                    bag.setK(k);
-                                    bag.setMCDMName(mcdmName);
-                                    bag.setMCDMObjective(mcdmObjective);
-                                    bag.setWSMNormalization(wsmNormalization);
-                                    bag.setWSRT(wSRT);
-                                    bag.setWTT(wTT);
-                                    bag.setWLength(wLength);
-                                    bag.setWUtil(wUtil);
-                                    bag.setThreadNumber(threadNumber);
-                                    bag.setTimeout(timeout);
-                                    bag.setMetaheuristicName(metaheuristicName);
-                                    bag.setEvaluator(evaluator);
-                                    bag.setEvaluatorName(evaluatorName);
-
-                                    logger.info(createInfo(bag));
-
-                                    Solution solution = wsmLWR.solve(bag);
-
-                                    solution.getCost().writeResultToFile(bag);
-
-                                    if (solution.getMulticastList() == null || solution.getMulticastList().isEmpty()) {
-                                        logger.info(Constants.NO_SOLUTION_COULD_BE_FOUND);
-                                    } else {
-                                        if (solution.getCost().getTotalCost() == Double.MAX_VALUE) {
-                                            logger.info(createFoundNoSolutionString(solution));
-                                        } else {
-                                            logger.info(createFoundSolutionString(solution));
-
-                                            new OutputMethods(bag, wsmLWR.getSolution(), solution.getCost().getWCDMap(), graph, rate, wsmLWR.getDurationMap(), wsmLWR.getSRTUnicastCandidateList());
-
-                                        }
-                                    }
-                                }
-                                case "WSMCWR" -> {
-                                    ktu.kaganndemirr.routing.phy.pathpenalization.metaheuristic.WSMCWR wsmCWR = new ktu.kaganndemirr.routing.phy.pathpenalization.metaheuristic.WSMCWR();
-
-                                    Bag bag = new Bag();
-                                    bag.setGraph(graph);
-                                    bag.setApplicationList(applicationList);
-                                    bag.setTopologyName(topologyName);
-                                    bag.setApplicationName(applicationName);
-                                    bag.setRouting(routing);
-                                    bag.setPathFindingMethod(pathFindingMethod);
-                                    bag.setAlgorithm(algorithm);
-                                    bag.setUnicastCandidateSortingMethod(unicastCandidateSortingMethod);
-                                    bag.setK(k);
-                                    bag.setMCDMName(mcdmName);
-                                    bag.setMCDMObjective(mcdmObjective);
-                                    bag.setWSMNormalization(wsmNormalization);
-                                    bag.setCWR(cwr);
-                                    bag.setThreadNumber(threadNumber);
-                                    bag.setTimeout(timeout);
-                                    bag.setMetaheuristicName(metaheuristicName);
-                                    bag.setEvaluator(evaluator);
-                                    bag.setEvaluatorName(evaluatorName);
-
-                                    logger.info(createInfo(bag));
-
-                                    Solution solution = wsmCWR.solve(bag);
-
-                                    solution.getCost().writeResultToFile(bag);
-
-                                    if (solution.getMulticastList() == null || solution.getMulticastList().isEmpty()) {
-                                        logger.info(Constants.NO_SOLUTION_COULD_BE_FOUND);
-                                    } else {
-                                        if (solution.getCost().getTotalCost() == Double.MAX_VALUE) {
-                                            logger.info(createFoundNoSolutionString(solution));
-                                        } else {
-                                            logger.info(createFoundSolutionString(solution));
-
-                                            new OutputMethods(bag, wsmCWR.getSolution(), solution.getCost().getWCDMap(), graph, rate, wsmCWR.getDurationMap(), wsmCWR.getSRTUnicastCandidateList());
-
-                                        }
-                                    }
-                                }
-                                case "WPM" -> {
-                                    ktu.kaganndemirr.routing.phy.pathpenalization.heuristic.WPM wpm = new ktu.kaganndemirr.routing.phy.pathpenalization.heuristic.WPM();
-
-                                    Bag bag = new Bag();
-                                    bag.setGraph(graph);
-                                    bag.setApplicationList(applicationList);
-                                    bag.setTopologyName(topologyName);
-                                    bag.setApplicationName(applicationName);
-                                    bag.setRouting(routing);
-                                    bag.setPathFindingMethod(pathFindingMethod);
-                                    bag.setAlgorithm(algorithm);
-                                    bag.setUnicastCandidateSortingMethod(unicastCandidateSortingMethod);
-                                    bag.setK(k);
-                                    bag.setMCDMName(mcdmName);
-                                    bag.setMCDMObjective(mcdmObjective);
-                                    bag.setWSRT(wSRT);
-                                    bag.setWTT(wTT);
-                                    bag.setWLength(wLength);
-                                    bag.setWUtil(wUtil);
-                                    bag.setWPMVersion(wpmVersion);
-                                    bag.setEvaluator(evaluator);
-                                    bag.setEvaluatorName(evaluatorName);
-
-                                    if(Objects.equals(bag.getWPMVersion(), MCDMConstants.WPM_VERSION_V2)){
-                                        bag.setWPMValueType(wpmValueType);
-                                    }
-
-                                    logger.info(createInfo(bag));
-
-                                    Solution solution = wpm.solve(bag);
-
-                                    solution.getCost().writeResultToFile(bag);
-
-                                    if (solution.getMulticastList() == null || solution.getMulticastList().isEmpty()) {
-                                        logger.info(Constants.NO_SOLUTION_COULD_BE_FOUND);
-                                    } else {
-                                        if (solution.getCost().getTotalCost() == Double.MAX_VALUE) {
-                                            logger.info(createFoundNoSolutionString(solution));
-                                        } else {
-                                            logger.info(createFoundSolutionString(solution));
-
-                                            new OutputMethods(bag, wpm.getSolution(), solution.getCost().getWCDMap(), graph, rate, wpm.getDurationMap(), wpm.getSRTUnicastCandidateList());
-
-
-                                        }
-                                    }
-                                }
-                                case "WPMLWR" -> {
-                                    ktu.kaganndemirr.routing.phy.pathpenalization.metaheuristic.WPMLWR wpmLWR = new ktu.kaganndemirr.routing.phy.pathpenalization.metaheuristic.WPMLWR();
-
-                                    Bag bag = new Bag();
-                                    bag.setGraph(graph);
-                                    bag.setApplicationList(applicationList);
-                                    bag.setTopologyName(topologyName);
-                                    bag.setApplicationName(applicationName);
-                                    bag.setRouting(routing);
-                                    bag.setPathFindingMethod(pathFindingMethod);
-                                    bag.setAlgorithm(algorithm);
-                                    bag.setUnicastCandidateSortingMethod(unicastCandidateSortingMethod);
-                                    bag.setLWR(lwr);
-                                    bag.setK(k);
-                                    bag.setMCDMName(mcdmName);
-                                    bag.setMCDMObjective(mcdmObjective);
-                                    bag.setWSRT(wSRT);
-                                    bag.setWTT(wTT);
-                                    bag.setWLength(wLength);
-                                    bag.setWUtil(wUtil);
-                                    bag.setThreadNumber(threadNumber);
-                                    bag.setTimeout(timeout);
-                                    bag.setMetaheuristicName(metaheuristicName);
-                                    bag.setEvaluator(evaluator);
-                                    bag.setEvaluatorName(evaluatorName);
-                                    bag.setWPMVersion(wpmVersion);
-
-                                    if(Objects.equals(bag.getWPMVersion(), MCDMConstants.WPM_VERSION_V2)){
-                                        bag.setWPMValueType(wpmValueType);
-                                    }
-
-                                    logger.info(createInfo(bag));
-
-                                    Solution solution = wpmLWR.solve(bag);
-
-                                    solution.getCost().writeResultToFile(bag);
-
-                                    if (solution.getMulticastList() == null || solution.getMulticastList().isEmpty()) {
-                                        logger.info(Constants.NO_SOLUTION_COULD_BE_FOUND);
-                                    } else {
-                                        if (solution.getCost().getTotalCost() == Double.MAX_VALUE) {
-                                            logger.info(createFoundNoSolutionString(solution));
-                                        } else {
-                                            logger.info(createFoundSolutionString(solution));
-
-                                            new OutputMethods(bag, wpmLWR.getSolution(), solution.getCost().getWCDMap(), graph, rate, wpmLWR.getDurationMap(), wpmLWR.getSRTUnicastCandidateList());
-
-                                        }
-                                    }
-                                }
-                                default -> throw new InputMismatchException("Aborting: " + routing + ", " + pathFindingMethod + ", " + algorithm + " unrecognized!");
-                            }
-                        }
-                        default -> throw new InputMismatchException("Aborting: Solver " + routing + ", " + pathFindingMethod + " unrecognized!");
                     }
                 }
-                default -> throw new InputMismatchException("Aborting: " + routing + " unrecognized!");
-            }
-            //endregion
+                case "MCDM" -> {
+                    MCDM mcdm = new MCDM();
 
-        } catch (ParseException | IOException pe) {
-            throw new RuntimeException(pe);
+                    Bag bag = new Bag();
+                    bag.setGraph(graph);
+                    bag.setApplicationList(applicationList);
+                    bag.setTopologyName(topologyName);
+                    bag.setApplicationName(applicationName);
+                    bag.setRouting(routing);
+                    bag.setPathFindingMethod(pathFindingMethod);
+                    bag.setAlgorithm(algorithm);
+                    bag.setUnicastCandidateSortingMethod(unicastCandidateSortingMethod);
+                    bag.setK(k);
+                    bag.setMCDMName(mcdmName);
+                    bag.setMCDMObjective(mcdmObjective);
+                    bag.setWSMNormalization(wsmNormalization);
+                    bag.setWPMVersion(wpmVersion);
+                    bag.setWPMValueType(wpmValueType);
+                    bag.setWSRT(wSRT);
+                    bag.setWTT(wTT);
+                    bag.setWLength(wLength);
+                    bag.setWUtil(wUtil);
+                    bag.setEvaluator(evaluator);
+                    bag.setEvaluatorName(evaluatorName);
+
+                    logger.info(createInfo(bag));
+
+                    Solution solution = mcdm.solve(bag);
+
+                    solution.getCost().writeResultToFile(bag);
+
+                    if (solution.getMulticastList() == null || solution.getMulticastList().isEmpty()) {
+                        logger.info(Constants.NO_SOLUTION_COULD_BE_FOUND);
+                    } else {
+                        if (solution.getCost().getTotalCost() == Double.MAX_VALUE) {
+                            logger.info(createFoundNoSolutionString(solution));
+                        } else {
+                            logger.info(createFoundSolutionString(solution));
+
+                            new OutputMethods(bag, mcdm.getSolution(), solution.getCost().getWCDMap(), graph, rate, mcdm.getDurationMap(), mcdm.getSRTUnicastCandidateList());
+
+
+                        }
+                    }
+                }
+                case "LWR" -> {
+                    LWR lwr = new LWR();
+
+                    Bag bag = new Bag();
+                    bag.setGraph(graph);
+                    bag.setApplicationList(applicationList);
+                    bag.setTopologyName(topologyName);
+                    bag.setApplicationName(applicationName);
+                    bag.setRouting(routing);
+                    bag.setPathFindingMethod(pathFindingMethod);
+                    bag.setAlgorithm(algorithm);
+                    bag.setUnicastCandidateSortingMethod(unicastCandidateSortingMethod);
+                    bag.setLWR(lwrName);
+                    bag.setCWR(cwrName);
+                    bag.setK(k);
+                    bag.setMCDMName(mcdmName);
+                    bag.setMCDMObjective(mcdmObjective);
+                    bag.setWSMNormalization(wsmNormalization);
+                    bag.setWSRT(wSRT);
+                    bag.setWTT(wTT);
+                    bag.setWLength(wLength);
+                    bag.setWUtil(wUtil);
+                    bag.setThreadNumber(threadNumber);
+                    bag.setTimeout(timeout);
+                    bag.setMetaheuristicName(metaheuristicName);
+                    bag.setEvaluator(evaluator);
+                    bag.setEvaluatorName(evaluatorName);
+
+                    logger.info(createInfo(bag));
+
+                    Solution solution = lwr.solve(bag);
+
+                    solution.getCost().writeResultToFile(bag);
+
+                    if (solution.getMulticastList() == null || solution.getMulticastList().isEmpty()) {
+                        logger.info(Constants.NO_SOLUTION_COULD_BE_FOUND);
+                    } else {
+                        if (solution.getCost().getTotalCost() == Double.MAX_VALUE) {
+                            logger.info(createFoundNoSolutionString(solution));
+                        } else {
+                            logger.info(createFoundSolutionString(solution));
+
+                            new OutputMethods(bag, lwr.getSolution(), solution.getCost().getWCDMap(), graph, rate, lwr.getDurationMap(), lwr.getSRTUnicastCandidateList());
+
+                        }
+                    }
+                }
+                case "CWR" -> {
+                    CWR cwr = new CWR();
+
+                    Bag bag = new Bag();
+                    bag.setGraph(graph);
+                    bag.setApplicationList(applicationList);
+                    bag.setTopologyName(topologyName);
+                    bag.setApplicationName(applicationName);
+                    bag.setRouting(routing);
+                    bag.setPathFindingMethod(pathFindingMethod);
+                    bag.setAlgorithm(algorithm);
+                    bag.setUnicastCandidateSortingMethod(unicastCandidateSortingMethod);
+                    bag.setK(k);
+                    bag.setMCDMName(mcdmName);
+                    bag.setMCDMObjective(mcdmObjective);
+                    bag.setWSMNormalization(wsmNormalization);
+                    bag.setCWR(cwrName);
+                    bag.setThreadNumber(threadNumber);
+                    bag.setTimeout(timeout);
+                    bag.setMetaheuristicName(metaheuristicName);
+                    bag.setEvaluator(evaluator);
+                    bag.setEvaluatorName(evaluatorName);
+
+                    logger.info(createInfo(bag));
+
+                    Solution solution = cwr.solve(bag);
+
+                    solution.getCost().writeResultToFile(bag);
+
+                    if (solution.getMulticastList() == null || solution.getMulticastList().isEmpty()) {
+                        logger.info(Constants.NO_SOLUTION_COULD_BE_FOUND);
+                    } else {
+                        if (solution.getCost().getTotalCost() == Double.MAX_VALUE) {
+                            logger.info(createFoundNoSolutionString(solution));
+                        } else {
+                            logger.info(createFoundSolutionString(solution));
+
+                            new OutputMethods(bag, cwr.getSolution(), solution.getCost().getWCDMap(), graph, rate, cwr.getDurationMap(), cwr.getSRTUnicastCandidateList());
+
+                        }
+                    }
+                }
+                case null, default -> throw new InputMismatchException("Aborting: " + algorithm + " unrecognized!");
+            }
+        }catch (ParseException | IOException pe) {
+                throw new RuntimeException(pe);
         }
     }
 

@@ -1,27 +1,26 @@
-package ktu.kaganndemirr.routing.phy.yen.metaheuristic;
+package ktu.kaganndemirr.routing.metaheuristic;
 
-import ktu.kaganndemirr.application.Application;
-import ktu.kaganndemirr.architecture.GCLEdge;
-import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.evaluator.AVBLatencyMathCost;
 import ktu.kaganndemirr.evaluator.Cost;
 import ktu.kaganndemirr.evaluator.Evaluator;
 import ktu.kaganndemirr.message.Multicast;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
-import ktu.kaganndemirr.routing.phy.yen.YenKShortestPaths;
-import ktu.kaganndemirr.routing.phy.yen.YenRandomizedKShortestPaths;
+import ktu.kaganndemirr.routing.KShortestPaths;
 import ktu.kaganndemirr.solver.Solution;
 import ktu.kaganndemirr.util.Bag;
 import ktu.kaganndemirr.util.Constants;
-import ktu.kaganndemirr.util.LaursenMethods;
 import ktu.kaganndemirr.util.MetaheuristicMethods;
-import org.jgrapht.Graph;
+import ktu.kaganndemirr.util.mcdm.WPMMethods;
+import ktu.kaganndemirr.util.mcdm.WSMMethods;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.Instant;
@@ -30,15 +29,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static ktu.kaganndemirr.util.HelperMethods.createScenarioOutputPath;
-import static ktu.kaganndemirr.util.HelperMethods.writeSolutionsToFile;
+import static ktu.kaganndemirr.util.HelperMethods.*;
 
-public class LaursenRO {
-    private static final Logger logger = LoggerFactory.getLogger(LaursenRO.class.getSimpleName());
-
-    private final int k;
-
-    private long yenKShortestPathsDuration;
+public class LWR {
+    private static final Logger logger = LoggerFactory.getLogger(LWR.class.getSimpleName());
 
     private List<UnicastCandidate> ttUnicastCandidateList;
     private List<UnicastCandidate> srtUnicastCandidateList;
@@ -62,9 +56,7 @@ public class LaursenRO {
 
     private final Map<Double, Double> durationMap;
 
-    public LaursenRO(int k){
-        this.k = k;
-        yenKShortestPathsDuration = 0;
+    public LWR(){
         unicastList = new ArrayList<>();
         writeLock = new Object();
         costLock = new Object();
@@ -74,33 +66,27 @@ public class LaursenRO {
     }
 
     public Solution solve(Bag bag){
-        Instant yenKShortestPathsStartTime = Instant.now();
-        YenKShortestPaths yenKShortestPaths = new YenKShortestPaths(bag);
-        Instant yenKShortestPathsEndTime = Instant.now();
-        yenKShortestPathsDuration = Duration.between(yenKShortestPathsStartTime, yenKShortestPathsEndTime).toMillis();
-
-        ttUnicastCandidateList = yenKShortestPaths.getTTUnicastCandidateList();
-        srtUnicastCandidateList = yenKShortestPaths.getSRTUnicastCandidateList();
-
-        ttUnicastList = yenKShortestPaths.getTTUnicastList();
-        srtUnicastList = yenKShortestPaths.getSRTUnicastList();
+        KShortestPaths kShortestPaths = new KShortestPaths(bag);
+        ttUnicastList = kShortestPaths.getTTUnicastList();
+        srtUnicastList = kShortestPaths.getSRTUnicastList();
 
         unicastList.addAll(ttUnicastList);
         unicastList.addAll(srtUnicastList);
 
         this.evaluator = bag.getEvaluator();
 
-        scenarioOutputPath = createScenarioOutputPath(bag);
+        if(logger.isDebugEnabled()){
+            scenarioOutputPath = createScenarioOutputPath(bag);
 
-        new File(scenarioOutputPath).mkdirs();
+            new File(scenarioOutputPath).mkdirs();
+        }
 
         try (ExecutorService exec = Executors.newFixedThreadPool(bag.getThreadNumber())) {
 
             Timer timer = getTimer(Duration.ofSeconds(bag.getTimeout()));
 
-
             for (int i = 0; i < bag.getThreadNumber(); i++) {
-                exec.execute(new LaursenRoutingOptimizationRunnable(bag));
+                exec.execute(new LWRRunnable(bag, unicastList));
             }
 
             exec.awaitTermination(Duration.ofSeconds(bag.getTimeout()).toSeconds(), TimeUnit.SECONDS);
@@ -113,7 +99,7 @@ public class LaursenRO {
             timer.cancel();
 
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            logger.info("Executor interrupted");
         }
         return new Solution(globalBestCost, Multicast.generateMulticastList(bestSolution));
     }
@@ -127,6 +113,8 @@ public class LaursenRO {
 
                 @Override
                 public void run() {
+                    //Report progress every 10sec
+
                     float searchProgress = (++i * (float) Constants.PROGRESS_PERIOD_SECOND) / duration.toMillis();
                     logger.info("Searching {} %: CurrentBest {}", numberFormat.format(searchProgress * 100), globalBestCost);
                 }
@@ -137,14 +125,16 @@ public class LaursenRO {
         return timer;
     }
 
-    private class LaursenRoutingOptimizationRunnable implements Runnable {
+    private class LWRRunnable implements Runnable {
         private int i = 0;
         Instant solutionStartTime = Instant.now();
 
-        private final Bag bag;
+        Bag bag;
+        List<Unicast> unicastList;
 
-        public LaursenRoutingOptimizationRunnable(Bag bag){
+        public LWRRunnable(Bag bag, List<Unicast> unicastList) {
             this.bag = bag;
+            this.unicastList = unicastList;
         }
 
         @Override
@@ -154,28 +144,62 @@ public class LaursenRO {
             while (!Thread.currentThread().isInterrupted()) {
                 i++;
 
+                KShortestPaths kShortestPaths = new KShortestPaths(bag);
 
-                List<Unicast> solution = null;
-                List<Unicast> initialSolution = null;
+                srtUnicastCandidateList = kShortestPaths.getSRTUnicastCandidateList();
+                ttUnicastCandidateList = kShortestPaths.getTTUnicastCandidateList();
 
-                if(Objects.equals(bag.getMetaheuristicName(), Constants.GRASP)){
-                    initialSolution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, unicastList, k, evaluator);
-                    solution = MetaheuristicMethods.GRASP(initialSolution, evaluator, srtUnicastCandidateList, globalBestCost);
-                } else if (Objects.equals(bag.getMetaheuristicName(), Constants.ALO)) {
-                    initialSolution = LaursenMethods.constructInitialSolution(srtUnicastCandidateList, unicastList, k, evaluator);
-                    solution = MetaheuristicMethods.ALO(initialSolution, initialSolution, srtUnicastCandidateList, k, evaluator);
+                BufferedWriter costsWriter = null;
+                if(logger.isDebugEnabled()){
+                    try {
+                        costsWriter = new BufferedWriter(new FileWriter(Paths.get(scenarioOutputPath, "Costs.txt").toString(), true));
+                        costsWriter.write("############## ThreadName:" + threadName + " Iteration:" + i + " ##############\n");
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
 
-                if (logger.isDebugEnabled()) {
+                List<Unicast> initialSolution = null;
+                try{
+                    if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT)){
+                        //TODO
+                    } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH)) {
+                        if(Objects.equals(bag.getMCDMName(), Constants.WSM)){
+                            initialSolution = WSMMethods.srtTTLength(bag, srtUnicastCandidateList, unicastList, costsWriter);
+                        } else if (Objects.equals(bag.getMCDMName(), Constants.WPM)) {
+                            initialSolution = WPMMethods.srtTTLength(bag, srtUnicastCandidateList, unicastList, costsWriter);
+                        }
+                    } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH_UTIL)) {
+                        //TODO
+                    }
+                }catch (IOException e){
+                    throw new RuntimeException(e);
+                }
+
+
+                List<Unicast> solution = null;
+
+                if(Objects.equals(bag.getMetaheuristicName(), Constants.GRASP)){
+                    solution = MetaheuristicMethods.GRASP(initialSolution, evaluator, srtUnicastCandidateList, globalBestCost);
+                } else if (Objects.equals(bag.getMetaheuristicName(), Constants.ALO)) {
+                    solution = MetaheuristicMethods.ALO(initialSolution, initialSolution, srtUnicastCandidateList, bag.getK(), evaluator);
+                }
+
+                if(logger.isDebugEnabled()){
                     synchronized (writeLock) {
                         assert solution != null;
                         try {
+                            assert costsWriter != null;
+                            costsWriter.close();
+                            assert initialSolution != null;
                             writeSolutionsToFile(initialSolution, solution, scenarioOutputPath, threadName, i);
+                            writeSRTCandidateRoutesToFile(srtUnicastCandidateList, scenarioOutputPath, threadName, i);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
                     }
                 }
+
 
                 //Evaluate and see if better than anything we have seen before
                 Cost cost = evaluator.evaluate(solution);
@@ -185,7 +209,7 @@ public class LaursenRO {
                         if (cost.getTotalCost() < globalBestCost.getTotalCost()) {
                             globalBestCost = cost;
                             Instant solutionEndTime = Instant.now();
-                            durationMap.put(Double.parseDouble(globalBestCost.toString().split("\\s")[0]), (Duration.between(solutionStartTime, solutionEndTime).toMillis() / 1e3) + yenKShortestPathsDuration / 1e3);
+                            durationMap.put(Double.parseDouble(globalBestCost.toString().split("\\s")[0]), (Duration.between(solutionStartTime, solutionEndTime).toMillis() / 1e3));
                             bestSolution.clear();
                             assert solution != null;
                             bestSolution.addAll(solution);
@@ -194,7 +218,7 @@ public class LaursenRO {
                 }
             }
 
-            logger.info(" {} finished in {} iterations", Thread.currentThread().getName(), i);
+            logger.info(" {} finished in {} iterations", threadName, i);
         }
     }
 
@@ -222,4 +246,6 @@ public class LaursenRO {
         return durationMap;
     }
 }
+
+
 

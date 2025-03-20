@@ -89,6 +89,24 @@ public class WSMMethods {
         return normalizedList;
     }
 
+    public static List<Unicast> srtTTLength(Bag bag, List<UnicastCandidate> srtUnicastCandidateList, List<Unicast> unicastList, BufferedWriter costsWriter) throws IOException {
+        List<UnicastCandidate> sortedSRTUnicastCandidateList = null;
+        if(Objects.equals(bag.getUnicastCandidateSortingMethod(), MCDMConstants.DEADLINE)){
+            sortedSRTUnicastCandidateList = UnicastCandidateSortingMethods.sortUnicastCandidateListForDeadlineAscending(srtUnicastCandidateList);
+        }
+
+        List<Unicast> solution = new ArrayList<>();
+
+        if(!unicastList.isEmpty()){
+            solution.addAll(unicastList);
+        }
+
+        Map<GCLEdge, Double> edgeDurationMap = getEdgeTTDurationMap(unicastList);
+
+        assert sortedSRTUnicastCandidateList != null;
+        return getSRTTTLengthCostList(bag, sortedSRTUnicastCandidateList, solution, edgeDurationMap, costsWriter);
+    }
+
     public static List<Unicast> getSRTTTLengthCostList(Bag bag, List<UnicastCandidate> sortedSRTUnicastCandidateList, List<Unicast> solution, Map<GCLEdge, Double> edgeDurationMap, BufferedWriter costsWriter) throws IOException {
 
         for (UnicastCandidate unicastCandidate : sortedSRTUnicastCandidateList) {
@@ -197,55 +215,4 @@ public class WSMMethods {
         return solution;
     }
 
-    public static List<Unicast> srtTTLength(Bag bag, List<UnicastCandidate> srtUnicastCandidateList, List<Unicast> unicastList, BufferedWriter costsWriter) throws IOException {
-        List<UnicastCandidate> sortedSRTUnicastCandidateList = null;
-        if(Objects.equals(bag.getUnicastCandidateSortingMethod(), MCDMConstants.DEADLINE)){
-            sortedSRTUnicastCandidateList = UnicastCandidateSortingMethods.sortUnicastCandidateListForDeadlineAscending(srtUnicastCandidateList);
-        }
-
-        List<Unicast> solution = new ArrayList<>();
-
-        if(!unicastList.isEmpty()){
-            solution.addAll(unicastList);
-        }
-
-        Map<GCLEdge, Double> edgeDurationMap = getEdgeTTDurationMap(unicastList);
-
-        assert sortedSRTUnicastCandidateList != null;
-        return getSRTTTLengthCostList(bag, sortedSRTUnicastCandidateList, solution, edgeDurationMap, costsWriter);
-    }
-
-    public static GraphPath<Node, GCLEdge> srtTTLengthForCandidatePathComputing(Bag bag, Application application, EndSystem target, List<GraphPath<Node, GCLEdge>> kShortestPathsGraphPathList, List<Unicast> unicastList, List<GraphPath<Node, GCLEdge>> mcdmGraphPathList, BufferedWriter costsWriter, int candidatePathIndex) throws IOException {
-        List<Unicast> solution = new ArrayList<>();
-
-        if(!unicastList.isEmpty()){
-            solution.addAll(unicastList);
-        }
-
-        if(!mcdmGraphPathList.isEmpty()){
-            for(GraphPath<Node, GCLEdge> graphPath: mcdmGraphPathList){
-                solution.add(new Unicast(application, target, graphPath));
-            }
-        }
-
-        Map<GCLEdge, Double> edgeDurationMap = getEdgeTTDurationMap(unicastList);
-
-        List<List<Double>> srtTTLengthCostList = getSRTTTLengthCostListForCandidatePathComputation(kShortestPathsGraphPathList, solution, application, edgeDurationMap);
-
-        double maxCost = Double.MAX_VALUE;
-        GraphPath<Node, GCLEdge> selectedGraphPath = null;
-
-        for (int i = 0; i < kShortestPathsGraphPathList.size(); i++) {
-            double cost = Math.pow(srtTTLengthCostList.getFirst().get(i), bag.getWSRT()) * Math.pow(srtTTLengthCostList.get(1).get(i), bag.getWTT()) * Math.pow(srtTTLengthCostList.getLast().get(i), bag.getWLength());
-            if (cost < maxCost) {
-                maxCost = cost;
-                selectedGraphPath = kShortestPathsGraphPathList.get(i);
-                if (maxCost == 0) {
-                    break;
-                }
-            }
-        }
-
-        return selectedGraphPath;
-    }
 }

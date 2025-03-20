@@ -14,14 +14,14 @@ import org.jgrapht.alg.shortestpath.YenKShortestPath;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
+import java.util.Objects;
 
-import static ktu.kaganndemirr.routing.phy.yen.HelperMethods.fillYenKShortestPathGraphPathList;
 import static ktu.kaganndemirr.util.GraphMethods.copyGraph;
 import static ktu.kaganndemirr.util.GraphMethods.discardUnnecessaryEndSystems;
 import static ktu.kaganndemirr.util.HelperMethods.fillKShortestPathGraphPathList;
 
 public class PathFindingMethods {
-    public static List<GraphPath<Node, GCLEdge>> yenKShortestPaths(Bag bag, Application application, EndSystem target){
+    public static List<GraphPath<Node, GCLEdge>> yenKShortestPathsPHY(Bag bag, Application application, EndSystem target){
         Graph<Node, GCLEdge> newGraph = copyGraph(bag.getGraph());
         Graph<Node, GCLEdge> graphWithoutUnnecessaryEndSystems = discardUnnecessaryEndSystems(newGraph, application.getSource(), target);
 
@@ -40,7 +40,7 @@ public class PathFindingMethods {
         return yenKShortestPathGraphPathList;
     }
 
-    public static List<GraphPath<Node, GCLEdge>> pathPenalizationKShortestPaths(Bag bag, Application application, EndSystem target){
+    public static List<GraphPath<Node, GCLEdge>> pathPenalizationKShortestPathsPHY(Bag bag, Application application, EndSystem target){
         Graph<Node, GCLEdge> newGraph = copyGraph(bag.getGraph());
         Graph<Node, GCLEdge> graphWithoutUnnecessaryEndSystems = discardUnnecessaryEndSystems(newGraph, application.getSource(), target);
 
@@ -66,7 +66,7 @@ public class PathFindingMethods {
         return fillKShortestPathGraphPathList(pathPenalizationKShortestPathGraphPathList, bag.getK());
     }
 
-    public static List<GraphPath<Node, GCLEdge>> yenKShortestPathsLWR(Bag bag, Application application, EndSystem target){
+    public static List<GraphPath<Node, GCLEdge>> yenKShortestPathsPHYLWR(Bag bag, Application application, EndSystem target){
         Graph<Node, GCLEdge> newGraph = copyGraph(bag.getGraph());
         GraphMethods.randomizeGraph(newGraph, bag.getLWR());
         Graph<Node, GCLEdge> graphWithoutUnnecessaryEndSystems = discardUnnecessaryEndSystems(newGraph, application.getSource(), target);
@@ -80,13 +80,13 @@ public class PathFindingMethods {
         if (yenKShortestPathList == null) {
             throw new InputMismatchException("Aborting, could not find a path from " + application.getSource() + " to " + target);
         } else {
-            yenKShortestPathGraphPathList.addAll(fillYenKShortestPathGraphPathList(yenKShortestPathList, bag.getK()));
+            yenKShortestPathGraphPathList.addAll(fillKShortestPathGraphPathList(yenKShortestPathList, bag.getK()));
         }
 
         return yenKShortestPathGraphPathList;
     }
 
-    public static List<GraphPath<Node, GCLEdge>> pathPenalizationKShortestPathsLWR(Bag bag, Application application, EndSystem target){
+    public static List<GraphPath<Node, GCLEdge>> pathPenalizationKShortestPathsPHYLWR(Bag bag, Application application, EndSystem target){
         Graph<Node, GCLEdge> newGraph = copyGraph(bag.getGraph());
         GraphMethods.randomizeGraph(newGraph, bag.getLWR());
         Graph<Node, GCLEdge> graphWithoutUnnecessaryEndSystems = discardUnnecessaryEndSystems(newGraph, application.getSource(), target);
@@ -113,15 +113,35 @@ public class PathFindingMethods {
         return fillKShortestPathGraphPathList(pathPenalizationKShortestPathGraphPathList, bag.getK());
     }
 
-    public static List<Unicast> getTTUnicastList(List<Application> applicationList) {
-        List<Unicast> ttUnicastList = new ArrayList<>();
-        for (Application app : applicationList) {
-            if (app instanceof TTApplication) {
-                for(int i = 0; i < app.getTargetList().size(); i++){
-                    ttUnicastList.add(new Unicast(app, app.getTargetList().get(i), app.getExplicitPathList().get(i)));
-                }
+    public static List<GraphPath<Node, GCLEdge>> yenKShortestPathsMTR(Bag bag, Application application, List<Unicast> ttUnicastList, EndSystem target){
+
+        List<Graph<Node, GCLEdge>> virtualTopologyList = null;
+        if (Objects.equals(bag.getMTRName(), Constants.MTR_V1)){
+            virtualTopologyList = MTRMethods.createVirtualTopologyListForV1(bag.getGraph(), ttUnicastList);
+        } else if (Objects.equals(bag.getMTRName(), Constants.MTR_AVERAGE)) {
+            virtualTopologyList = MTRMethods.createVirtualTopologyListForAverage(bag.getGraph(), ttUnicastList);
+        }
+
+        assert virtualTopologyList != null;
+        List<Integer> kValues = HelperMethods.findKForTopologies(bag.getK(), virtualTopologyList.size());
+
+        List<GraphPath<Node, GCLEdge>> yenKShortestPathGraphPathList = new ArrayList<>(bag.getK());
+
+        for(int i = 0; i < virtualTopologyList.size(); i++){
+            Graph<Node, GCLEdge> newGraph = copyGraph(virtualTopologyList.get(i));
+            Graph<Node, GCLEdge> graphWithoutUnnecessaryEndSystems = discardUnnecessaryEndSystems(newGraph, application.getSource(), target);
+
+            YenKShortestPath<Node, GCLEdge> allYenKShortestPathList = new YenKShortestPath<>(graphWithoutUnnecessaryEndSystems);
+
+            List<GraphPath<Node, GCLEdge>> yenKShortestPathList = allYenKShortestPathList.getPaths(application.getSource(), target, kValues.get(i));
+
+            if (yenKShortestPathList == null) {
+                throw new InputMismatchException("Aborting, could not find a path from " + application.getSource() + " to " + target);
+            } else {
+                yenKShortestPathGraphPathList.addAll(fillKShortestPathGraphPathList(yenKShortestPathList, kValues.get(i)));
             }
         }
-        return ttUnicastList;
+
+        return yenKShortestPathGraphPathList;
     }
 }

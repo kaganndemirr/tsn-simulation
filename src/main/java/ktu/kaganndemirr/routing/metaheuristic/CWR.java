@@ -1,25 +1,18 @@
-package ktu.kaganndemirr.routing.phy.yen.metaheuristic;
+package ktu.kaganndemirr.routing.metaheuristic;
 
-import ktu.kaganndemirr.application.Application;
-import ktu.kaganndemirr.architecture.GCLEdge;
-import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.evaluator.AVBLatencyMathCost;
 import ktu.kaganndemirr.evaluator.Cost;
 import ktu.kaganndemirr.evaluator.Evaluator;
 import ktu.kaganndemirr.message.Multicast;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
-import ktu.kaganndemirr.routing.phy.yen.YenKShortestPaths;
-import ktu.kaganndemirr.routing.phy.yen.YenMCDMKShortestPaths;
-import ktu.kaganndemirr.routing.phy.yen.YenRandomizedKShortestPaths;
+import ktu.kaganndemirr.routing.KShortestPaths;
 import ktu.kaganndemirr.solver.Solution;
 import ktu.kaganndemirr.util.Bag;
 import ktu.kaganndemirr.util.Constants;
-import ktu.kaganndemirr.util.LaursenMethods;
 import ktu.kaganndemirr.util.MetaheuristicMethods;
 import ktu.kaganndemirr.util.mcdm.WPMMethods;
 import ktu.kaganndemirr.util.mcdm.WSMMethods;
-import org.jgrapht.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,10 +29,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static ktu.kaganndemirr.util.HelperMethods.*;
+import static ktu.kaganndemirr.util.HelperMethods.createScenarioOutputPath;
+import static ktu.kaganndemirr.util.HelperMethods.writeSolutionsToFile;
 
-public class WSMLWR {
-    private static final Logger logger = LoggerFactory.getLogger(WSMLWR.class.getSimpleName());
+public class CWR {
+    private static final Logger logger = LoggerFactory.getLogger(CWR.class.getSimpleName());
+
+    private long kShortestPathsDuration;
 
     private List<UnicastCandidate> ttUnicastCandidateList;
     private List<UnicastCandidate> srtUnicastCandidateList;
@@ -63,7 +59,8 @@ public class WSMLWR {
 
     private final Map<Double, Double> durationMap;
 
-    public WSMLWR(){
+    public CWR(){
+        kShortestPathsDuration = 0;
         unicastList = new ArrayList<>();
         writeLock = new Object();
         costLock = new Object();
@@ -73,9 +70,17 @@ public class WSMLWR {
     }
 
     public Solution solve(Bag bag){
-        YenMCDMKShortestPaths yenMCDMKShortestPaths = new YenMCDMKShortestPaths(bag);
-        ttUnicastList = yenMCDMKShortestPaths.getTTUnicastList();
-        srtUnicastList = yenMCDMKShortestPaths.getSRTUnicastList();
+        Instant kShortestPathsStartTime = Instant.now();
+        KShortestPaths kShortestPaths = new KShortestPaths(bag);
+        Instant kShortestPathsEndTime = Instant.now();
+
+        kShortestPathsDuration = Duration.between(kShortestPathsStartTime, kShortestPathsEndTime).toMillis();
+
+        ttUnicastCandidateList = kShortestPaths.getTTUnicastCandidateList();
+        srtUnicastCandidateList = kShortestPaths.getSRTUnicastCandidateList();
+
+        ttUnicastList = kShortestPaths.getTTUnicastList();
+        srtUnicastList = kShortestPaths.getSRTUnicastList();
 
         unicastList.addAll(ttUnicastList);
         unicastList.addAll(srtUnicastList);
@@ -88,13 +93,12 @@ public class WSMLWR {
             new File(scenarioOutputPath).mkdirs();
         }
 
-
         try (ExecutorService exec = Executors.newFixedThreadPool(bag.getThreadNumber())) {
 
             Timer timer = getTimer(Duration.ofSeconds(bag.getTimeout()));
 
             for (int i = 0; i < bag.getThreadNumber(); i++) {
-                exec.execute(new WSMv2Runnable(bag, unicastList));
+                exec.execute(new WSMCWRRunnable(bag, unicastList));
             }
 
             exec.awaitTermination(Duration.ofSeconds(bag.getTimeout()).toSeconds(), TimeUnit.SECONDS);
@@ -133,14 +137,14 @@ public class WSMLWR {
         return timer;
     }
 
-    private class WSMv2Runnable implements Runnable {
+    private class WSMCWRRunnable implements Runnable {
         private int i = 0;
         Instant solutionStartTime = Instant.now();
 
         Bag bag;
         List<Unicast> unicastList;
 
-        public WSMv2Runnable(Bag bag, List<Unicast> unicastList) {
+        public WSMCWRRunnable(Bag bag, List<Unicast> unicastList) {
             this.bag = bag;
             this.unicastList = unicastList;
         }
@@ -152,21 +156,14 @@ public class WSMLWR {
             while (!Thread.currentThread().isInterrupted()) {
                 i++;
 
-                YenMCDMKShortestPaths yenMCDMKShortestPaths;
-                try {
-                    yenMCDMKShortestPaths = new YenMCDMKShortestPaths(bag, scenarioOutputPath, threadName, i);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-
-                srtUnicastCandidateList = yenMCDMKShortestPaths.getSRTUnicastCandidateList();
-                ttUnicastCandidateList = yenMCDMKShortestPaths.getTTUnicastCandidateList();
-
                 BufferedWriter costsWriter = null;
                 if(logger.isDebugEnabled()){
                     try {
                         costsWriter = new BufferedWriter(new FileWriter(Paths.get(scenarioOutputPath, "Costs.txt").toString(), true));
-                        costsWriter.write("############## ThreadName:" + threadName + " Iteration:" + i + " ##############\n");
+                        synchronized (costLock){
+                            costsWriter.write("############## ThreadName:" + threadName + " Iteration:" + i + " ##############\n");
+                        }
+
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -177,14 +174,17 @@ public class WSMLWR {
                     if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT)){
                         //TODO
                     } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH)) {
-                        initialSolution = WSMMethods.srtTTLength(bag, srtUnicastCandidateList, ttUnicastList, costsWriter);
+                        if(Objects.equals(bag.getMCDMName(), Constants.WSM)){
+                            initialSolution = WSMMethods.srtTTLength(bag, srtUnicastCandidateList, unicastList, costsWriter);
+                        } else if (Objects.equals(bag.getMCDMName(), Constants.WPM)) {
+                            initialSolution = WPMMethods.srtTTLength(bag, srtUnicastCandidateList, unicastList, costsWriter);
+                        }
                     } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH_UTIL)) {
                         //TODO
                     }
                 }catch (IOException e){
                     throw new RuntimeException(e);
                 }
-
 
                 List<Unicast> solution = null;
 
@@ -202,7 +202,6 @@ public class WSMLWR {
                             costsWriter.close();
                             assert initialSolution != null;
                             writeSolutionsToFile(initialSolution, solution, scenarioOutputPath, threadName, i);
-                            writeSRTCandidateRoutesToFile(srtUnicastCandidateList, scenarioOutputPath, threadName, i);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
@@ -219,7 +218,7 @@ public class WSMLWR {
                         if (cost.getTotalCost() < globalBestCost.getTotalCost()) {
                             globalBestCost = cost;
                             Instant solutionEndTime = Instant.now();
-                            durationMap.put(Double.parseDouble(globalBestCost.toString().split("\\s")[0]), (Duration.between(solutionStartTime, solutionEndTime).toMillis() / 1e3));
+                            durationMap.put(Double.parseDouble(globalBestCost.toString().split("\\s")[0]), (Duration.between(solutionStartTime, solutionEndTime).toMillis() / 1e3) + kShortestPathsDuration / 1e3);
                             bestSolution.clear();
                             assert solution != null;
                             bestSolution.addAll(solution);
@@ -256,5 +255,6 @@ public class WSMLWR {
         return durationMap;
     }
 }
+
 
 

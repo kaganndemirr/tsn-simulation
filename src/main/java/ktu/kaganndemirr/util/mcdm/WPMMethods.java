@@ -25,6 +25,24 @@ import static ktu.kaganndemirr.util.mcdm.HelperMethods.*;
 public class WPMMethods {
     private static final Logger logger = LoggerFactory.getLogger(WPMMethods.class.getSimpleName());
 
+    public static List<Unicast> srtTTLength(Bag bag, List<UnicastCandidate> srtUnicastCandidateList, List<Unicast> unicastList, BufferedWriter costsWriter) throws IOException {
+        List<UnicastCandidate> sortedSRTUnicastCandidateList = null;
+        if(Objects.equals(bag.getUnicastCandidateSortingMethod(), MCDMConstants.DEADLINE)){
+            sortedSRTUnicastCandidateList = UnicastCandidateSortingMethods.sortUnicastCandidateListForDeadlineAscending(srtUnicastCandidateList);
+        }
+
+        List<Unicast> solution = new ArrayList<>();
+
+        if(!unicastList.isEmpty()){
+            solution.addAll(unicastList);
+        }
+
+        Map<GCLEdge, Double> edgeDurationMap = getEdgeTTDurationMap(unicastList);
+
+        assert sortedSRTUnicastCandidateList != null;
+        return getSRTTTLengthCostList(bag, sortedSRTUnicastCandidateList, solution, edgeDurationMap, costsWriter);
+    }
+
     public static List<Unicast> getSRTTTLengthCostList(Bag bag, List<UnicastCandidate> sortedSRTUnicastCandidateList, List<Unicast> solution, Map<GCLEdge, Double> edgeDurationMap, BufferedWriter costsWriter) throws IOException {
 
         for (UnicastCandidate unicastCandidate : sortedSRTUnicastCandidateList) {
@@ -135,7 +153,7 @@ public class WPMMethods {
                 }
 
                 for(CandidatePathHolder candidatePathHolder: candidatePathHolderList){
-                    int winnerNumber = srtTTLengthV2Cost(bag, candidatePathHolder, candidatePathHolderList);
+                    int winnerNumber = getSRTTTLengthWPMV2Cost(bag, candidatePathHolder, candidatePathHolderList);
                     candidatePathScoreMap.put(candidatePathHolder, candidatePathScoreMap.get(candidatePathHolder) + winnerNumber);
                 }
 
@@ -176,7 +194,7 @@ public class WPMMethods {
         return solution;
     }
 
-    private static int srtTTLengthV2Cost(Bag bag, CandidatePathHolder candidatePathHolder, List<CandidatePathHolder> candidatePathHolderList) throws IOException {
+    private static int getSRTTTLengthWPMV2Cost(Bag bag, CandidatePathHolder candidatePathHolder, List<CandidatePathHolder> candidatePathHolderList) {
         int winnerNumber = 0;
         if(candidatePathHolder.getSRTCost() == 0 || candidatePathHolder.getTTCost() == 0){
             return candidatePathHolderList.size() - 1;
@@ -210,57 +228,6 @@ public class WPMMethods {
             }
         }
         return winnerNumber;
-    }
-
-    public static List<Unicast> srtTTLength(Bag bag, List<UnicastCandidate> srtUnicastCandidateList, List<Unicast> unicastList, BufferedWriter costsWriter) throws IOException {
-        List<UnicastCandidate> sortedSRTUnicastCandidateList = null;
-        if(Objects.equals(bag.getUnicastCandidateSortingMethod(), MCDMConstants.DEADLINE)){
-            sortedSRTUnicastCandidateList = UnicastCandidateSortingMethods.sortUnicastCandidateListForDeadlineAscending(srtUnicastCandidateList);
-        }
-
-        List<Unicast> solution = new ArrayList<>();
-
-        if(!unicastList.isEmpty()){
-            solution.addAll(unicastList);
-        }
-
-        Map<GCLEdge, Double> edgeDurationMap = getEdgeTTDurationMap(unicastList);
-        assert sortedSRTUnicastCandidateList != null;
-        return getSRTTTLengthCostList(bag, sortedSRTUnicastCandidateList, solution, edgeDurationMap, costsWriter);
-    }
-
-    public static GraphPath<Node, GCLEdge> srtTTLengthForCandidatePathComputing(Bag bag, Application application, EndSystem target, List<GraphPath<Node, GCLEdge>> kShortestPathsGraphPathList, List<Unicast> unicastList, List<GraphPath<Node, GCLEdge>> mcdmGraphPathList, BufferedWriter costsWriter, int candidatePathIndex) throws IOException {
-        List<Unicast> solution = new ArrayList<>();
-
-        if(!unicastList.isEmpty()){
-            solution.addAll(unicastList);
-        }
-
-        if(!mcdmGraphPathList.isEmpty()){
-            for(GraphPath<Node, GCLEdge> graphPath: mcdmGraphPathList){
-                solution.add(new Unicast(application, target, graphPath));
-            }
-        }
-
-        Map<GCLEdge, Double> edgeDurationMap = getEdgeTTDurationMap(unicastList);
-
-        List<List<Double>> srtCostList = getSRTTTLengthCostListForCandidatePathComputation(kShortestPathsGraphPathList, solution, application, edgeDurationMap);
-
-        double maxCost = Double.MAX_VALUE;
-        GraphPath<Node, GCLEdge> selectedGraphPath = null;
-
-        for (int i = 0; i < kShortestPathsGraphPathList.size(); i++) {
-            double cost = Math.pow(srtCostList.getFirst().get(i), bag.getWSRT()) * Math.pow(srtCostList.get(1).get(i), bag.getWTT()) * Math.pow(srtCostList.getLast().get(i), bag.getWLength());
-            if (cost < maxCost) {
-                maxCost = cost;
-                selectedGraphPath = kShortestPathsGraphPathList.get(i);
-                if (maxCost == 0) {
-                    break;
-                }
-            }
-        }
-
-        return selectedGraphPath;
     }
 
 }

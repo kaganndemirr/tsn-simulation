@@ -1,13 +1,14 @@
-package ktu.kaganndemirr.routing.phy.yen.heuristic;
+package ktu.kaganndemirr.routing.heuristic;
 
 import ktu.kaganndemirr.evaluator.Cost;
 import ktu.kaganndemirr.message.Multicast;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
-import ktu.kaganndemirr.routing.phy.yen.YenKShortestPaths;
+import ktu.kaganndemirr.routing.KShortestPaths;
 import ktu.kaganndemirr.solver.Solution;
 import ktu.kaganndemirr.util.Bag;
 import ktu.kaganndemirr.util.Constants;
+import ktu.kaganndemirr.util.mcdm.WPMMethods;
 import ktu.kaganndemirr.util.mcdm.WSMMethods;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +27,9 @@ import java.util.Objects;
 
 import static ktu.kaganndemirr.util.HelperMethods.createScenarioOutputPath;
 
-public class WSM {
-    private static final Logger logger = LoggerFactory.getLogger(WSM.class.getSimpleName());
+//TODO: TT için güzergah hesaplamaya uygun değil
+public class MCDM {
+    private static final Logger logger = LoggerFactory.getLogger(MCDM.class.getSimpleName());
 
     private List<UnicastCandidate> srtUnicastCandidateList;
 
@@ -35,19 +37,18 @@ public class WSM {
 
     private final Map<Double, Double> durationMap;
 
-
-    public WSM() {
+    public MCDM() {
         this.durationMap = new HashMap<>();
     }
 
     public Solution solve(Bag bag) throws IOException {
-        Instant yenKShortestPathsStartTime = Instant.now();
-        YenKShortestPaths yenKShortestPaths = new YenKShortestPaths(bag);
-        Instant yenKShortestPathsEndTime = Instant.now();
-        long yenKShortestPathsDuration = Duration.between(yenKShortestPathsStartTime, yenKShortestPathsEndTime).toMillis();
+        Instant kShortestPathsStartTime = Instant.now();
+        KShortestPaths kShortestPaths = new KShortestPaths(bag);
+        Instant kShortestPathsEndTime = Instant.now();
+        long yenKShortestPathsDuration = Duration.between(kShortestPathsStartTime, kShortestPathsEndTime).toMillis();
 
-        srtUnicastCandidateList = yenKShortestPaths.getSRTUnicastCandidateList();
-        List<Unicast> ttUnicastList = yenKShortestPaths.getTTUnicastList();
+        srtUnicastCandidateList = kShortestPaths.getSRTUnicastCandidateList();
+        List<Unicast> ttUnicastList = kShortestPaths.getTTUnicastList();
 
         String scenarioOutputPath = null;
         if(logger.isDebugEnabled()){
@@ -66,7 +67,11 @@ public class WSM {
             if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT)){
                 solution = null;
             } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH)) {
-                solution = WSMMethods.srtTTLength(bag, srtUnicastCandidateList, ttUnicastList, costsWriter);
+                if(Objects.equals(bag.getMCDMName(), Constants.WSM)){
+                    solution = WSMMethods.srtTTLength(bag, srtUnicastCandidateList, ttUnicastList, costsWriter);
+                } else if (Objects.equals(bag.getMCDMName(), Constants.WPM)) {
+                    solution = WPMMethods.srtTTLength(bag, srtUnicastCandidateList, ttUnicastList, costsWriter);
+                }
             } else if (Objects.equals(bag.getMCDMObjective(), Constants.SRT_TT_LENGTH_UTIL)) {
                 solution = null;
             }
@@ -99,3 +104,4 @@ public class WSM {
     }
 
 }
+
