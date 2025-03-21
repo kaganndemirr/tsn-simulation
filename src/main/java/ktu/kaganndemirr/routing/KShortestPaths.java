@@ -30,7 +30,6 @@ public class KShortestPaths {
         ttUnicastList = new ArrayList<>();
         srtUnicastList = new ArrayList<>();
 
-        //For MTR
         for (Application application : bag.getApplicationList()) {
             if (application instanceof TTApplication){
                 for(int i = 0; i < application.getTargetList().size(); i++){
@@ -38,8 +37,15 @@ public class KShortestPaths {
                         ttUnicastList.add(new Unicast(application, application.getTargetList().get(i), application.getExplicitPathList().get(i)));
                     }
                 }
+            } else if (application instanceof SRTApplication) {
+                for(int i = 0; i < application.getTargetList().size(); i++){
+                    if(!application.getExplicitPathList().isEmpty()){
+                        srtUnicastList.add(new Unicast(application, application.getTargetList().get(i), application.getExplicitPathList().get(i)));
+                    }
+                }
             }
         }
+
 
         for (Application application : bag.getApplicationList()) {
             if (application instanceof TTApplication){
@@ -107,7 +113,7 @@ public class KShortestPaths {
                                     srtUnicastCandidateList.add(new UnicastCandidate(application, application.getTargetList().get(i), pathPenalizationGraphPathListLWR));
                                 }
                             }
-                        } else if (Objects.equals(bag.getPathFindingMethod(), Constants.MTR)) {
+                        } else if (Objects.equals(bag.getRouting(), Constants.MTR)) {
                             if(Objects.equals(bag.getPathFindingMethod(), Constants.YEN)){
                                 if(bag.getLWR() == null){
                                     List<GraphPath<Node, GCLEdge>> yenKShortestPathGraphPathList = PathFindingMethods.yenKShortestPathsMTR(bag, application, ttUnicastList, application.getTargetList().get(i));
@@ -126,9 +132,6 @@ public class KShortestPaths {
                             }
                         }
 
-                    }
-                    else {
-                        srtUnicastList.add(new Unicast(application, application.getTargetList().get(i), application.getExplicitPathList().get(i)));
                     }
                 }
             }

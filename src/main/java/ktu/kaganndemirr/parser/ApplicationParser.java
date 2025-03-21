@@ -89,13 +89,11 @@ public class ApplicationParser {
         int deadline = parseDeadline(srtAppEle);
         EndSystem source = parseSource(srtAppEle);
         List<EndSystem> targetList = parseTargetList(srtAppEle);
-        String vlanId = "vl" + i;
-        double offset = 0.0;
 
         //TODO
         List<GraphPath<Node, GCLEdge>> graphPathList = new ArrayList<>();
 
-        return new SRTApplication(name, pcp, applicationType, frameSizeByte, numberOfFrames, messageSizeByte, messageSizeMbps, cmi, deadline, source, targetList, graphPathList, vlanId, offset);
+        return new SRTApplication(name, pcp, applicationType, frameSizeByte, numberOfFrames, messageSizeByte, messageSizeMbps, cmi, deadline, source, targetList, graphPathList);
     }
 
     private static TTApplication getTTApplication(Element ttAppEle, int rate, Graph<Node, GCLEdge> graph, int i) {
@@ -119,10 +117,7 @@ public class ApplicationParser {
 
         double messageSizeMbps = getTTMessageSizeMbps(gcl.getDuration(), numberOfFrames, Constants.TSN_CONFIGURATION_FRAMEWORK_CMI, rate);
 
-        String vlanId = "vl" + i;
-        double offset = 0.0;
-
-        return new TTApplication(name, pcp, applicationType, frameSizeByte, numberOfFrames, messageSizeByte, messageSizeMbps, cmi, deadline, source, targetList, graphPathList, vlanId, offset);
+        return new TTApplication(name, pcp, applicationType, frameSizeByte, numberOfFrames, messageSizeByte, messageSizeMbps, cmi, deadline, source, targetList, graphPathList);
     }
 
     private static int parsePayloadSize(Element appEle) {

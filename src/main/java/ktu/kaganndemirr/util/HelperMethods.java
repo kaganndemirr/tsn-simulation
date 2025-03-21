@@ -96,30 +96,25 @@ public class HelperMethods {
     public static String createScenarioOutputPath(Bag bag){
         List<String> resultList = new ArrayList<>();
         resultList.add("outputs");
+
         resultList.add(bag.getRouting());
+
         if (bag.getMTRName() != null){
             resultList.add(bag.getMTRName());
         }
+
         resultList.add(bag.getPathFindingMethod());
+
         resultList.add(bag.getAlgorithm());
-        if (bag.getUnicastCandidateSortingMethod() != null){
-            resultList.add(bag.getUnicastCandidateSortingMethod());
-        }
-        if (bag.getLWR() != null){
-            resultList.add(bag.getLWR());
-        }
-        if (bag.getK() != 0){
-            resultList.add(String.valueOf(bag.getK()));
-        }
+
         if (bag.getMCDMObjective() != null){
             resultList.add(bag.getMCDMObjective());
         }
-        if (bag.getWSMNormalization() != null){
-            resultList.add(bag.getWSMNormalization());
+
+        if (bag.getUnicastCandidateSortingMethod() != null){
+            resultList.add(bag.getUnicastCandidateSortingMethod());
         }
-        if (bag.getCWR() != null){
-            resultList.add(bag.getCWR());
-        }
+
         if (bag.getWSRT() != 0){
             resultList.add(String.valueOf(bag.getWSRT()));
         }
@@ -132,11 +127,34 @@ public class HelperMethods {
         if (bag.getWUtil() != 0){
             resultList.add(String.valueOf(bag.getWUtil()));
         }
-        if (bag.getWPMVersion() != null){
+
+        if(bag.getMCDMName() != null){
+            resultList.add(bag.getMCDMName());
+        }
+
+        if (bag.getWSMNormalization() != null){
+            resultList.add(bag.getWSMNormalization());
+        }
+
+        if(bag.getWPMVersion() != null){
             resultList.add(bag.getWPMVersion());
         }
-        if (bag.getWPMValueType() != null){
+
+        if(bag.getWPMValueType() != null)
+        {
             resultList.add(bag.getWPMValueType());
+        }
+
+        if (bag.getLWR() != null){
+            resultList.add(bag.getLWR());
+        }
+
+        if (bag.getCWR() != null){
+            resultList.add(bag.getCWR());
+        }
+
+        if (bag.getK() != 0){
+            resultList.add(String.valueOf(bag.getK()));
         }
         if (bag.getMetaheuristicName() != null){
             resultList.add(bag.getMetaheuristicName());
@@ -144,6 +162,7 @@ public class HelperMethods {
         if (bag.getEvaluatorName() != null){
             resultList.add(bag.getEvaluatorName());
         }
+
         resultList.add(bag.getTopologyName() + "_" + bag.getApplicationName());
 
         return buildPath(resultList);
@@ -152,30 +171,25 @@ public class HelperMethods {
     public static String createResultOutputPath(Bag bag){
         List<String> resultList = new ArrayList<>();
         resultList.add("outputs");
+
         resultList.add(bag.getRouting());
+
         if (bag.getMTRName() != null){
             resultList.add(bag.getMTRName());
         }
+
         resultList.add(bag.getPathFindingMethod());
+
         resultList.add(bag.getAlgorithm());
-        if (bag.getUnicastCandidateSortingMethod() != null){
-            resultList.add(bag.getUnicastCandidateSortingMethod());
-        }
-        if (bag.getLWR() != null){
-            resultList.add(bag.getLWR());
-        }
-        if (bag.getK() != 0){
-            resultList.add(String.valueOf(bag.getK()));
-        }
+
         if (bag.getMCDMObjective() != null){
             resultList.add(bag.getMCDMObjective());
         }
-        if (bag.getWSMNormalization() != null){
-            resultList.add(bag.getWSMNormalization());
+
+        if (bag.getUnicastCandidateSortingMethod() != null){
+            resultList.add(bag.getUnicastCandidateSortingMethod());
         }
-        if (bag.getCWR() != null){
-            resultList.add(bag.getCWR());
-        }
+
         if (bag.getWSRT() != 0){
             resultList.add(String.valueOf(bag.getWSRT()));
         }
@@ -188,11 +202,34 @@ public class HelperMethods {
         if (bag.getWUtil() != 0){
             resultList.add(String.valueOf(bag.getWUtil()));
         }
-        if (bag.getWPMVersion() != null){
+
+        if(bag.getMCDMName() != null){
+            resultList.add(bag.getMCDMName());
+        }
+
+        if (bag.getWSMNormalization() != null){
+            resultList.add(bag.getWSMNormalization());
+        }
+
+        if(bag.getWPMVersion() != null){
             resultList.add(bag.getWPMVersion());
         }
-        if (bag.getWPMValueType() != null){
+
+        if(bag.getWPMValueType() != null)
+        {
             resultList.add(bag.getWPMValueType());
+        }
+
+        if (bag.getLWR() != null){
+            resultList.add(bag.getLWR());
+        }
+
+        if (bag.getCWR() != null){
+            resultList.add(bag.getCWR());
+        }
+
+        if (bag.getK() != 0){
+            resultList.add(String.valueOf(bag.getK()));
         }
         if (bag.getMetaheuristicName() != null){
             resultList.add(bag.getMetaheuristicName());
@@ -266,6 +303,12 @@ public class HelperMethods {
         if (bag.getMCDMName() != null){
             result += ", MCDM Name: " + bag.getMCDMName();
         }
+        if (bag.getWPMVersion() != null){
+            result += ", WPM Version: " + bag.getWPMVersion();
+        }
+        if (bag.getWPMValueType() != null){
+            result += ", WPM Value Type: " + bag.getWPMValueType();
+        }
         if (bag.getMCDMObjective() != null){
             result += ", MCDM Objective: " + bag.getMCDMObjective();
         }
@@ -293,12 +336,6 @@ public class HelperMethods {
         if (bag.getTimeout() != 0){
             result += ", Timeout: " + bag.getTimeout() + "(sec)";
         }
-        if (bag.getWPMVersion() != null){
-            result += ", WPM Version: " + bag.getWPMVersion();
-        }
-        if (bag.getWPMValueType() != null){
-            result += ", WPM Value Type: " + bag.getWPMValueType();
-        }
         if (bag.getMetaheuristicName() != null){
             result += ", Metaheuristic Name: " + bag.getMetaheuristicName();
         }
@@ -306,56 +343,6 @@ public class HelperMethods {
         result += ", Evaluator Name: " + bag.getEvaluatorName();
 
         return result;
-    }
-
-    public static String createGCLSynthesisPath(Bag bag){
-        List<String> resultList = new ArrayList<>();
-        resultList.add("gclSynthesis");
-        resultList.add(bag.getRouting());
-        if (bag.getMTRName() != null){
-            resultList.add(bag.getMTRName());
-        }
-        resultList.add(bag.getPathFindingMethod());
-        resultList.add(bag.getAlgorithm());
-        if (bag.getLWR() != null){
-            resultList.add(bag.getLWR());
-        }
-        if (bag.getK() != 0){
-            resultList.add(String.valueOf(bag.getK()));
-        }
-        if (bag.getMCDMObjective() != null){
-            resultList.add(bag.getMCDMObjective());
-        }
-        if (bag.getWSMNormalization() != null){
-            resultList.add(bag.getWSMNormalization());
-        }
-        if (bag.getCWR() != null){
-            resultList.add(bag.getCWR());
-        }
-        if (bag.getWSRT() != 0){
-            resultList.add(String.valueOf(bag.getWSRT()));
-        }
-        if (bag.getWTT() != 0){
-            resultList.add(String.valueOf(bag.getWTT()));
-        }
-        if (bag.getWLength() != 0){
-            resultList.add(String.valueOf(bag.getWLength()));
-        }
-        if (bag.getWUtil() != 0){
-            resultList.add(String.valueOf(bag.getWUtil()));
-        }
-        if (bag.getWPMVersion() != null){
-            resultList.add(bag.getWPMVersion());
-        }
-        if (bag.getWPMValueType() != null){
-            resultList.add(bag.getWPMValueType());
-        }
-        if (bag.getMetaheuristicName() != null){
-            resultList.add(bag.getMetaheuristicName());
-        }
-        resultList.add(bag.getTopologyName() + "_" + bag.getApplicationName());
-
-        return buildPath(resultList);
     }
 
     public static List<GraphPath<Node, GCLEdge>> fillKShortestPathGraphPathList(List<GraphPath<Node, GCLEdge>> kShortestPathList, int k){

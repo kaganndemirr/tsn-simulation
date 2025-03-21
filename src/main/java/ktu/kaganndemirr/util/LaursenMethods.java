@@ -28,7 +28,7 @@ public class LaursenMethods {
             Cost currentBestCost = new AVBLatencyMathCost();
             Unicast currentUnicast;
             Unicast currentBestUnicast = null;
-            for (int u = 0; u < k; u++) {
+            for (int u = 0; u < Math.max(3, k/4); u++) {
                 currentUnicast = new Unicast(unicastCandidate.getApplication(), unicastCandidate.getTarget(), unicastCandidate.getCandidatePathList().get(u));
                 initialSolution.add(currentUnicast);
                 Cost cost = eval.evaluate(initialSolution);

@@ -51,8 +51,8 @@ public class AVBLatencyMathCost implements Cost, Comparator<AVBLatencyMathCost> 
         if (!isUsed) {
             return Double.MAX_VALUE;
         }
-        double w1 = 10000;
-        double w2 = 3.0;
+        double w1 = 3.0;
+        double w2 = 10000;
         double w3 = 1.0;
         return w1 * o1 + w2 * o2 + w3 * o3;
     }

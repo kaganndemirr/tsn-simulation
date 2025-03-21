@@ -1,9 +1,5 @@
 package ktu.kaganndemirr.util.mcdm;
 
-import ktu.kaganndemirr.application.Application;
-import ktu.kaganndemirr.application.SRTApplication;
-import ktu.kaganndemirr.application.TTApplication;
-import ktu.kaganndemirr.architecture.EndSystem;
 import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.message.Unicast;
@@ -16,77 +12,116 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.*;
 
-import static ktu.kaganndemirr.util.mcdm.HelperMethods.*;
+import static ktu.kaganndemirr.util.mcdm.HelperMethods.createSRTTTLengthCandidatePathHolder;
+import static ktu.kaganndemirr.util.mcdm.HelperMethods.getEdgeTTDurationMap;
 
 public class WSMMethods {
     private static final Logger logger = LoggerFactory.getLogger(WSMMethods.class.getSimpleName());
 
-    public static List<Double> normalizeSRTTTLengthCostListMax(List<Double> srtTTCostlist) {
-        double max = Collections.max(srtTTCostlist);
+    public static void normalizeCandidatePathHolderCostListMax(List<CandidatePathHolder> candidatePathHolderList) {
+        double maxSRTCost = Collections.max(candidatePathHolderList, Comparator.comparingDouble(CandidatePathHolder::getSRTCost)).getSRTCost();
+        double maxTTCost = Collections.max(candidatePathHolderList, Comparator.comparingDouble(CandidatePathHolder::getTTCost)).getTTCost();
+        double maxLength = Collections.max(candidatePathHolderList, Comparator.comparingDouble(CandidatePathHolder::getLength)).getLength();
 
-        List<Double> normalizedSRTTTCostlist = new ArrayList<>();
+        for(CandidatePathHolder candidatePathHolder: candidatePathHolderList){
+            if(maxSRTCost == 0){
+                candidatePathHolder.setSRTCost(0.0);
+            } else {
+                double normalizedValue = candidatePathHolder.getSRTCost() / maxSRTCost;
+                candidatePathHolder.setSRTCost(normalizedValue);
+            }
 
-        if (max == 0) {
-            for (int i = 0; i < srtTTCostlist.size(); i++) {
-                normalizedSRTTTCostlist.add(0.0);
+            if(maxTTCost == 0){
+                candidatePathHolder.setTTCost(0.0);
+            } else {
+                double normalizedValue = candidatePathHolder.getTTCost() / maxTTCost;
+                candidatePathHolder.setTTCost(normalizedValue);
             }
-        } else {
-            for (Double d : srtTTCostlist) {
-                normalizedSRTTTCostlist.add(d / max);
-            }
+
+            double normalizedValue = candidatePathHolder.getLength() / maxLength;
+            candidatePathHolder.setLength(normalizedValue);
+
         }
-
-        return normalizedSRTTTCostlist;
     }
 
-    public static List<Double> normalizeSRTTTLengthCostListVector(List<Double> srtTTCostlist) {
-        List<Double> normalizedList = new ArrayList<>();
-        double total = 0.0;
-        for (Double d : srtTTCostlist) {
-            total += d * d;
-        }
-        double totalSqrt = Math.sqrt(total);
+    public static void normalizeCandidatePathHolderCostListVector(List<CandidatePathHolder> candidatePathHolderList) {
+        double sumOfSRTCostSquares = candidatePathHolderList.stream()
+                .mapToDouble(c -> c.getSRTCost() * c.getSRTCost())
+                .sum();
 
-        if (totalSqrt == 0) {
-            for (Double ignored : srtTTCostlist) {
-                normalizedList.add(0.0);
-            }
-        } else {
-            for (Double d : srtTTCostlist) {
-                normalizedList.add(d / totalSqrt);
-            }
-        }
+        double sqrtSumOfSRTCostSquares = Math.sqrt(sumOfSRTCostSquares);
 
-        return normalizedList;
+        double sumOfTTCostSquares = candidatePathHolderList.stream()
+                .mapToDouble(c -> c.getTTCost() * c.getTTCost())
+                .sum();
+
+        double sqrtSumOfTTCostSquares = Math.sqrt(sumOfTTCostSquares);
+
+        double sumOfLengthSquares = candidatePathHolderList.stream()
+                .mapToDouble(c -> c.getLength() * c.getLength())
+                .sum(); // Kareleri topla
+
+        double sqrtSumOfLengthSquares = Math.sqrt(sumOfLengthSquares);
+
+        for(CandidatePathHolder candidatePathHolder: candidatePathHolderList){
+            if(sqrtSumOfSRTCostSquares == 0){
+                candidatePathHolder.setSRTCost(0.0);
+            }else {
+                double normalizedValue = candidatePathHolder.getSRTCost() / sqrtSumOfSRTCostSquares;
+                candidatePathHolder.setSRTCost(normalizedValue);
+            }
+
+            if(sqrtSumOfTTCostSquares == 0){
+                candidatePathHolder.setTTCost(0.0);
+            }else {
+                double normalizedValue = candidatePathHolder.getTTCost() / sqrtSumOfTTCostSquares;
+                candidatePathHolder.setTTCost(normalizedValue);
+            }
+
+            double normalizedValue = candidatePathHolder.getLength() / sqrtSumOfLengthSquares;
+            candidatePathHolder.setLength(normalizedValue);
+        }
     }
 
-    public static List<Double> normalizeSRTTTLengthCostListMinMax(List<Double> srtTTCostlist) {
-        double min = Collections.min(srtTTCostlist);
-        double max = Collections.max(srtTTCostlist);
+    public static void normalizeCandidatePathHolderCostListMinMax(List<CandidatePathHolder> candidatePathHolderList) {
+        double maxSRTCost = Collections.max(candidatePathHolderList, Comparator.comparingDouble(CandidatePathHolder::getSRTCost)).getSRTCost();
+        double maxTTCost = Collections.max(candidatePathHolderList, Comparator.comparingDouble(CandidatePathHolder::getTTCost)).getTTCost();
+        double maxLength = Collections.max(candidatePathHolderList, Comparator.comparingDouble(CandidatePathHolder::getLength)).getLength();
 
-        ArrayList<Double> normalizedList = new ArrayList<>();
+        double minSRTCost = Collections.min(candidatePathHolderList, Comparator.comparingDouble(CandidatePathHolder::getSRTCost)).getSRTCost();
+        double minTTCost = Collections.min(candidatePathHolderList, Comparator.comparingDouble(CandidatePathHolder::getTTCost)).getTTCost();
+        double minLength = Collections.min(candidatePathHolderList, Comparator.comparingDouble(CandidatePathHolder::getLength)).getLength();
 
-        if (min == max && min == 0) {
-            for (int i = 0; i < srtTTCostlist.size(); i++) {
-                normalizedList.add(0.0);
+        for(CandidatePathHolder candidatePathHolder: candidatePathHolderList){
+            if(minSRTCost == 0 && minSRTCost == maxSRTCost){
+                candidatePathHolder.setSRTCost(0.0);
+            } else if (minSRTCost == maxSRTCost) {
+                candidatePathHolder.setSRTCost(1.0);
+            }else {
+                double normalizedValue = (candidatePathHolder.getSRTCost() - minSRTCost) / (maxSRTCost - minSRTCost);
+                candidatePathHolder.setSRTCost(normalizedValue);
             }
-        } else if (min == max) {
-            for (int i = 0; i < srtTTCostlist.size(); i++) {
-                normalizedList.add(1.0);
+
+            if(minTTCost == 0 && minTTCost == maxTTCost){
+                candidatePathHolder.setTTCost(0.0);
+            } else if (minTTCost == maxTTCost) {
+                candidatePathHolder.setTTCost(1.0);
+            }else {
+                double normalizedValue = (candidatePathHolder.getTTCost() - minTTCost) / (maxTTCost - minTTCost);
+                candidatePathHolder.setTTCost(normalizedValue);
             }
-        } else {
-            for (Double d : srtTTCostlist) {
-                double normalizedValue = (d - min) / (max - min);
-                normalizedList.add(normalizedValue);
+
+            if(minLength == maxLength){
+                candidatePathHolder.setLength(1.0);
+            }else {
+                double normalizedValue = (candidatePathHolder.getLength() - minLength) / (maxLength - minLength);
+                candidatePathHolder.setLength(normalizedValue);
             }
+
         }
-
-        return normalizedList;
     }
 
     public static List<Unicast> srtTTLength(Bag bag, List<UnicastCandidate> srtUnicastCandidateList, List<Unicast> unicastList, BufferedWriter costsWriter) throws IOException {
@@ -110,60 +145,12 @@ public class WSMMethods {
     public static List<Unicast> getSRTTTLengthCostList(Bag bag, List<UnicastCandidate> sortedSRTUnicastCandidateList, List<Unicast> solution, Map<GCLEdge, Double> edgeDurationMap, BufferedWriter costsWriter) throws IOException {
 
         for (UnicastCandidate unicastCandidate : sortedSRTUnicastCandidateList) {
-            List<Double> srtCostList = new ArrayList<>();
-            List<Double> ttCostList = new ArrayList<>();
-            List<Double> lengthList = new ArrayList<>();
+            List<CandidatePathHolder> candidatePathHolderList = createSRTTTLengthCandidatePathHolder(unicastCandidate, solution, edgeDurationMap);
 
-            for (GraphPath<Node, GCLEdge> graphPath : unicastCandidate.getCandidatePathList()) {
-                double srtCost = 0;
-
-                for (Unicast unicast : solution) {
-                    if (unicast.getApplication() instanceof SRTApplication) {
-                        int sameEdgeNumber = getSameEdgeList(graphPath.getEdgeList(), unicast.getPath().getEdgeList()).size();
-                        double sSSf = (unicastCandidate.getApplication().getFrameSizeByte() * unicastCandidate.getApplication().getNumber0fFrames()) * (unicast.getApplication().getFrameSizeByte() * unicast.getApplication().getNumber0fFrames());
-                        double tSTf = unicastCandidate.getApplication().getCMI() * unicast.getApplication().getCMI();
-                        double dSDf = (double) 1 / (unicastCandidate.getApplication().getDeadline() * unicast.getApplication().getDeadline());
-                        srtCost += sameEdgeNumber * (sSSf / tSTf) * dSDf;
-                    }
-                }
-
-                srtCostList.add(srtCost);
-
-                double ttCost = 0;
-                for (Unicast unicast : solution) {
-                    if (unicast.getApplication() instanceof TTApplication) {
-                        List<GCLEdge> sameElements = getSameEdgeList(graphPath.getEdgeList(), unicast.getPath().getEdgeList());
-                        for (GCLEdge edge : sameElements) {
-                            ttCost += edgeDurationMap.get(edge);
-                        }
-                    }
-                }
-
-                ttCostList.add(ttCost);
-                lengthList.add((double) graphPath.getEdgeList().size());
-            }
-
-            List<Double> normalizedSRTCostList = null;
-            List<Double> normalizedTTCostList = null;
-            List<Double> normalizedLengthList = null;
             switch (bag.getWSMNormalization()) {
-                case MCDMConstants.MIN_MAX -> {
-                    normalizedSRTCostList = normalizeSRTTTLengthCostListMinMax(srtCostList);
-                    normalizedTTCostList = normalizeSRTTTLengthCostListMinMax(ttCostList);
-                    normalizedLengthList = normalizeSRTTTLengthCostListMinMax(lengthList);
-                }
-                case MCDMConstants.VECTOR -> {
-                    normalizedSRTCostList = normalizeSRTTTLengthCostListVector(srtCostList);
-                    normalizedTTCostList = normalizeSRTTTLengthCostListVector(ttCostList);
-                    normalizedLengthList = normalizeSRTTTLengthCostListVector(lengthList);
-                }
-                case MCDMConstants.MAX -> {
-                    {
-                        normalizedSRTCostList = normalizeSRTTTLengthCostListMax(srtCostList);
-                        normalizedTTCostList = normalizeSRTTTLengthCostListMax(ttCostList);
-                        normalizedLengthList = normalizeSRTTTLengthCostListMax(lengthList);
-                    }
-                }
+                case MCDMConstants.MIN_MAX -> normalizeCandidatePathHolderCostListMinMax(candidatePathHolderList);
+                case MCDMConstants.VECTOR -> normalizeCandidatePathHolderCostListVector(candidatePathHolderList);
+                case MCDMConstants.MAX -> normalizeCandidatePathHolderCostListMax(candidatePathHolderList);
             }
 
             double maxCost = Double.MAX_VALUE;
@@ -183,16 +170,15 @@ public class WSMMethods {
             if(logger.isDebugEnabled()){
                 resultList = new ArrayList<>();
             }
-            for (int i = 0; i < unicastCandidate.getCandidatePathList().size(); i++) {
-                assert normalizedSRTCostList != null;
-                double cost = wSRT * normalizedSRTCostList.get(i) + wTT * normalizedTTCostList.get(i) + wLength * normalizedLengthList.get(i);
+            for (CandidatePathHolder candidatePathHolder : candidatePathHolderList) {
+                double cost = wSRT * candidatePathHolder.getSRTCost() + wTT * candidatePathHolder.getTTCost() + wLength * candidatePathHolder.getLength();
                 if(logger.isDebugEnabled()){
                     assert resultList != null;
                     resultList.add(cost);
                 }
                 if (cost < maxCost) {
                     maxCost = cost;
-                    selectedGraphPath = unicastCandidate.getCandidatePathList().get(i);
+                    selectedGraphPath = candidatePathHolder.getCandidatePath();
                     if (maxCost == 0) {
                         break;
                     }
@@ -200,6 +186,18 @@ public class WSMMethods {
             }
 
             if(logger.isDebugEnabled()){
+                List<Double> normalizedSRTCostList  = candidatePathHolderList.stream()
+                        .map(CandidatePathHolder::getSRTCost)
+                        .toList();
+
+                List<Double> normalizedTTCostList  = candidatePathHolderList.stream()
+                        .map(CandidatePathHolder::getTTCost)
+                        .toList();
+
+                List<Double> normalizedLengthList  = candidatePathHolderList.stream()
+                        .map(CandidatePathHolder::getLength)
+                        .toList();
+
                 costsWriter.write(unicastCandidate.getApplication().getName() + "\n");
                 costsWriter.write(normalizedSRTCostList + "\n");
                 costsWriter.write(normalizedTTCostList + "\n");

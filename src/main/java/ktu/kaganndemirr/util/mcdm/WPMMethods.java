@@ -47,39 +47,7 @@ public class WPMMethods {
 
         for (UnicastCandidate unicastCandidate : sortedSRTUnicastCandidateList) {
 
-            List<CandidatePathHolder> candidatePathHolderList = new ArrayList<>();
-            for (GraphPath<Node, GCLEdge> candidatePath : unicastCandidate.getCandidatePathList()) {
-                CandidatePathHolder candidatePathHolder = new CandidatePathHolder();
-                candidatePathHolder.setCandidatePath(candidatePath);
-                double srtCost = 0;
-
-                for (Unicast unicast : solution) {
-                    if (unicast.getApplication() instanceof SRTApplication) {
-                        int sameEdgeNumber = getSameEdgeList(candidatePath.getEdgeList(), unicast.getPath().getEdgeList()).size();
-                        double sSSf = (unicastCandidate.getApplication().getFrameSizeByte() * unicastCandidate.getApplication().getNumber0fFrames()) * (unicast.getApplication().getFrameSizeByte() * unicast.getApplication().getNumber0fFrames());
-                        double tSTf = unicastCandidate.getApplication().getCMI() * unicast.getApplication().getCMI();
-                        double dSDf = (double) 1 / (unicastCandidate.getApplication().getDeadline() * unicast.getApplication().getDeadline());
-                        srtCost += sameEdgeNumber * (sSSf / tSTf) * dSDf;
-                    }
-                }
-
-                candidatePathHolder.setSRTCost(srtCost);
-
-                double ttCost = 0;
-                for (Unicast unicast : solution) {
-                    if (unicast.getApplication() instanceof TTApplication) {
-                        List<GCLEdge> sameElements = getSameEdgeList(candidatePath.getEdgeList(), unicast.getPath().getEdgeList());
-                        for (GCLEdge edge : sameElements) {
-                            ttCost += edgeDurationMap.get(edge);
-                        }
-                    }
-                }
-
-                candidatePathHolder.setTTCost(ttCost);
-                candidatePathHolder.setLength((double) candidatePath.getEdgeList().size());
-
-                candidatePathHolderList.add(candidatePathHolder);
-            }
+            List<CandidatePathHolder> candidatePathHolderList = createSRTTTLengthCandidatePathHolder(unicastCandidate, solution, edgeDurationMap);
 
             double maxCost = Double.MAX_VALUE;
             GraphPath<Node, GCLEdge> selectedGraphPath = null;
@@ -149,12 +117,8 @@ public class WPMMethods {
                 Map<CandidatePathHolder, Integer> candidatePathScoreMap = new HashMap<>();
 
                 for(CandidatePathHolder candidatePathHolder: candidatePathHolderList){
-                    candidatePathScoreMap.put(candidatePathHolder, 0);
-                }
-
-                for(CandidatePathHolder candidatePathHolder: candidatePathHolderList){
                     int winnerNumber = getSRTTTLengthWPMV2Cost(bag, candidatePathHolder, candidatePathHolderList);
-                    candidatePathScoreMap.put(candidatePathHolder, candidatePathScoreMap.get(candidatePathHolder) + winnerNumber);
+                    candidatePathScoreMap.put(candidatePathHolder, winnerNumber);
                 }
 
                 if(logger.isDebugEnabled()){
@@ -181,7 +145,7 @@ public class WPMMethods {
                         .collect(Collectors.toMap(
                                 Map.Entry::getKey,
                                 Map.Entry::getValue,
-                                (e1, e2) -> e1,
+                                (i1, i2) -> i1,
                                 LinkedHashMap::new
                         ));
 

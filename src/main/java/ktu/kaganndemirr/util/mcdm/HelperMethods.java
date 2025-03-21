@@ -8,18 +8,14 @@ import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
-import ktu.kaganndemirr.routing.phy.yen.metaheuristic.WSMLWR;
-import ktu.kaganndemirr.util.Bag;
-import ktu.kaganndemirr.util.RandomNumberGenerator;
 import org.jgrapht.GraphPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.*;
-
-import static ktu.kaganndemirr.util.mcdm.WSMMethods.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class HelperMethods {
     private static final Logger logger = LoggerFactory.getLogger(HelperMethods.class.getSimpleName());
@@ -65,45 +61,41 @@ public class HelperMethods {
         return sameEdgeList;
     }
 
-    public static List<List<Double>> getSRTTTLengthCostListForCandidatePathComputation(List<GraphPath<Node, GCLEdge>> kShortestPathsGraphPathList, List<Unicast> solution, Application application, Map<GCLEdge, Double> edgeDurationMap){
-        List<List<Double>> srtTTLengthCostList = new ArrayList<>();
-
-        List<Double> srtCostList = new ArrayList<>();
-        List<Double> ttCostList = new ArrayList<>();
-        List<Double> lengthList = new ArrayList<>();
-
-        for (GraphPath<Node, GCLEdge> graphPath : kShortestPathsGraphPathList) {
+    public static List<CandidatePathHolder> createSRTTTLengthCandidatePathHolder(UnicastCandidate unicastCandidate, List<Unicast> solution, Map<GCLEdge, Double> edgeDurationMap){
+        List<CandidatePathHolder> candidatePathHolderList = new ArrayList<>();
+        for (GraphPath<Node, GCLEdge> candidatePath : unicastCandidate.getCandidatePathList()) {
+            CandidatePathHolder candidatePathHolder = new CandidatePathHolder();
+            candidatePathHolder.setCandidatePath(candidatePath);
             double srtCost = 0;
 
             for (Unicast unicast : solution) {
                 if (unicast.getApplication() instanceof SRTApplication) {
-                    int sameEdgeNumber = getSameEdgeList(graphPath.getEdgeList(), unicast.getPath().getEdgeList()).size();
-                    double sSSf = (application.getFrameSizeByte() * application.getNumber0fFrames()) * (unicast.getApplication().getFrameSizeByte() * unicast.getApplication().getNumber0fFrames());
-                    double tSTf = application.getCMI() * unicast.getApplication().getCMI();
-                    srtCost += sameEdgeNumber * tSTf * sSSf;
+                    int sameEdgeNumber = getSameEdgeList(candidatePath.getEdgeList(), unicast.getPath().getEdgeList()).size();
+                    double sSSf = (unicastCandidate.getApplication().getFrameSizeByte() * unicastCandidate.getApplication().getNumber0fFrames()) * (unicast.getApplication().getFrameSizeByte() * unicast.getApplication().getNumber0fFrames());
+                    double tSTf = unicastCandidate.getApplication().getCMI() * unicast.getApplication().getCMI();
+                    double dSDf = (double) 1 / (unicastCandidate.getApplication().getDeadline() * unicast.getApplication().getDeadline());
+                    srtCost += sameEdgeNumber * (sSSf / tSTf) * dSDf;
                 }
             }
 
-            srtCostList.add(srtCost);
+            candidatePathHolder.setSRTCost(srtCost);
 
             double ttCost = 0;
             for (Unicast unicast : solution) {
                 if (unicast.getApplication() instanceof TTApplication) {
-                    List<GCLEdge> sameElements = getSameEdgeList(graphPath.getEdgeList(), unicast.getPath().getEdgeList());
+                    List<GCLEdge> sameElements = getSameEdgeList(candidatePath.getEdgeList(), unicast.getPath().getEdgeList());
                     for (GCLEdge edge : sameElements) {
                         ttCost += edgeDurationMap.get(edge);
                     }
                 }
             }
 
-            ttCostList.add(ttCost);
-            lengthList.add((double) graphPath.getEdgeList().size());
+            candidatePathHolder.setTTCost(ttCost);
+            candidatePathHolder.setLength((double) candidatePath.getEdgeList().size());
+
+            candidatePathHolderList.add(candidatePathHolder);
         }
 
-        srtTTLengthCostList.add(srtCostList);
-        srtTTLengthCostList.add(ttCostList);
-        srtTTLengthCostList.add(lengthList);
-
-        return srtTTLengthCostList;
+        return candidatePathHolderList;
     }
 }

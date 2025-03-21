@@ -9,10 +9,9 @@ import java.util.List;
 import java.util.Map;
 
 public class Constants {
-    public static final String TSNCF = "TSNCF";
-    public static final String TSNCF_V2 = "TSNCFV2";
-    public static final String TSN_TSNSCHED = "TSNTSNSCHED";
-    public static final String TSN_NC = "TSNNC";
+    public static final String TSNCF = "tsncf";
+    public static final String TSNCF_V2 = "tsncfV2";
+    public static final String TSN_TSNSCHED = "tsnsched";
 
     public static final String AVB_LATENCY_MATH_TSNCF = "avbLatencyMathTSNCF";
     public static final String AVB_LATENCY_MATH_TSNCF_V2 = "avbLatencyMathTSNCFV2";

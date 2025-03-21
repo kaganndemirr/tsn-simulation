@@ -23,11 +23,7 @@ public class Application {
     protected List<EndSystem> targetList;
     protected List<GraphPath<Node, GCLEdge>> explicitPathList;
 
-    //For GCLSynthesis and NetworkCalculus
-    protected String vlanId;
-    protected double offset;
-
-    protected Application(String name, int pcp, String applicationType, int frameSizeByte, int number0fFrames, int messageSizeByte, double messageSizeMbps, double cmi, int deadline, EndSystem source, List<EndSystem> targetList, List<GraphPath<Node, GCLEdge>> explicitPathList, String vlanId, double offset) {
+    protected Application(String name, int pcp, String applicationType, int frameSizeByte, int number0fFrames, int messageSizeByte, double messageSizeMbps, double cmi, int deadline, EndSystem source, List<EndSystem> targetList, List<GraphPath<Node, GCLEdge>> explicitPathList) {
         this.name = name;
         this.pcp = pcp;
         this.applicationType = applicationType;
@@ -40,8 +36,6 @@ public class Application {
         this.source = source;
         this.targetList = targetList;
         this.explicitPathList = explicitPathList;
-        this.vlanId = vlanId;
-        this.offset = offset;
     }
 
     public String getName() {
@@ -90,14 +84,6 @@ public class Application {
 
     public List<GraphPath<Node, GCLEdge>> getExplicitPathList() {
         return explicitPathList;
-    }
-
-    public String getVlanId(){
-        return vlanId;
-    }
-
-    public double getOffset(){
-        return offset;
     }
 
     public String toString() {

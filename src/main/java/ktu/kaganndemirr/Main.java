@@ -81,7 +81,7 @@ public class Main {
         //Default value of K
         int k = 0;
         //Default thread number
-        int threadNumber = Runtime.getRuntime().availableProcessors();
+        int threadNumber = 0;
         //Metaheuristic Algorithm Timeout
         int timeout = 0;
 
@@ -350,6 +350,7 @@ public class Main {
                     bag.setTopologyName(topologyName);
                     bag.setApplicationName(applicationName);
                     bag.setRouting(routing);
+                    bag.setMTRName(mtrName);
                     bag.setPathFindingMethod(pathFindingMethod);
                     bag.setAlgorithm(algorithm);
                     bag.setK(k);
@@ -440,6 +441,8 @@ public class Main {
                     bag.setCWR(cwrName);
                     bag.setK(k);
                     bag.setMCDMName(mcdmName);
+                    bag.setWPMVersion(wpmVersion);
+                    bag.setWPMValueType(wpmValueType);
                     bag.setMCDMObjective(mcdmObjective);
                     bag.setWSMNormalization(wsmNormalization);
                     bag.setWSRT(wSRT);
