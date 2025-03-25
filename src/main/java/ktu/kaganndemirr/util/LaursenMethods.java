@@ -7,7 +7,6 @@ import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.UnicastCandidate;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 

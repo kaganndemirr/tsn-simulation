@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.*;
 
-import static ktu.kaganndemirr.util.Constants.*;
+import static ktu.kaganndemirr.util.Constants.SHORTEST_PATH;
 import static ktu.kaganndemirr.util.HelperMethods.*;
 
 public class OutputMethods {
@@ -57,7 +57,7 @@ public class OutputMethods {
         writeLinkUtilizationsToFile();
         writeDurationMap();
 
-        if (bag.getLWR() == null){
+        if (bag.getLWR() == null && !Objects.equals(bag.getPathFindingMethod(), SHORTEST_PATH)){
             writeSRTCandidateRoutesToFile();
         }
 

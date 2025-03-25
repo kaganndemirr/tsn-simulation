@@ -5,7 +5,6 @@ import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.architecture.Node;
 import org.jgrapht.GraphPath;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 

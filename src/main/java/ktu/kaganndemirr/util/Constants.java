@@ -1,20 +1,13 @@
 package ktu.kaganndemirr.util;
 
-import ktu.kaganndemirr.application.SRTApplication;
-import ktu.kaganndemirr.architecture.GCLEdge;
-import ktu.kaganndemirr.message.Unicast;
-
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class Constants {
     public static final String TSNCF = "tsncf";
-    public static final String TSNCF_V2 = "tsncfV2";
     public static final String TSN_TSNSCHED = "tsnsched";
 
-    public static final String AVB_LATENCY_MATH_TSNCF = "avbLatencyMathTSNCF";
-    public static final String AVB_LATENCY_MATH_TSNCF_V2 = "avbLatencyMathTSNCFV2";
+    public static final String AVB_LATENCY_MATH_V1= "avbLatencyMathV1";
+    public static final String AVB_LATENCY_MATH_V2 = "avbLatencyMathV2";
 
     public static HashMap<Integer, String> applicationTypeMap;
 
@@ -35,6 +28,15 @@ public class Constants {
     public static final String PATH_PENALIZATION = "pathPenalization";
     public static final String WSM = "wsm";
     public static final String WPM = "wpm";
+    public static final String MTR_V1 = "v1";
+    public static final String MTR_AVERAGE = "average";
+    public static final String MTR_HIERARCHICAL = "hierarchical";
+    public static final String MTR_KMEANS= "kmeans";
+    public static final String SHORTEST_PATH = "shortestPath";
+    public static final String DIJKSTRA = "dijkstra";
+
+    public static final int MTR_V1_VT_NUMBER = 1;
+    public static final int MTR_AVERAGE_VT_NUMBER = 2;
 
     public static final int CLASS_A_PCP = 6;
     public static final int TT_PCP = 7;
@@ -43,7 +45,7 @@ public class Constants {
 
 
 
-    public static final int TSN_CONFIGURATION_FRAMEWORK_CMI = 500;
+    public static final int TSNCF_TT_CMI = 500;
 
     public static final int ONE_SECOND = 1_000_000;
 
@@ -71,8 +73,7 @@ public class Constants {
     public static final String ALO = "ALO";
     public static final String CONSTRUCT_INITIAL_SOLUTION = "constructInitialSolution";
 
-    public static final String MTR_V1 = "v1";
-    public static final String MTR_AVERAGE = "average";
+
 
 
 

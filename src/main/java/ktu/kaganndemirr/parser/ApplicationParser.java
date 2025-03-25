@@ -32,7 +32,7 @@ public class ApplicationParser {
 
         List<Application> applications = new ArrayList<>();
 
-        if(Objects.equals(TSNSimulationVersion, Constants.TSNCF) || Objects.equals(TSNSimulationVersion, Constants.TSNCF_V2) || Objects.equals(TSNSimulationVersion, Constants.TSN_TSNSCHED)){
+        if(Objects.equals(TSNSimulationVersion, Constants.TSNCF) || Objects.equals(TSNSimulationVersion, Constants.TSN_TSNSCHED)){
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             Document dom;
 
@@ -102,7 +102,7 @@ public class ApplicationParser {
         String applicationType = Constants.applicationTypeMap.get(pcp);
         int frameSizeByte = 0;
         int messageSizeByte = 0;
-        double cmi = Constants.TSN_CONFIGURATION_FRAMEWORK_CMI;
+        double cmi = Constants.TSNCF_TT_CMI;
         int deadline = 0;
         EndSystem source = parseSource(ttAppEle);
         List<EndSystem> targetList = parseTargetList(ttAppEle);
@@ -115,7 +115,7 @@ public class ApplicationParser {
 
         int numberOfFrames = gcl.getFrequency();
 
-        double messageSizeMbps = getTTMessageSizeMbps(gcl.getDuration(), numberOfFrames, Constants.TSN_CONFIGURATION_FRAMEWORK_CMI, rate);
+        double messageSizeMbps = getTTMessageSizeMbps(gcl.getDuration(), numberOfFrames, Constants.TSNCF_TT_CMI, rate);
 
         return new TTApplication(name, pcp, applicationType, frameSizeByte, numberOfFrames, messageSizeByte, messageSizeMbps, cmi, deadline, source, targetList, graphPathList);
     }

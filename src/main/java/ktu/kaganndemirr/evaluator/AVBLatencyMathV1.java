@@ -4,20 +4,22 @@ import ktu.kaganndemirr.application.Application;
 import ktu.kaganndemirr.application.SRTApplication;
 import ktu.kaganndemirr.application.TTApplication;
 import ktu.kaganndemirr.architecture.GCLEdge;
-import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.message.Multicast;
+import ktu.kaganndemirr.message.Unicast;
 import ktu.kaganndemirr.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 import static ktu.kaganndemirr.util.Constants.MAX_BE_FRAME_BYTES;
 
-public class AVBLatencyMathTSNCF implements Evaluator {
+public class AVBLatencyMathV1 implements Evaluator {
 
-    private static final Logger logger = LoggerFactory.getLogger(AVBLatencyMathTSNCF.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(AVBLatencyMathV1.class.getSimpleName());
 
     @Override
     public Cost evaluate(List<Unicast> unicastList) {

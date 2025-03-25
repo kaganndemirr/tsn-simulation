@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static ktu.kaganndemirr.util.HelperMethods.createResultOutputPath;
-import static ktu.kaganndemirr.util.HelperMethods.createScenarioOutputPath;
 
 public class AVBLatencyMathCost implements Cost, Comparator<AVBLatencyMathCost> {
 

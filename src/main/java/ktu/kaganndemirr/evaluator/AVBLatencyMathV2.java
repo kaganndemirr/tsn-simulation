@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class AVBLatencyMathTSNCFV2 implements Evaluator{
-    private static final Logger logger = LoggerFactory.getLogger(AVBLatencyMathTSNCFV2.class.getSimpleName());
+public class AVBLatencyMathV2 implements Evaluator{
+    private static final Logger logger = LoggerFactory.getLogger(AVBLatencyMathV2.class.getSimpleName());
 
     @Override
     public Cost evaluate(List<Unicast> unicastList) {

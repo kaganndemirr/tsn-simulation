@@ -1,6 +1,5 @@
 package ktu.kaganndemirr.util;
 
-import ktu.kaganndemirr.application.Application;
 import ktu.kaganndemirr.application.SRTApplication;
 import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.architecture.Node;
@@ -13,7 +12,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -95,72 +93,71 @@ public class HelperMethods {
 
     public static String createScenarioOutputPath(Bag bag){
         List<String> resultList = new ArrayList<>();
+
         resultList.add("outputs");
-
-        resultList.add(bag.getRouting());
-
+        resultList.add("TSN Simulation Version=" + bag.getTSNSimulationVersion());
+        resultList.add("Routing=" + bag.getRouting());
         if (bag.getMTRName() != null){
-            resultList.add(bag.getMTRName());
+            resultList.add("MTR Name=" + bag.getMTRName());
         }
-
-        resultList.add(bag.getPathFindingMethod());
-
-        resultList.add(bag.getAlgorithm());
-
-        if (bag.getMCDMObjective() != null){
-            resultList.add(bag.getMCDMObjective());
+        if(bag.getVTNumber() != 0){
+            resultList.add("VT Number=" + bag.getVTNumber());
         }
-
-        if (bag.getUnicastCandidateSortingMethod() != null){
-            resultList.add(bag.getUnicastCandidateSortingMethod());
-        }
-
-        if (bag.getWSRT() != 0){
-            resultList.add(String.valueOf(bag.getWSRT()));
-        }
-        if (bag.getWTT() != 0){
-            resultList.add(String.valueOf(bag.getWTT()));
-        }
-        if (bag.getWLength() != 0){
-            resultList.add(String.valueOf(bag.getWLength()));
-        }
-        if (bag.getWUtil() != 0){
-            resultList.add(String.valueOf(bag.getWUtil()));
-        }
-
-        if(bag.getMCDMName() != null){
-            resultList.add(bag.getMCDMName());
-        }
-
-        if (bag.getWSMNormalization() != null){
-            resultList.add(bag.getWSMNormalization());
-        }
-
-        if(bag.getWPMVersion() != null){
-            resultList.add(bag.getWPMVersion());
-        }
-
-        if(bag.getWPMValueType() != null)
-        {
-            resultList.add(bag.getWPMValueType());
-        }
-
+        resultList.add("Path Finding Method=" + bag.getPathFindingMethod());
         if (bag.getLWR() != null){
-            resultList.add(bag.getLWR());
+            if(bag.getCWR() != null){
+                resultList.add("Algorithm=LWRCWR");
+            }
         }
-
-        if (bag.getCWR() != null){
-            resultList.add(bag.getCWR());
-        }
-
+        resultList.add("Algorithm=" + bag.getAlgorithm());
         if (bag.getK() != 0){
-            resultList.add(String.valueOf(bag.getK()));
+            resultList.add("K=" + bag.getK());
         }
         if (bag.getMetaheuristicName() != null){
-            resultList.add(bag.getMetaheuristicName());
+            resultList.add("Metaheuristic Name=" + bag.getMetaheuristicName());
         }
-        if (bag.getEvaluatorName() != null){
-            resultList.add(bag.getEvaluatorName());
+        resultList.add("Evaluator Name=" + bag.getEvaluatorName());
+        if(bag.getMCDMName() != null){
+            resultList.add("MCDM Name=" + bag.getMCDMName());
+        }
+        if (bag.getWSMNormalization() != null){
+            resultList.add("WSM Normalization=" + bag.getWSMNormalization());
+        }
+        if(bag.getWPMVersion() != null){
+            resultList.add("WPM Version=" + bag.getWPMVersion());
+        }
+        if(bag.getWPMValueType() != null)
+        {
+            resultList.add("WPM Value Type=" + bag.getWPMValueType());
+        }
+        if (bag.getMCDMObjective() != null){
+            resultList.add("MCDM Objective=" + bag.getMCDMObjective());
+        }
+        if (bag.getUnicastCandidateSortingMethod() != null){
+            resultList.add("SRT Sorted by=" + bag.getUnicastCandidateSortingMethod());
+        }
+        if (bag.getLWR() != null){
+            if(bag.getCWR() != null){
+                resultList.add("LWR=" + bag.getLWR() + ",CWR=" + bag.getCWR());
+            }
+            else{
+                resultList.add("LWR=" + bag.getLWR());
+            }
+        }
+        if (bag.getCWR() != null){
+            resultList.add("CWR=" + bag.getCWR());
+        }
+        if (bag.getWSRT() != 0){
+            resultList.add("wSRT=" + bag.getWSRT());
+        }
+        if (bag.getWTT() != 0){
+            resultList.add("wTT=" + bag.getWTT());
+        }
+        if (bag.getWLength() != 0){
+            resultList.add("wLength=" + bag.getWLength());
+        }
+        if (bag.getWUtil() != 0){
+            resultList.add("wUtil=" + bag.getWUtil());
         }
 
         resultList.add(bag.getTopologyName() + "_" + bag.getApplicationName());
@@ -170,72 +167,71 @@ public class HelperMethods {
 
     public static String createResultOutputPath(Bag bag){
         List<String> resultList = new ArrayList<>();
+
         resultList.add("outputs");
-
-        resultList.add(bag.getRouting());
-
+        resultList.add("TSN Simulation Version=" + bag.getTSNSimulationVersion());
+        resultList.add("Routing=" + bag.getRouting());
         if (bag.getMTRName() != null){
-            resultList.add(bag.getMTRName());
+            resultList.add("MTR Name=" + bag.getMTRName());
         }
-
-        resultList.add(bag.getPathFindingMethod());
-
-        resultList.add(bag.getAlgorithm());
-
-        if (bag.getMCDMObjective() != null){
-            resultList.add(bag.getMCDMObjective());
+        if(bag.getVTNumber() != 0){
+            resultList.add("VT Number=" + bag.getVTNumber());
         }
-
-        if (bag.getUnicastCandidateSortingMethod() != null){
-            resultList.add(bag.getUnicastCandidateSortingMethod());
-        }
-
-        if (bag.getWSRT() != 0){
-            resultList.add(String.valueOf(bag.getWSRT()));
-        }
-        if (bag.getWTT() != 0){
-            resultList.add(String.valueOf(bag.getWTT()));
-        }
-        if (bag.getWLength() != 0){
-            resultList.add(String.valueOf(bag.getWLength()));
-        }
-        if (bag.getWUtil() != 0){
-            resultList.add(String.valueOf(bag.getWUtil()));
-        }
-
-        if(bag.getMCDMName() != null){
-            resultList.add(bag.getMCDMName());
-        }
-
-        if (bag.getWSMNormalization() != null){
-            resultList.add(bag.getWSMNormalization());
-        }
-
-        if(bag.getWPMVersion() != null){
-            resultList.add(bag.getWPMVersion());
-        }
-
-        if(bag.getWPMValueType() != null)
-        {
-            resultList.add(bag.getWPMValueType());
-        }
-
+        resultList.add("Path Finding Method=" + bag.getPathFindingMethod());
         if (bag.getLWR() != null){
-            resultList.add(bag.getLWR());
+            if(bag.getCWR() != null){
+                resultList.add("Algorithm=LWRCWR");
+            }
         }
-
-        if (bag.getCWR() != null){
-            resultList.add(bag.getCWR());
-        }
-
+        resultList.add("Algorithm=" + bag.getAlgorithm());
         if (bag.getK() != 0){
-            resultList.add(String.valueOf(bag.getK()));
+            resultList.add("K=" + bag.getK());
         }
         if (bag.getMetaheuristicName() != null){
-            resultList.add(bag.getMetaheuristicName());
+            resultList.add("Metaheuristic Name=" + bag.getMetaheuristicName());
         }
-        if (bag.getEvaluatorName() != null){
-            resultList.add(bag.getEvaluatorName());
+        resultList.add("Evaluator Name=" + bag.getEvaluatorName());
+        if(bag.getMCDMName() != null){
+            resultList.add("MCDM Name=" + bag.getMCDMName());
+        }
+        if (bag.getWSMNormalization() != null){
+            resultList.add("WSM Normalization=" + bag.getWSMNormalization());
+        }
+        if(bag.getWPMVersion() != null){
+            resultList.add("WPM Version=" + bag.getWPMVersion());
+        }
+        if(bag.getWPMValueType() != null)
+        {
+            resultList.add("WPM Value Type=" + bag.getWPMValueType());
+        }
+        if (bag.getMCDMObjective() != null){
+            resultList.add("MCDM Objective=" + bag.getMCDMObjective());
+        }
+        if (bag.getUnicastCandidateSortingMethod() != null){
+            resultList.add("SRT Sorted by=" + bag.getUnicastCandidateSortingMethod());
+        }
+        if (bag.getLWR() != null){
+            if(bag.getCWR() != null){
+                resultList.add("LWR=" + bag.getLWR() + ",CWR=" + bag.getCWR());
+            }
+            else{
+                resultList.add("LWR=" + bag.getLWR());
+            }
+        }
+        if (bag.getCWR() != null){
+            resultList.add("CWR=" + bag.getCWR());
+        }
+        if (bag.getWSRT() != 0){
+            resultList.add("wSRT=" + bag.getWSRT());
+        }
+        if (bag.getWTT() != 0){
+            resultList.add("wTT=" + bag.getWTT());
+        }
+        if (bag.getWLength() != 0){
+            resultList.add("wLength=" + bag.getWLength());
+        }
+        if (bag.getWUtil() != 0){
+            resultList.add("wUtil=" + bag.getWUtil());
         }
 
         return buildPath(resultList);
@@ -285,63 +281,78 @@ public class HelperMethods {
     }
 
     public static String createInfo(Bag bag){
-        String result = "Routing: " + bag.getRouting();
+        String result = "TSN Simulation Version=" + bag.getTSNSimulationVersion();
+        result += ", Routing=" + bag.getRouting();
         if (bag.getMTRName() != null){
-            result += ", MTR Name: " + bag.getMTRName();
+            if (bag.getVTNumber() != 0){
+                result += ", MTR Name=" + bag.getMTRName() + ", VT Number=" + bag.getVTNumber();
+            }
+            else{
+                result += ", MTR Name=" + bag.getMTRName() + ", VT Number=Algorithm Will Decide";
+            }
         }
-        result += ", PathFindingMethod: " + bag.getPathFindingMethod();
-        result += ", Algorithm: " + bag.getAlgorithm();
-        if (bag.getUnicastCandidateSortingMethod() != null){
-            result += ", Unicast Candidate Sorting Method: " + bag.getUnicastCandidateSortingMethod();
-        }
+        result += ", PathFindingMethod=" + bag.getPathFindingMethod();
         if (bag.getLWR() != null){
-            result += ", LWR: " + bag.getLWR();
+            if(bag.getCWR() != null){
+                result += ", Algorithm=LWRCWR";
+            }
         }
+        result += ", Algorithm=" + bag.getAlgorithm();
         if (bag.getK() != 0){
-            result += ", K: " + bag.getK();
-        }
-        if (bag.getMCDMName() != null){
-            result += ", MCDM Name: " + bag.getMCDMName();
-        }
-        if (bag.getWPMVersion() != null){
-            result += ", WPM Version: " + bag.getWPMVersion();
-        }
-        if (bag.getWPMValueType() != null){
-            result += ", WPM Value Type: " + bag.getWPMValueType();
-        }
-        if (bag.getMCDMObjective() != null){
-            result += ", MCDM Objective: " + bag.getMCDMObjective();
-        }
-        if (bag.getWSMNormalization() != null){
-            result += ", WSM Normalization: " + bag.getWSMNormalization();
-        }
-        if (bag.getCWR() != null){
-            result += ", CWR: " + bag.getCWR();
-        }
-        if (bag.getWSRT() != 0){
-            result += ", wSRT: " + bag.getWSRT();
-        }
-        if (bag.getWTT() != 0){
-            result += ", wTT: " + bag.getWTT();
-        }
-        if (bag.getWLength() != 0){
-            result += ", wLength: " + bag.getWLength();
-        }
-        if (bag.getWUtil() != 0){
-            result += ", wUtil: " + bag.getWUtil();
-        }
-        if (bag.getThreadNumber() != 0){
-            result += ", ThreadNumber: " + bag.getThreadNumber();
-        }
-        if (bag.getTimeout() != 0){
-            result += ", Timeout: " + bag.getTimeout() + "(sec)";
+            result += ", K=" + bag.getK();
         }
         if (bag.getMetaheuristicName() != null){
-            result += ", Metaheuristic Name: " + bag.getMetaheuristicName();
+            result += ", Metaheuristic Name=" + bag.getMetaheuristicName();
+        }
+        if (bag.getThreadNumber() != 0){
+            result += ", ThreadNumber=" + bag.getThreadNumber();
+        }
+        if (bag.getTimeout() != 0){
+            result += ", Timeout=" + bag.getTimeout() + "(sec)";
+        }
+        result += ", Evaluator Name=" + bag.getEvaluatorName();
+        if (bag.getMCDMName() != null){
+            result += ", MCDM Name=" + bag.getMCDMName();
+        }
+        if (bag.getWSMNormalization() != null){
+            result += ", WSM Normalization=" + bag.getWSMNormalization();
+        }
+        if (bag.getWPMVersion() != null){
+            result += ", WPM Version=" + bag.getWPMVersion();
+        }
+        if (bag.getWPMValueType() != null){
+            result += ", WPM Value Type=" + bag.getWPMValueType();
+        }
+        if (bag.getMCDMObjective() != null){
+            result += ", MCDM Objective=" + bag.getMCDMObjective();
+        }
+        if (bag.getUnicastCandidateSortingMethod() != null){
+            result += ", SRT Sorted by=" + bag.getUnicastCandidateSortingMethod();
+        }
+        if (bag.getLWR() != null){
+            if(bag.getCWR() != null){
+                result += ", LWR=" + bag.getLWR() + ", CWR=" + bag.getCWR();
+            }
+            else{
+                result += ", LWR=" + bag.getLWR();
+            }
         }
 
-        result += ", Evaluator Name: " + bag.getEvaluatorName();
-
+        if (bag.getCWR() != null){
+            result += ", CWR=" + bag.getCWR();
+        }
+        if (bag.getWSRT() != 0){
+            result += ", wSRT=" + bag.getWSRT();
+        }
+        if (bag.getWTT() != 0){
+            result += ", wTT=" + bag.getWTT();
+        }
+        if (bag.getWLength() != 0){
+            result += ", wLength=" + bag.getWLength();
+        }
+        if (bag.getWUtil() != 0){
+            result += ", wUtil=" + bag.getWUtil();
+        }
         return result;
     }
 
@@ -353,24 +364,5 @@ public class HelperMethods {
             }
         }
         return kShortestPathList;
-    }
-
-    public static List<Integer> findKForTopologies(int k, int virtualTopologyListSize) {
-        List<Integer> kList = new ArrayList<>();
-        if (k % virtualTopologyListSize == 0) {
-            for (int j = 0; j < virtualTopologyListSize; j++) {
-                kList.add(k / virtualTopologyListSize);
-            }
-        } else {
-            for (int j = 0; j < virtualTopologyListSize; j++) {
-                kList.add(k / virtualTopologyListSize);
-            }
-            int z = 0;
-            while (z < k % virtualTopologyListSize) {
-                kList.set(z, kList.get(z) + 1);
-                z++;
-            }
-        }
-        return kList;
     }
 }

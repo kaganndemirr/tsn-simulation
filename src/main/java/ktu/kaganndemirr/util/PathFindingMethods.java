@@ -1,7 +1,6 @@
 package ktu.kaganndemirr.util;
 
 import ktu.kaganndemirr.application.Application;
-import ktu.kaganndemirr.application.TTApplication;
 import ktu.kaganndemirr.architecture.EndSystem;
 import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.architecture.Node;
@@ -11,10 +10,7 @@ import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.alg.shortestpath.YenKShortestPath;
 
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static ktu.kaganndemirr.util.GraphMethods.copyGraph;
 import static ktu.kaganndemirr.util.GraphMethods.discardUnnecessaryEndSystems;
@@ -117,13 +113,16 @@ public class PathFindingMethods {
 
         List<Graph<Node, GCLEdge>> virtualTopologyList = null;
         if (Objects.equals(bag.getMTRName(), Constants.MTR_V1)){
-            virtualTopologyList = MTRMethods.createVirtualTopologyListForV1(bag.getGraph(), ttUnicastList);
+            virtualTopologyList = MTRMethods.createVirtualTopologyListForV1(bag, ttUnicastList);
         } else if (Objects.equals(bag.getMTRName(), Constants.MTR_AVERAGE)) {
-            virtualTopologyList = MTRMethods.createVirtualTopologyListForAverage(bag.getGraph(), ttUnicastList);
+            virtualTopologyList = MTRMethods.createVirtualTopologyListForAverage(bag, ttUnicastList);
+        } else if (!Objects.equals(bag.getMTRName(), Constants.MTR_V1) && bag.getMTRName() != null) {
+            Map<Integer, List<Double>> clusterAndDurationListMap = MTRMethods.runClusterAlgorithm(bag, ttUnicastList);
+            virtualTopologyList = MTRMethods.createVirtualTopologyListForHierarchical(bag, clusterAndDurationListMap, ttUnicastList);
         }
 
         assert virtualTopologyList != null;
-        List<Integer> kValues = HelperMethods.findKForTopologies(bag.getK(), virtualTopologyList.size());
+        List<Integer> kValues = MTRMethods.findKForTopologies(bag.getK(), virtualTopologyList.size());
 
         List<GraphPath<Node, GCLEdge>> yenKShortestPathGraphPathList = new ArrayList<>(bag.getK());
 
@@ -143,5 +142,20 @@ public class PathFindingMethods {
         }
 
         return yenKShortestPathGraphPathList;
+    }
+
+    public static GraphPath<Node, GCLEdge> dijkstraShortestPath(Bag bag, Application application, EndSystem target){
+        Graph<Node, GCLEdge> newGraph = copyGraph(bag.getGraph());
+        Graph<Node, GCLEdge> graphWithoutUnnecessaryEndSystems = discardUnnecessaryEndSystems(newGraph, application.getSource(), target);
+
+        DijkstraShortestPath<Node, GCLEdge> dijkstraShortestPaths = new DijkstraShortestPath<>(graphWithoutUnnecessaryEndSystems);
+
+        GraphPath<Node, GCLEdge> dijkstraShortestPath = dijkstraShortestPaths.getPath(application.getSource(), target);
+
+        if (dijkstraShortestPath == null) {
+            throw new InputMismatchException("Aborting, could not find a path from " + application.getSource() + " to " + target);
+        } else {
+            return dijkstraShortestPath;
+        }
     }
 }

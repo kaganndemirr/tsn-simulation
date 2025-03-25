@@ -1,9 +1,5 @@
 package ktu.kaganndemirr.util.mcdm;
 
-import ktu.kaganndemirr.application.Application;
-import ktu.kaganndemirr.application.SRTApplication;
-import ktu.kaganndemirr.application.TTApplication;
-import ktu.kaganndemirr.architecture.EndSystem;
 import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.message.Unicast;
@@ -20,7 +16,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static ktu.kaganndemirr.util.mcdm.HelperMethods.*;
+import static ktu.kaganndemirr.util.mcdm.HelperMethods.createSRTTTLengthCandidatePathHolder;
+import static ktu.kaganndemirr.util.mcdm.HelperMethods.getEdgeTTDurationMap;
 
 public class WPMMethods {
     private static final Logger logger = LoggerFactory.getLogger(WPMMethods.class.getSimpleName());

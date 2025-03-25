@@ -28,8 +28,8 @@ import java.util.concurrent.TimeUnit;
 import static ktu.kaganndemirr.util.HelperMethods.createScenarioOutputPath;
 import static ktu.kaganndemirr.util.HelperMethods.writeSolutionsToFile;
 
-public class LaursenRO {
-    private static final Logger logger = LoggerFactory.getLogger(LaursenRO.class.getSimpleName());
+public class RO {
+    private static final Logger logger = LoggerFactory.getLogger(RO.class.getSimpleName());
 
     private final int k;
 
@@ -57,7 +57,7 @@ public class LaursenRO {
 
     private final Map<Double, Double> durationMap;
 
-    public LaursenRO(int k){
+    public RO(int k){
         this.k = k;
         kShortestPathsDuration = 0;
         unicastList = new ArrayList<>();

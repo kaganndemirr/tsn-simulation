@@ -5,17 +5,18 @@ import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.evaluator.Evaluator;
 import org.jgrapht.Graph;
-import org.jgrapht.GraphPath;
 
 import java.util.List;
 
 public class Bag {
+    private String tsnSimulationVersion;
     private Graph<Node, GCLEdge> graph;
     private List<Application> applicationList;
     private String topologyName;
     private String applicationName;
     private String routing;
     private String mtrName;
+    private int vtNumber;
     private String pathFindingMethod;
     private String algorithm;
     private String unicastCandidateSortingMethod;
@@ -36,6 +37,15 @@ public class Bag {
     private String metaheuristicName;
     private Evaluator evaluator;
     private String evaluatorName;
+    private int rate;
+
+    public String getTSNSimulationVersion() {
+        return tsnSimulationVersion;
+    }
+
+    public void setTSNSimulationVersion(String tsnSimulationVersion) {
+        this.tsnSimulationVersion = tsnSimulationVersion;
+    }
 
     public Graph<Node, GCLEdge> getGraph() {
         return graph;
@@ -83,6 +93,14 @@ public class Bag {
 
     public void setMTRName(String mtrName) {
         this.mtrName = mtrName;
+    }
+
+    public int getVTNumber() {
+        return vtNumber;
+    }
+
+    public void setVTNumber(int vtNumber) {
+        this.vtNumber = vtNumber;
     }
 
     public String getPathFindingMethod() {
@@ -243,6 +261,14 @@ public class Bag {
 
     public void setEvaluatorName(String evaluatorName) {
         this.evaluatorName = evaluatorName;
+    }
+
+    public int getRate() {
+        return rate;
+    }
+
+    public void setRate(int rate) {
+        this.rate = rate;
     }
 
 }

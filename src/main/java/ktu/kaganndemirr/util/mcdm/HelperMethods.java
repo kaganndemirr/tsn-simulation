@@ -1,6 +1,5 @@
 package ktu.kaganndemirr.util.mcdm;
 
-import ktu.kaganndemirr.application.Application;
 import ktu.kaganndemirr.application.SRTApplication;
 import ktu.kaganndemirr.application.TTApplication;
 import ktu.kaganndemirr.architecture.GCL;
