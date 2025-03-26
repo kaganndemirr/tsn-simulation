@@ -1,6 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
 <Applications>
     <AVBApplication name="AVB_1">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_FRONT_CAM" />
@@ -8,9 +8,8 @@
             <Dest name="ES_CTRL3" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_2">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_FRONT_CAM" />
@@ -18,9 +17,8 @@
             <Dest name="ES_CTRL3" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_3">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_FRONT_CAM" />
@@ -28,9 +26,8 @@
             <Dest name="ES_CTRL3" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_4">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_FRONT_CAM" />
@@ -38,9 +35,8 @@
             <Dest name="ES_CTRL3" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_5">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_REAR_CAM" />
@@ -48,9 +44,8 @@
             <Dest name="ES_CTRL3" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_6">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_REAR_CAM" />
@@ -58,9 +53,8 @@
             <Dest name="ES_CTRL3" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_7">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_REAR_CAM" />
@@ -68,9 +62,8 @@
             <Dest name="ES_CTRL3" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_8">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_REAR_CAM" />
@@ -78,9 +71,8 @@
             <Dest name="ES_CTRL3" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_9">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_FRONT_SVCAM" />
@@ -88,9 +80,8 @@
             <Dest name="ES_CTRL3" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_10">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_FRONT_SVCAM" />
@@ -98,9 +89,8 @@
             <Dest name="ES_CTRL3" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_11">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_LEFT_SVCAM" />
@@ -108,9 +98,8 @@
             <Dest name="ES_CTRL3" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_12">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_LEFT_SVCAM" />
@@ -118,9 +107,8 @@
             <Dest name="ES_CTRL3" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_13">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_RIGHT_SVCAM" />
@@ -128,9 +116,8 @@
             <Dest name="ES_CTRL4" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_14">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_RIGHT_SVCAM" />
@@ -138,9 +125,8 @@
             <Dest name="ES_CTRL4" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_15">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_REAR_SVCAM" />
@@ -148,9 +134,8 @@
             <Dest name="ES_CTRL4" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_16">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_REAR_SVCAM" />
@@ -158,9 +143,8 @@
             <Dest name="ES_CTRL4" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_17">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_FRONT_RAD" />
@@ -168,9 +152,8 @@
             <Dest name="ES_CTRL4" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_18">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_FRONT_RAD" />
@@ -178,9 +161,8 @@
             <Dest name="ES_CTRL4" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_19">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_FRONT_RAD" />
@@ -188,9 +170,8 @@
             <Dest name="ES_CTRL4" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_20">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_FRONT_RAD" />
@@ -198,9 +179,8 @@
             <Dest name="ES_CTRL4" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_21">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_LEFT_FRONT_RAD" />
@@ -208,9 +188,8 @@
             <Dest name="ES_CTRL4" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_22">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_LEFT_FRONT_RAD" />
@@ -218,9 +197,8 @@
             <Dest name="ES_CTRL4" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_23">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_LEFT_FRONT_RAD" />
@@ -228,9 +206,8 @@
             <Dest name="ES_CTRL4" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_24">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_LEFT_FRONT_RAD" />
@@ -238,9 +215,8 @@
             <Dest name="ES_CTRL4" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_25">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_RIGHT_FRONT_RAD" />
@@ -248,9 +224,8 @@
             <Dest name="ES_CTRL4" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_26">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_RIGHT_FRONT_RAD" />
@@ -258,9 +233,8 @@
             <Dest name="ES_CTRL4" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_27">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_RIGHT_FRONT_RAD" />
@@ -268,9 +242,8 @@
             <Dest name="ES_CTRL5" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_28">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_RIGHT_FRONT_RAD" />
@@ -278,9 +251,8 @@
             <Dest name="ES_CTRL5" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_29">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_LEFT_REAR_RAD" />
@@ -288,9 +260,8 @@
             <Dest name="ES_CTRL5" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_30">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_LEFT_REAR_RAD" />
@@ -298,9 +269,8 @@
             <Dest name="ES_CTRL5" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_31">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_LEFT_REAR_RAD" />
@@ -308,9 +278,8 @@
             <Dest name="ES_CTRL5" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_32">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_LEFT_REAR_RAD" />
@@ -318,9 +287,8 @@
             <Dest name="ES_CTRL5" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_33">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_RIGHT_REAR_RAD" />
@@ -328,9 +296,8 @@
             <Dest name="ES_CTRL5" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_34">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_RIGHT_REAR_RAD" />
@@ -338,9 +305,8 @@
             <Dest name="ES_CTRL5" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_35">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_RIGHT_REAR_RAD" />
@@ -348,9 +314,8 @@
             <Dest name="ES_CTRL5" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_36">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_RIGHT_REAR_RAD" />
@@ -358,9 +323,8 @@
             <Dest name="ES_CTRL5" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_37">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_REAR_RAD" />
@@ -368,9 +332,8 @@
             <Dest name="ES_CTRL5" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_38">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_REAR_RAD" />
@@ -378,9 +341,8 @@
             <Dest name="ES_CTRL5" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_39">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_REAR_RAD" />
@@ -388,9 +350,8 @@
             <Dest name="ES_CTRL5" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_40">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_REAR_RAD" />
@@ -398,9 +359,8 @@
             <Dest name="ES_CTRL5" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_41">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_CTRL5" />
@@ -408,9 +368,8 @@
             <Dest name="ES_REAR_RAD" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_42">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_CTRL5" />
@@ -418,9 +377,8 @@
             <Dest name="ES_REAR_RAD" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_43">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_CTRL4" />
@@ -428,9 +386,8 @@
             <Dest name="ES_FRONT_RAD" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_44">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_CTRL4" />
@@ -438,9 +395,8 @@
             <Dest name="ES_FRONT_RAD" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_45">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_CTRL3" />
@@ -448,9 +404,8 @@
             <Dest name="ES_FRONT_CAM" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_46">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_CTRL3" />
@@ -458,9 +413,8 @@
             <Dest name="ES_FRONT_CAM" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_47">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_CTRL3" />
@@ -468,9 +422,8 @@
             <Dest name="ES_REAR_CAM" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_48">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_CTRL3" />
@@ -478,9 +431,8 @@
             <Dest name="ES_REAR_CAM" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_49">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_CTRL3" />
@@ -488,9 +440,8 @@
             <Dest name="ES_FRONT_CAM" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_50">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_CTRL3" />
@@ -498,9 +449,8 @@
             <Dest name="ES_FRONT_CAM" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_51">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_CTRL4" />
@@ -508,9 +458,8 @@
             <Dest name="ES_FRONT_RAD" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_52">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_CTRL4" />
@@ -518,9 +467,8 @@
             <Dest name="ES_FRONT_RAD" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_53">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_CTRL5" />
@@ -528,9 +476,8 @@
             <Dest name="ES_ECM" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_54">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_CTRL5" />
@@ -538,9 +485,8 @@
             <Dest name="ES_ECM" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_55">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_CTRL1" />
@@ -548,9 +494,8 @@
             <Dest name="ES_EBCM" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_56">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_CTRL1" />
@@ -558,9 +503,8 @@
             <Dest name="ES_EBCM" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_57">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_CTRL2" />
@@ -568,9 +512,8 @@
             <Dest name="ES_ECM" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_58">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_CTRL2" />
@@ -578,9 +521,8 @@
             <Dest name="ES_ECM" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_59">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_CTRL2" />
@@ -588,9 +530,8 @@
             <Dest name="ES_EBCM" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_60">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_CTRL2" />
@@ -598,9 +539,8 @@
             <Dest name="ES_EBCM" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_61">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_ECM" />
@@ -608,9 +548,8 @@
             <Dest name="ES_CTRL5" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_62">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_ECM" />
@@ -618,9 +557,8 @@
             <Dest name="ES_CTRL5" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_63">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_ECM" />
@@ -628,9 +566,8 @@
             <Dest name="ES_CTRL1" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_64">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_ECM" />
@@ -638,9 +575,8 @@
             <Dest name="ES_CTRL1" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_65">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_EBCM" />
@@ -648,9 +584,8 @@
             <Dest name="ES_CTRL2" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_66">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_EBCM" />
@@ -658,9 +593,8 @@
             <Dest name="ES_CTRL2" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_67">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_EBCM" />
@@ -668,9 +602,8 @@
             <Dest name="ES_CTRL1" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_68">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_EBCM" />
@@ -678,9 +611,8 @@
             <Dest name="ES_CTRL1" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_69">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_CTRL1" />
@@ -688,9 +620,8 @@
             <Dest name="ES_EPS" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_70">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_CTRL1" />
@@ -698,9 +629,8 @@
             <Dest name="ES_EPS" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_71">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_CTRL2" />
@@ -708,9 +638,8 @@
             <Dest name="ES_EPS" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_72">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_CTRL2" />
@@ -718,9 +647,8 @@
             <Dest name="ES_EPS" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_73">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_EPS" />
@@ -728,9 +656,8 @@
             <Dest name="ES_CTRL1" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_74">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_EPS" />
@@ -738,9 +665,8 @@
             <Dest name="ES_CTRL1" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_75">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_EPS" />
@@ -748,9 +674,8 @@
             <Dest name="ES_CTRL2" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_76">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_EPS" />
@@ -758,9 +683,8 @@
             <Dest name="ES_CTRL2" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_77">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_IMU1" />
@@ -768,9 +692,8 @@
             <Dest name="ES_CTRL2" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_78">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_IMU1" />
@@ -778,9 +701,8 @@
             <Dest name="ES_CTRL2" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_79">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_IMU1" />
@@ -788,9 +710,8 @@
             <Dest name="ES_MAPLOC" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_80">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_IMU1" />
@@ -798,9 +719,8 @@
             <Dest name="ES_MAPLOC" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_81">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_IMU1" />
@@ -808,9 +728,8 @@
             <Dest name="ES_CTRL1" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_82">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_IMU1" />
@@ -818,9 +737,8 @@
             <Dest name="ES_CTRL1" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_83">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_IMU2" />
@@ -828,9 +746,8 @@
             <Dest name="ES_CTRL2" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_84">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_IMU2" />
@@ -838,9 +755,8 @@
             <Dest name="ES_CTRL2" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_85">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_IMU2" />
@@ -848,9 +764,8 @@
             <Dest name="ES_MAPLOC" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_86">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_IMU2" />
@@ -858,9 +773,8 @@
             <Dest name="ES_MAPLOC" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_87">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_IMU2" />
@@ -868,9 +782,8 @@
             <Dest name="ES_CTRL1" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_88">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_IMU2" />
@@ -878,9 +791,8 @@
             <Dest name="ES_CTRL1" />
         </Destinations>
         <Deadline>8000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_89">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_MAPLOC" />
@@ -888,9 +800,8 @@
             <Dest name="ES_CTRL2" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_90">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_MAPLOC" />
@@ -898,9 +809,8 @@
             <Dest name="ES_CTRL2" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_91">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_MAPLOC" />
@@ -908,9 +818,8 @@
             <Dest name="ES_CTRL1" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_92">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_MAPLOC" />
@@ -918,9 +827,8 @@
             <Dest name="ES_CTRL1" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_93">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>46</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_MAPLOC" />
@@ -928,9 +836,8 @@
             <Dest name="ES_FRONT_CAM" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_94">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_MAPLOC" />
@@ -938,9 +845,8 @@
             <Dest name="ES_FRONT_CAM" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_95">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_FRONT_CAM" />
@@ -948,9 +854,8 @@
             <Dest name="ES_MAPLOC" />
         </Destinations>
         <Deadline>2000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <AVBApplication name="AVB_96">
-        <AVBClass>CLASS_A</AVBClass>
         <PayloadSize>1500</PayloadSize>
         <NoOfFrames>1</NoOfFrames>
         <Source name="ES_FRONT_CAM" />
@@ -958,7 +863,7 @@
             <Dest name="ES_MAPLOC" />
         </Destinations>
         <Deadline>4000</Deadline>
-    </AVBApplication>
+    <Interval>125</Interval></AVBApplication>
     <TTApplication name="TT1">
         <Source name="ES_CTRL1">
             <Destinations>
