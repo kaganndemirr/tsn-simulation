@@ -4,6 +4,7 @@ import ktu.kaganndemirr.architecture.EndSystem;
 import ktu.kaganndemirr.architecture.GCLEdge;
 import ktu.kaganndemirr.architecture.Node;
 import ktu.kaganndemirr.architecture.Switch;
+import ktu.kaganndemirr.util.mcdm.MCDMConstants;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.graph.SimpleDirectedWeightedGraph;
@@ -58,7 +59,7 @@ public class GraphMethods {
     }
 
     public static void randomizeGraph(Graph<Node, GCLEdge> graph, String lwr) {
-        if (Objects.equals(lwr, Constants.RANDOMIZE_WITH_HEADS_OR_TAILS_USING_THREAD_LOCAL_RANDOM)) {
+        if (Objects.equals(lwr, MCDMConstants.RANDOMIZE_WITH_HEADS_OR_TAILS_USING_THREAD_LOCAL_RANDOM)) {
             for (GCLEdge edge : graph.edgeSet()) {
                 graph.setEdgeWeight(graph.getEdgeSource(edge), graph.getEdgeTarget(edge), RandomNumberGenerator.randomizeWithHeadsOrTailsUsingThreadLocalRandom((int) Constants.UNIT_WEIGHT, graph.edgeSet().size()));
             }

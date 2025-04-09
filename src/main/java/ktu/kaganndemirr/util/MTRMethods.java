@@ -77,7 +77,7 @@ public class MTRMethods {
         return virtualTopologyList;
     }
 
-    public static List<Graph<Node, GCLEdge>> createVirtualTopologyListForHierarchical(Bag bag, Map<Integer, List<Double>> clusterAndDurationListMap, List<Unicast> ttUnicastList) {
+    public static List<Graph<Node, GCLEdge>> createVirtualTopologyList(Bag bag, Map<Integer, List<Double>> clusterAndDurationListMap, List<Unicast> ttUnicastList) {
         List<Graph<Node, GCLEdge>> topologyList = new ArrayList<>();
         for (int i = 0; i < clusterAndDurationListMap.size(); i++) {
             topologyList.add(copyGraph(bag.getGraph()));

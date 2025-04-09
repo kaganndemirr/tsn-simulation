@@ -63,9 +63,7 @@ public class Constants {
 
     public static final int MAX_BE_FRAME_BYTES = 1522;
 
-    public static final String RANDOMIZE_WITH_HEADS_OR_TAILS_USING_SECURE_RANDOM = "headsOrTailsSecureRandom";
 
-    public static final String RANDOMIZE_WITH_HEADS_OR_TAILS_USING_THREAD_LOCAL_RANDOM = "headsOrTailsThreadLocalRandom";
 
     public static final int PROGRESS_PERIOD_SECOND = 10_000;
 

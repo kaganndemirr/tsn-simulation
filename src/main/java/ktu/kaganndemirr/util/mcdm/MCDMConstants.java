@@ -12,14 +12,14 @@ public class MCDMConstants {
     public static final String RELATIVE = "relative";
 
     public static final double LOST_COST = 2;
-    public static final double WIN_COST = 0;
 
     public static final int WPM_THRESHOLD = 1;
 
-    public static final String WSM = "wsm";
-    public static final String WPM = "wpm";
-
     public static final String DEADLINE = "deadline";
+
+    public static final String RANDOMIZE_WITH_HEADS_OR_TAILS_USING_SECURE_RANDOM = "headsOrTailsSecureRandom";
+
+    public static final String RANDOMIZE_WITH_HEADS_OR_TAILS_USING_THREAD_LOCAL_RANDOM = "headsOrTailsThreadLocalRandom";
 
     public static final String THREAD_LOCAL_RANDOM = "threadLocalRandom";
 }

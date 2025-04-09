@@ -1,0 +1,346 @@
+//Bütün Deneyler için Ortak
+-net
+-app
+-rate
+-routing
+-pathFindingMethod
+-algorithm
+-idleSlope
+-tsnSimulationVersion tsncf
+-evaluatorName avbLatencyMathV1
+
+//Shortest Path
+-net
+-app
+-rate
+-routing phy
+-pathFindingMethod shortestPath
+-algorithm dijkstra
+-idleSlope
+-tsnSimulationVersion tsncf
+-evaluatorName avbLatencyMathV1
+
+//U
+-net
+-app
+-rate
+-routing phy
+-pathFindingMethod yen
+-algorithm U
+-idleSlope
+-tsnSimulationVersion tsncf
+-evaluatorName avbLatencyMathV1
+-k 
+
+//RO
+-net
+-app
+-rate
+-routing phy
+-pathFindingMethod
+-algorithm RO
+-idleSlope
+-tsnSimulationVersion tsncf
+-evaluatorName avbLatencyMathV1
+-k
+-threadNumber
+-timeout
+-metaheuristicName
+
+//MCDM WSM
+-net
+-app
+-rate
+-routing phy
+-pathFindingMethod
+-algorithm MCDM
+-idleSlope
+-tsnSimulationVersion tsncf
+-evaluatorName avbLatencyMathV1
+-k
+-unicastCandidateSortingMethod deadline 
+-mcdmObjective srtTTLength 
+-mcdmName wsm 
+-wsmNormalization max 
+-wSRT 
+-wTT
+-wLength
+
+//MCDM WPM v1
+-net
+-app
+-rate
+-routing phy
+-pathFindingMethod
+-algorithm MCDM
+-idleSlope
+-tsnSimulationVersion tsncf
+-evaluatorName avbLatencyMathV1
+-k
+-unicastCandidateSortingMethod deadline 
+-mcdmObjective srtTTLength 
+-mcdmName wpm 
+-wpmVersion v1
+-wSRT 
+-wTT
+-wLength
+
+//MCDM WPM v2
+-net
+-app
+-rate
+-routing phy
+-pathFindingMethod
+-algorithm MCDM
+-idleSlope
+-tsnSimulationVersion tsncf
+-evaluatorName avbLatencyMathV1
+-k
+-unicastCandidateSortingMethod deadline 
+-mcdmObjective srtTTLength 
+-mcdmName wpm 
+-wpmVersion v2
+-wpmValueType 
+-wSRT 
+-wTT
+-wLength
+
+//LWR WSM
+-net
+-app
+-rate
+-routing phy
+-pathFindingMethod
+-algorithm LWR
+-idleSlope
+-tsnSimulationVersion tsncf
+-evaluatorName avbLatencyMathV1
+-k
+-unicastCandidateSortingMethod deadline 
+-mcdmObjective srtTTLength 
+-mcdmName wsm 
+-wsmNormalization max 
+-wSRT 
+-wTT
+-wLength
+-threadNumber
+-timeout
+-metaheuristicName
+-lwr
+
+//LWR WPM v1
+-net
+-app
+-rate
+-routing phy
+-pathFindingMethod
+-algorithm LWR
+-idleSlope
+-tsnSimulationVersion tsncf
+-evaluatorName avbLatencyMathV1
+-k
+-unicastCandidateSortingMethod deadline 
+-mcdmObjective srtTTLength 
+-mcdmName wpm 
+-wpmVersion v1
+-wSRT 
+-wTT
+-wLength
+-threadNumber
+-timeout
+-metaheuristicName
+-lwr
+
+//LWR WPM v2
+-net
+-app
+-rate
+-routing phy
+-pathFindingMethod
+-algorithm LWR
+-idleSlope
+-tsnSimulationVersion tsncf
+-evaluatorName avbLatencyMathV1
+-k
+-unicastCandidateSortingMethod deadline 
+-mcdmObjective srtTTLength 
+-mcdmName wpm 
+-wpmVersion v2
+-wpmValueType
+-wSRT 
+-wTT
+-wLength
+-threadNumber
+-timeout
+-metaheuristicName
+-lwr
+
+//CWR WSM
+-net
+-app
+-rate
+-routing phy
+-pathFindingMethod
+-algorithm CWR
+-idleSlope
+-tsnSimulationVersion tsncf
+-evaluatorName avbLatencyMathV1
+-k
+-unicastCandidateSortingMethod deadline 
+-mcdmObjective srtTTLength 
+-mcdmName wsm 
+-wsmNormalization max 
+-threadNumber
+-timeout
+-metaheuristicName
+-cwr
+
+//CWR WPM v1
+-net
+-app
+-rate
+-routing phy
+-pathFindingMethod
+-algorithm CWR
+-idleSlope
+-tsnSimulationVersion tsncf
+-evaluatorName avbLatencyMathV1
+-k
+-unicastCandidateSortingMethod deadline 
+-mcdmObjective srtTTLength 
+-mcdmName wpm 
+-wpmVersion v1 
+-threadNumber
+-timeout
+-metaheuristicName
+-cwr
+
+//CWR WPM v2
+-net
+-app
+-rate
+-routing phy
+-pathFindingMethod
+-algorithm CWR
+-idleSlope
+-tsnSimulationVersion tsncf
+-evaluatorName avbLatencyMathV1
+-k
+-unicastCandidateSortingMethod deadline 
+-mcdmObjective srtTTLength 
+-mcdmName wpm 
+-wpmVersion v2
+-wpmValueType
+-threadNumber
+-timeout
+-metaheuristicName
+-cwr
+
+//LWRCWR WSM
+-net
+-app
+-rate
+-routing phy
+-pathFindingMethod
+-algorithm LWR
+-idleSlope
+-tsnSimulationVersion tsncf
+-evaluatorName avbLatencyMathV1
+-k
+-unicastCandidateSortingMethod deadline 
+-mcdmObjective srtTTLength 
+-mcdmName wsm 
+-wsmNormalization max 
+-wSRT 
+-wTT
+-wLength
+-threadNumber
+-timeout
+-metaheuristicName
+-lwr
+-cwr
+
+//LWRCWR WPM v1
+-net
+-app
+-rate
+-routing phy
+-pathFindingMethod
+-algorithm LWR
+-idleSlope
+-tsnSimulationVersion tsncf
+-evaluatorName avbLatencyMathV1
+-k
+-unicastCandidateSortingMethod deadline 
+-mcdmObjective srtTTLength 
+-mcdmName wpm 
+-wpmVersion v1
+-wSRT 
+-wTT
+-wLength
+-threadNumber
+-timeout
+-metaheuristicName
+-lwr
+-cwr
+
+//LWRCWR WPM v2
+-net
+-app
+-rate
+-routing phy
+-pathFindingMethod
+-algorithm LWR
+-idleSlope
+-tsnSimulationVersion tsncf
+-evaluatorName avbLatencyMathV1
+-k
+-unicastCandidateSortingMethod deadline 
+-mcdmObjective srtTTLength 
+-mcdmName wpm 
+-wpmVersion v2
+-wpmValueType
+-wSRT 
+-wTT
+-wLength
+-threadNumber
+-timeout
+-metaheuristicName
+-lwr
+-cwr
+
+//MTR (v1 and average)
+-net
+-app
+-rate
+-routing mtr
+-mtrName
+-pathFindingMethod
+-algorithm RO
+-idleSlope
+-tsnSimulationVersion tsncf
+-evaluatorName avbLatencyMathV1
+-k
+-threadNumber
+-timeout
+-metaheuristicName
+
+//MTR (hierarchical and kmeans)
+-net
+-app
+-rate
+-routing mtr
+-mtrName
+-vtNumber (optional)
+-pathFindingMethod
+-algorithm RO
+-idleSlope
+-tsnSimulationVersion tsncf
+-evaluatorName avbLatencyMathV1
+-k
+-threadNumber
+-timeout
+-metaheuristicName
+
+//Creating Jar
+clean package

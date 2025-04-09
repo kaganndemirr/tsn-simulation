@@ -118,7 +118,7 @@ public class PathFindingMethods {
             virtualTopologyList = MTRMethods.createVirtualTopologyListForAverage(bag, ttUnicastList);
         } else if (!Objects.equals(bag.getMTRName(), Constants.MTR_V1) && bag.getMTRName() != null) {
             Map<Integer, List<Double>> clusterAndDurationListMap = MTRMethods.runClusterAlgorithm(bag, ttUnicastList);
-            virtualTopologyList = MTRMethods.createVirtualTopologyListForHierarchical(bag, clusterAndDurationListMap, ttUnicastList);
+            virtualTopologyList = MTRMethods.createVirtualTopologyList(bag, clusterAndDurationListMap, ttUnicastList);
         }
 
         assert virtualTopologyList != null;

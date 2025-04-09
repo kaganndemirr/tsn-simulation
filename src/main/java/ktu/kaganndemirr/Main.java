@@ -154,7 +154,7 @@ public class Main {
 
         options.addOption(ROUTING_ARG, true, "Choose routing (Choices: phy, mtr)");
         options.addOption(PATH_FINDING_METHOD_ARG, true, "Choose path finding method (Choices: shortestPath, yen, pathPenalization)");
-        options.addOption(ALGORITHM_ARG, true, "Choose algorithm (Choices: GRASP, ALO)");
+        options.addOption(ALGORITHM_ARG, true, "Choose algorithm (Choices: dijsktra, U, RO, MCDM, LWR, CWR)");
         options.addOption(UNICAST_CANDIDATE_SORTING_METHOD_ARG, true, "Unicast Candidate Sorting Method (Choices: deadline, deadline/size/period)");
 
         options.addOption(WPM_OBJECTIVE_ARG, true, "Weighted Product Model Objective (Choices: srtTT, srtTTLength, srtTTLengthUtil)");
@@ -553,6 +553,8 @@ public class Main {
                             bag.setUnicastCandidateSortingMethod(unicastCandidateSortingMethod);
                             bag.setK(k);
                             bag.setMCDMName(mcdmName);
+                            bag.setWPMVersion(wpmVersion);
+                            bag.setWPMValueType(wpmValueType);
                             bag.setMCDMObjective(mcdmObjective);
                             bag.setWSMNormalization(wsmNormalization);
                             bag.setCWR(cwrName);
